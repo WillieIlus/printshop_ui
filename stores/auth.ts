@@ -93,6 +93,40 @@ export const useAuthStore = defineStore('auth', () => {
     tokens.value = newTokens
   }
 
+  /** Request password reset email (when backend endpoint exists) */
+  async function requestPasswordReset(email: string) {
+    error.value = null
+    try {
+      const { $api } = useNuxtApp()
+      await $api(API.auth.forgotPassword, {
+        method: 'POST',
+        body: { email },
+      })
+      return { success: true }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Request failed'
+      error.value = message
+      return { success: false, error: message }
+    }
+  }
+
+  /** Confirm password reset with token from email (when backend endpoint exists) */
+  async function resetPassword(uid: string, token: string, newPassword: string) {
+    error.value = null
+    try {
+      const { $api } = useNuxtApp()
+      await $api(API.auth.resetConfirm, {
+        method: 'POST',
+        body: { uid, token, new_password: newPassword },
+      })
+      return { success: true }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Reset failed'
+      error.value = message
+      return { success: false, error: message }
+    }
+  }
+
   return {
     tokens,
     user,
@@ -107,6 +141,8 @@ export const useAuthStore = defineStore('auth', () => {
     refreshTokens,
     logout,
     setTokens,
+    requestPasswordReset,
+    resetPassword,
   }
 }, {
   persist: {

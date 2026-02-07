@@ -1,4 +1,6 @@
 import type { SignupCredentials } from '~/shared/types'
+import { useAuthStore } from '~/stores/auth'
+import { useProfileStore } from '~/stores/profile'
 
 export function useAuth() {
   const authStore = useAuthStore()

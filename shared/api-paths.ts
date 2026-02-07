@@ -7,6 +7,8 @@ export const API = {
   auth: {
     login: 'api-auth/login/',
     refresh: 'api-auth/token/refresh/',
+    forgotPassword: 'api-auth/password/reset/',
+    resetConfirm: 'api-auth/password/reset/confirm/',
   },
   // Users
   users: () => 'users/',
@@ -54,4 +56,18 @@ export const API = {
   claimDetail: (pk: number) => `claims/${pk}/`,
   claimVerify: () => 'claims/verify/',
   claimReview: (pk: number) => `claims/${pk}/review/`,
+  
+  // Pricing - Public (no auth required)
+  shopRateCard: (slug: string) => `shops/${slug}/rate-card/`,
+  shopCalculatePrice: (slug: string) => `shops/${slug}/calculate-price/`,
+  
+  // Pricing - Management (shop owner)
+  shopPrintingPrices: (slug: string) => `shops/${slug}/pricing/printing/`,
+  shopPrintingPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/printing/${pk}/`,
+  shopPaperPrices: (slug: string) => `shops/${slug}/pricing/paper/`,
+  shopPaperPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/paper/${pk}/`,
+  shopFinishingServices: (slug: string) => `shops/${slug}/pricing/finishing/`,
+  shopFinishingServiceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/finishing/${pk}/`,
+  shopVolumeDiscounts: (slug: string) => `shops/${slug}/pricing/discounts/`,
+  shopVolumeDiscountDetail: (slug: string, pk: number) => `shops/${slug}/pricing/discounts/${pk}/`,
 } as const

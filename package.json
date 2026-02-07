@@ -26,6 +26,8 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.13.0"
+    "@nuxt/eslint": "^1.13.0",
+    "@types/node": "^25.2.1",
+    "vue-tsc": "^3.2.4"
   }
 }

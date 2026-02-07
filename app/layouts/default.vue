@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <div class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
     <header v-if="$slots.header" class="sticky top-0 z-50 shrink-0">
       <slot name="header" />
     </header>
     <AppHeader v-else />
 
-    <div v-if="$slots.breadcrumb" class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0">
+    <div v-if="$slots.breadcrumb" class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2">
         <slot name="breadcrumb" />
       </div>

@@ -187,11 +187,15 @@ export const useQuoteStore = defineStore('quote', () => {
   }
 
   async function fetchProductTemplates(shopSlug: string) {
+    loading.value = true
+    error.value = null
     try {
       const { $api } = useNuxtApp()
       productTemplates.value = await $api<ProductTemplate[]>(API.productTemplates(shopSlug))
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch product templates'
+    } finally {
+      loading.value = false
     }
   }
 

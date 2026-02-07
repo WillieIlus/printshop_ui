@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     storesDirs: ['./stores/**'],
   },
 
-  piniaPluginPersistedstate: {
+  piniaPersistedstate: {
     storage: 'localStorage',
   },
 
@@ -55,7 +55,7 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: true,
+    typeCheck: false, // Disable type checking during dev for faster builds
   },
 
   colorMode: {

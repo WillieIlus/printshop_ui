@@ -51,7 +51,7 @@
             </NuxtLink>
           </template>
         </nav>
-        <div v-if="$slots.sidebar-footer" class="mt-auto border-t border-gray-200 dark:border-gray-800 p-4">
+        <div v-if="$slots['sidebar-footer']" class="mt-auto border-t border-gray-200 dark:border-gray-800 p-4">
           <slot name="sidebar-footer" />
         </div>
       </aside>
