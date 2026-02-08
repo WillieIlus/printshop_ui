@@ -1,16 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { fileURLToPath } from 'node:url'
-
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
 
   future: {
     compatibilityVersion: 4,
-  },
-
-  alias: {
-    '~/shared': fileURLToPath(new URL('./shared', import.meta.url)),
   },
 
   modules: [
@@ -22,7 +16,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
   ],
 
-  css: ['~/app/assets/css/main.css'],
+  css: ['./app/assets/css/main.css'],
 
   runtimeConfig: {
     public: {
@@ -32,7 +26,7 @@ export default defineNuxtConfig({
   },
 
   pinia: {
-    storesDirs: ['./stores/**'],
+    storesDirs: ['./app/stores/**'],
   },
 
   piniaPersistedstate: {
@@ -55,7 +49,7 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: false, // Disable type checking during dev for faster builds
+    typeCheck: false,
   },
 
   colorMode: {
