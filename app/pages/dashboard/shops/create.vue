@@ -7,7 +7,7 @@
       </div>
       <UButton to="/dashboard/shops" variant="ghost" size="sm">Back</UButton>
     </div>
-    <ShopsShopForm :loading="shopStore.loading" @submit="onSubmit" @cancel="goBack" />
+    <ShopsShopForm :loading="shopStore.loading" :error="shopStore.error" @submit="onSubmit" @cancel="goBack" />
   </div>
 </template>
 

@@ -1,4 +1,4 @@
-import type { Shop, ShopCreateInput, ShopHours, ShopMember, PaginatedResponse } from '~/shared/types'
+import type { Shop, ShopCreateInput, OpeningHours, ShopMember, PaginatedResponse } from '~/shared/types'
 import type { SocialLink } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
@@ -8,7 +8,7 @@ export const useShopStore = defineStore('shop', () => {
   const currentShop = ref<Shop | null>(null)
   const nearbyShops = ref<Shop[]>([])
   const shopMembers = ref<ShopMember[]>([])
-  const shopHours = ref<ShopHours[]>([])
+  const shopHours = ref<OpeningHours[]>([])
   const shopSocialLinks = ref<SocialLink[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -130,8 +130,10 @@ export const useShopStore = defineStore('shop', () => {
         body: data,
       })
       currentShop.value = shop
-      const idx = myShops.value.findIndex((s) => s.slug === slug)
-      if (idx !== -1) myShops.value[idx] = shop
+      if (Array.isArray(myShops.value)) {
+        const idx = myShops.value.findIndex((s) => s.slug === slug)
+        if (idx !== -1) myShops.value[idx] = shop
+      }
       return { success: true, shop }
     } catch (err: unknown) {
       const message = parseDjangoError(err, 'Failed to update shop')
@@ -194,7 +196,7 @@ export const useShopStore = defineStore('shop', () => {
   async function fetchShopHoursList(slug: string) {
     try {
       const { $api } = useNuxtApp()
-      shopHours.value = await $api<ShopHours[]>(API.shopHours(slug))
+      shopHours.value = await $api<OpeningHours[]>(API.shopHours(slug))
     } catch (err: unknown) {
       error.value = parseDjangoError(err, 'Failed to fetch hours')
       console.error('fetchShopHoursList error:', err)
@@ -202,7 +204,7 @@ export const useShopStore = defineStore('shop', () => {
     }
   }
 
-  async function updateShopHoursBulk(slug: string, hours: Partial<ShopHours>[]) {
+  async function updateShopHoursBulk(slug: string, hours: Partial<OpeningHours>[]) {
     try {
       const { $api } = useNuxtApp()
       await $api(API.shopHoursBulk(slug), {

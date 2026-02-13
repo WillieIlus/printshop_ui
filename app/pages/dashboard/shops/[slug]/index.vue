@@ -86,7 +86,7 @@
         </UCard>
         <UCard>
           <div class="text-center">
-            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ shop.members?.length ?? 0 }}</p>
+            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ shop.member_count ?? shop.members?.length ?? 0 }}</p>
             <p class="text-gray-600 dark:text-gray-400">Team Members</p>
           </div>
         </UCard>

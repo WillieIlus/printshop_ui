@@ -12,6 +12,7 @@
       v-else-if="shopStore.currentShop"
       :shop="shopStore.currentShop"
       :loading="shopStore.loading"
+      :error="shopStore.error"
       @submit="onSubmit"
       @cancel="goBack"
     />

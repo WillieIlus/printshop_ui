@@ -1,6 +1,14 @@
 <template>
   <VeeForm v-slot="{ meta }" :validation-schema="shopSchema" :initial-values="initialValues" @submit="onSubmit">
     <div class="space-y-6">
+      <UAlert
+        v-if="error"
+        color="error"
+        variant="soft"
+        :title="error"
+        icon="i-lucide-alert-circle"
+        class="mb-4"
+      />
       <UCard>
         <template #header>
           <h3 class="font-semibold text-gray-900 dark:text-white">Basic Information</h3>
@@ -46,7 +54,7 @@
 import { object, string } from 'yup'
 import type { Shop, ShopCreateInput } from '~/shared/types'
 
-const props = defineProps<{ shop?: Shop; loading?: boolean }>()
+const props = defineProps<{ shop?: Shop; loading?: boolean; error?: string | null }>()
 const emit = defineEmits<{ submit: [data: ShopCreateInput]; cancel: [] }>()
 
 const isEdit = computed(() => !!props.shop)
