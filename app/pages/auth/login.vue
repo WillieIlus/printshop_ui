@@ -3,7 +3,10 @@
     <AuthLoginForm />
     <template #footer>
       <p class="text-sm text-slate-600 dark:text-slate-400">
-        Don't have an account? <NuxtLink to="/auth/signup" class="text-primary-600 hover:underline font-medium dark:text-primary-400">Sign up</NuxtLink>
+        Don't have an account?
+        <NuxtLink to="/auth/signup" class="text-primary-600 hover:underline font-medium dark:text-primary-400">
+          Sign up
+        </NuxtLink>
       </p>
     </template>
   </NuxtLayout>

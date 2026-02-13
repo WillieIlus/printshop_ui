@@ -18,6 +18,35 @@ export const useShopStore = defineStore('shop', () => {
     previous: null as string | null,
   })
 
+  // ---------------------------------------------------------------------------
+  // Helper: parse Django error responses
+  // ---------------------------------------------------------------------------
+  function parseDjangoError(err: unknown, fallback: string): string {
+    if (err && typeof err === 'object' && 'data' in err) {
+      const responseData = (err as { data: unknown }).data
+
+      if (typeof responseData === 'object' && responseData !== null) {
+        const errors = Object.entries(responseData as Record<string, string[]>)
+          .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+          .join('; ')
+        if (errors) return errors
+      }
+
+      if (typeof responseData === 'string') {
+        return responseData
+      }
+    }
+
+    if (err instanceof Error) {
+      return err.message
+    }
+
+    return fallback
+  }
+
+  // ---------------------------------------------------------------------------
+  // Shops – CRUD
+  // ---------------------------------------------------------------------------
   async function fetchShops(params?: Record<string, string | number>) {
     loading.value = true
     error.value = null
@@ -31,7 +60,8 @@ export const useShopStore = defineStore('shop', () => {
         previous: response.previous,
       }
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch shops'
+      error.value = parseDjangoError(err, 'Failed to fetch shops')
+      console.error('fetchShops error:', err)
     } finally {
       loading.value = false
     }
@@ -44,7 +74,8 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       myShops.value = await $api<Shop[]>(API.shopsMyShops())
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch shops'
+      error.value = parseDjangoError(err, 'Failed to fetch my shops')
+      console.error('fetchMyShops error:', err)
     } finally {
       loading.value = false
     }
@@ -57,7 +88,8 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       currentShop.value = await $api<Shop>(API.shopDetail(slug))
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch shop'
+      error.value = parseDjangoError(err, 'Failed to fetch shop')
+      console.error('fetchShopBySlug error:', err)
     } finally {
       loading.value = false
     }
@@ -75,8 +107,9 @@ export const useShopStore = defineStore('shop', () => {
       myShops.value.push(shop)
       return { success: true, shop }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to create shop'
+      const message = parseDjangoError(err, 'Failed to create shop')
       error.value = message
+      console.error('createShop error:', err)
       return { success: false, error: message }
     } finally {
       loading.value = false
@@ -97,14 +130,18 @@ export const useShopStore = defineStore('shop', () => {
       if (idx !== -1) myShops.value[idx] = shop
       return { success: true, shop }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update shop'
+      const message = parseDjangoError(err, 'Failed to update shop')
       error.value = message
+      console.error('updateShop error:', err)
       return { success: false, error: message }
     } finally {
       loading.value = false
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Ownership transfer
+  // ---------------------------------------------------------------------------
   async function transferOwnership(slug: string, newOwnerId: number) {
     try {
       const { $api } = useNuxtApp()
@@ -114,17 +151,22 @@ export const useShopStore = defineStore('shop', () => {
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to transfer ownership'
+      const message = parseDjangoError(err, 'Failed to transfer ownership')
+      console.error('transferOwnership error:', err)
       return { success: false, error: message }
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Members
+  // ---------------------------------------------------------------------------
   async function fetchShopMembers(slug: string) {
     try {
       const { $api } = useNuxtApp()
       shopMembers.value = await $api<ShopMember[]>(API.shopMembers(slug))
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch members'
+      error.value = parseDjangoError(err, 'Failed to fetch members')
+      console.error('fetchShopMembers error:', err)
       throw err
     }
   }
@@ -136,17 +178,22 @@ export const useShopStore = defineStore('shop', () => {
       shopMembers.value = shopMembers.value.filter((m) => m.id !== pk)
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to remove member'
+      const message = parseDjangoError(err, 'Failed to remove member')
+      console.error('removeShopMember error:', err)
       return { success: false, error: message }
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Hours
+  // ---------------------------------------------------------------------------
   async function fetchShopHoursList(slug: string) {
     try {
       const { $api } = useNuxtApp()
       shopHours.value = await $api<ShopHours[]>(API.shopHours(slug))
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch hours'
+      error.value = parseDjangoError(err, 'Failed to fetch hours')
+      console.error('fetchShopHoursList error:', err)
       throw err
     }
   }
@@ -160,17 +207,22 @@ export const useShopStore = defineStore('shop', () => {
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update hours'
+      const message = parseDjangoError(err, 'Failed to update hours')
+      console.error('updateShopHoursBulk error:', err)
       return { success: false, error: message }
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Social links
+  // ---------------------------------------------------------------------------
   async function fetchShopSocialLinksList(slug: string) {
     try {
       const { $api } = useNuxtApp()
       shopSocialLinks.value = await $api<SocialLink[]>(API.shopSocialLinks(slug))
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch social links'
+      error.value = parseDjangoError(err, 'Failed to fetch social links')
+      console.error('fetchShopSocialLinksList error:', err)
       throw err
     }
   }
@@ -185,7 +237,8 @@ export const useShopStore = defineStore('shop', () => {
       shopSocialLinks.value.push(newLink)
       return { success: true, link: newLink }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to add link'
+      const message = parseDjangoError(err, 'Failed to add link')
+      console.error('addShopSocialLink error:', err)
       return { success: false, error: message }
     }
   }
@@ -197,11 +250,15 @@ export const useShopStore = defineStore('shop', () => {
       shopSocialLinks.value = shopSocialLinks.value.filter((l) => l.id !== pk)
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to delete link'
+      const message = parseDjangoError(err, 'Failed to delete link')
+      console.error('deleteShopSocialLink error:', err)
       return { success: false, error: message }
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Nearby
+  // ---------------------------------------------------------------------------
   async function fetchNearbyShops(params: { lat: number; lng: number; radius?: number }) {
     loading.value = true
     error.value = null
@@ -209,13 +266,15 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       nearbyShops.value = await $api<Shop[]>(API.shopsNearby(), { params })
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch nearby shops'
+      error.value = parseDjangoError(err, 'Failed to fetch nearby shops')
+      console.error('fetchNearbyShops error:', err)
     } finally {
       loading.value = false
     }
   }
 
   return {
+    // State
     shops,
     myShops,
     currentShop,
@@ -226,6 +285,8 @@ export const useShopStore = defineStore('shop', () => {
     loading,
     error,
     pagination,
+
+    // Actions
     fetchShops,
     fetchMyShops,
     fetchShopBySlug,

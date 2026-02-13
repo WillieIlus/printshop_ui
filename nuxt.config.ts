@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -16,7 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
   ],
 
-  css: ['./app/assets/css/main.css'],
+  css: ['~/assets/css/main.css'], // Fixed path
 
   runtimeConfig: {
     public: {
@@ -58,7 +57,12 @@ export default defineNuxtConfig({
     classSuffix: '',
   },
 
+  routeRules: {
+    '/auth/**': { ssr: false },
+  },
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
     head: {
       title: 'PrintShop - Pricing Engine & Gallery',
       meta: [

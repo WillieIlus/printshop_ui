@@ -1,11 +1,65 @@
 import type { AuthTokens, AuthUser, LoginCredentials, SignupCredentials } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
+const AUTH_STORAGE_KEY = 'auth'
+
+function extractErrorMessage(err: unknown, rateLimitStatus: number, rateLimitMessage: string): string {
+  if (err && typeof err === 'object') {
+    const e = err as { statusCode?: number; status?: number; data?: { detail?: string }; response?: { _data?: { detail?: string } } }
+    if (e.statusCode === rateLimitStatus || e.status === rateLimitStatus) return rateLimitMessage
+    const data = e.data ?? e.response?._data
+    if (data && typeof data === 'object' && 'detail' in data && typeof (data as { detail: unknown }).detail === 'string') {
+      return (data as { detail: string }).detail
+    }
+  }
+  return err instanceof Error ? err.message : 'Login failed'
+}
+
+function getAuthStorage(rememberMe: boolean): Storage {
+  return rememberMe ? localStorage : sessionStorage
+}
+
+/** Custom storage: uses localStorage when remember_me, else sessionStorage */
+const authStorage = {
+  getItem(key: string) {
+    if (import.meta.server) return null
+    try {
+      const fromLocal = localStorage.getItem(key)
+      if (fromLocal) {
+        const parsed = JSON.parse(fromLocal) as { rememberMe?: boolean }
+        if (parsed.rememberMe) return fromLocal
+      }
+      return sessionStorage.getItem(key)
+    } catch {
+      return null
+    }
+  },
+  setItem(key: string, value: string) {
+    if (import.meta.server) return
+    try {
+      const parsed = JSON.parse(value) as { rememberMe?: boolean }
+      const rememberMe = !!parsed.rememberMe
+      const storage = getAuthStorage(rememberMe)
+      const otherStorage = getAuthStorage(!rememberMe)
+      otherStorage.removeItem(key)
+      storage.setItem(key, value)
+    } catch {
+      localStorage.setItem(key, value)
+    }
+  },
+  removeItem(key: string) {
+    localStorage.removeItem(key)
+    sessionStorage.removeItem(key)
+  },
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const tokens = ref<AuthTokens | null>(null)
   const user = ref<AuthUser | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const rememberMe = ref(true)
+  const rateLimitUntil = ref<number>(0)
 
   const isAuthenticated = computed(() => !!tokens.value?.access)
   const accessToken = computed(() => tokens.value?.access)
@@ -14,17 +68,21 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(credentials: LoginCredentials) {
     loading.value = true
     error.value = null
+    rememberMe.value = !!credentials.remember_me
     try {
       const { $api } = useNuxtApp()
       const response = await $api<AuthTokens>(API.auth.login, {
         method: 'POST',
-        body: credentials,
+        body: { email: credentials.email, password: credentials.password },
       })
       tokens.value = response
       await fetchUser()
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Login failed'
+      const e = err as { statusCode?: number; status?: number }
+      const is429 = e?.statusCode === 429 || e?.status === 429
+      if (is429) rateLimitUntil.value = Date.now() + 60_000
+      const message = extractErrorMessage(err, 429, 'Too many requests. Please wait a minute before trying again.')
       error.value = message
       return { success: false, error: message }
     } finally {
@@ -132,6 +190,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     loading,
     error,
+    rateLimitUntil,
     isAuthenticated,
     accessToken,
     refreshToken,
@@ -146,6 +205,8 @@ export const useAuthStore = defineStore('auth', () => {
   }
 }, {
   persist: {
-    pick: ['tokens'],
+    key: AUTH_STORAGE_KEY,
+    storage: authStorage,
+    pick: ['tokens', 'rememberMe'],
   },
 })

@@ -1,6 +1,15 @@
 <template>
   <VeeForm v-slot="{ meta }" :validation-schema="loginSchema" @submit="onSubmit">
     <div class="space-y-4">
+      <UAlert
+        v-if="authStore.error"
+        color="error"
+        icon="i-lucide-alert-circle"
+        :title="authStore.error"
+        class="rounded-lg"
+        close
+        @update:open="(open) => { if (!open) authStore.error = null }"
+      />
       <FormsFormInput
         name="email"
         label="Email"
@@ -24,8 +33,14 @@
           Forgot password?
         </NuxtLink>
       </div>
-      <UButton type="submit" color="primary" block :loading="loading" :disabled="!meta.valid">
-        Sign In
+      <UButton
+        type="submit"
+        color="primary"
+        block
+        :loading="loading"
+        :disabled="!meta.valid || loading || isRateLimited"
+      >
+        {{ isRateLimited ? `Please wait ${Math.ceil((authStore.rateLimitUntil - now) / 1000)}s...` : 'Sign In' }}
       </UButton>
       <p class="text-center text-sm text-gray-600 dark:text-gray-400">
         Don't have an account?
@@ -37,10 +52,19 @@
 
 <script setup lang="ts">
 import { object, string } from 'yup'
+import { useAuthStore } from '~/stores/auth'
 
+const authStore = useAuthStore()
 const { login, loading } = useAuth()
 const notification = useNotification()
-const rememberMe = ref(false)
+const rememberMe = ref(true)
+const now = ref(Date.now())
+onMounted(() => {
+  rememberMe.value = authStore.rememberMe
+  const tick = setInterval(() => { now.value = Date.now() }, 1000)
+  onUnmounted(() => clearInterval(tick))
+})
+const isRateLimited = computed(() => authStore.rateLimitUntil > now.value)
 
 const loginSchema = object({
   email: string().email('Invalid email').required('Email is required'),
@@ -48,7 +72,7 @@ const loginSchema = object({
 })
 
 async function onSubmit(values: { email: string; password: string }) {
-  const result = await login(values.email, values.password)
+  const result = await login(values.email, values.password, rememberMe.value)
   if (!result.success) {
     notification.error(result.error || 'Login failed')
   }

@@ -1,6 +1,15 @@
 <template>
   <VeeForm v-slot="{ meta }" :validation-schema="signupSchema" @submit="onSubmit">
     <div class="space-y-4">
+      <UAlert
+        v-if="authStore.error"
+        color="error"
+        icon="i-lucide-alert-circle"
+        :title="authStore.error"
+        class="rounded-lg"
+        close
+        @update:open="(open) => { if (!open) authStore.error = null }"
+      />
       <div class="grid grid-cols-2 gap-4">
         <FormsFormInput name="first_name" label="First Name" placeholder="John" icon="i-lucide-user" />
         <FormsFormInput name="last_name" label="Last Name" placeholder="Doe" icon="i-lucide-user" />
@@ -28,7 +37,9 @@
 
 <script setup lang="ts">
 import { object, string, ref as yupRef } from 'yup'
+import { useAuthStore } from '~/stores/auth'
 
+const authStore = useAuthStore()
 const { signup, loading } = useAuth()
 const notification = useNotification()
 const agreeTerms = ref(false)

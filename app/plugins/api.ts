@@ -17,8 +17,10 @@ export default defineNuxtPlugin(() => {
       }
     },
 
-    async onResponseError({ response }) {
+    async onResponseError({ response, request }) {
       if (response?.status === 401) {
+        const url = typeof request === 'string' ? request : (request as Request)?.url ?? ''
+        if (url.includes('api-auth/login') || url.includes('token/refresh')) return
         const authStore = useAuthStore()
         const refreshed = await authStore.refreshTokens()
         if (!refreshed) {

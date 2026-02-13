@@ -12,8 +12,8 @@
             <UBadge v-if="shop.is_verified" color="success" variant="soft" class="mt-2">Verified</UBadge>
             <p v-if="shop.description" class="mt-4 text-gray-600 dark:text-gray-400">{{ shop.description }}</p>
             <div class="mt-4 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
-              <span v-if="shop.phone" class="flex items-center gap-1"><UIcon name="i-lucide-phone" class="w-4 h-4" />{{ shop.phone }}</span>
-              <span v-if="shop.email" class="flex items-center gap-1"><UIcon name="i-lucide-mail" class="w-4 h-4" />{{ shop.email }}</span>
+              <span v-if="shop.phone_number" class="flex items-center gap-1"><UIcon name="i-lucide-phone" class="w-4 h-4" />{{ shop.phone_number }}</span>
+              <span v-if="shop.business_email" class="flex items-center gap-1"><UIcon name="i-lucide-mail" class="w-4 h-4" />{{ shop.business_email }}</span>
             </div>
             <div class="mt-6 flex gap-3">
               <UButton :to="`/shops/${slug}/request-quote`" color="primary">Request a Quote</UButton>

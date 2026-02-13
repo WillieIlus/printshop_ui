@@ -16,7 +16,8 @@ const formatPrice = (price: string) => {
 </script>
 
 <template>
-  <div class="rate-card">
+  <div class="max-w-4xl mx-auto">
+
     <h2 v-if="shopName" class="text-2xl font-bold text-gray-900 mb-6">
       {{ shopName }} Rate Card
     </h2>
@@ -133,8 +134,3 @@ const formatPrice = (price: string) => {
   </div>
 </template>
 
-<style scoped>
-.rate-card {
-  @apply max-w-4xl mx-auto;
-}
-</style>

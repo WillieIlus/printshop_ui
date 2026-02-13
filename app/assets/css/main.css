@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* PrintShop – slate + primary blue theme */
+/* Only custom properties allowed here */
 @theme {
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
@@ -13,7 +13,7 @@
   --color-primary-800: #1e40af;
   --color-primary-900: #1e3a8a;
   --color-primary-950: #172554;
-  
+
   --color-accent-500: #8b5cf6;
 }
 
@@ -24,13 +24,25 @@ html {
 }
 
 body {
-  background-color: var(--color-slate-50);
-  color: var(--color-slate-900);
+  @apply bg-gray-50 text-gray-900;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: var(--color-slate-950);
-    color: var(--color-slate-100);
+    @apply bg-gray-950 text-gray-100;
   }
+}
+
+/* Page & layout transitions (avoids parentNode bug during navigation) */
+.page-enter-active,
+.page-leave-active,
+.layout-enter-active,
+.layout-leave-active {
+  transition: opacity 0.15s ease;
+}
+.page-enter-from,
+.page-leave-to,
+.layout-enter-from,
+.layout-leave-to {
+  opacity: 0;
 }

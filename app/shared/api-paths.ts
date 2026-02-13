@@ -5,10 +5,10 @@
 export const API = {
   // Auth (api-auth/)
   auth: {
-    login: 'api-auth/login/',
-    refresh: 'api-auth/token/refresh/',
-    forgotPassword: 'api-auth/password/reset/',
-    resetConfirm: 'api-auth/password/reset/confirm/',
+    login: 'auth/api-auth/login/',
+    refresh: 'auth/api-auth/token/refresh/',
+    forgotPassword: 'auth/api-auth/password/reset/',
+    resetConfirm: 'auth/api-auth/password/reset/confirm/',
   },
   // Users
   users: () => 'users/',

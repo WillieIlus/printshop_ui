@@ -11,8 +11,8 @@ export function useAuth() {
   const user = computed(() => authStore.user)
   const loading = computed(() => authStore.loading)
 
-  async function login(email: string, password: string) {
-    const result = await authStore.login({ email, password })
+  async function login(email: string, password: string, rememberMe = false) {
+    const result = await authStore.login({ email, password, remember_me: rememberMe })
     if (result.success) {
       await profileStore.fetchProfile()
       await router.push('/dashboard')

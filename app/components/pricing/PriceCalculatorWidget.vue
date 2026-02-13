@@ -78,7 +78,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="price-calculator bg-white rounded-xl shadow-lg p-6">
+  <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+
     <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
       <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -237,8 +238,3 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-.price-calculator {
-  @apply border border-gray-200;
-}
-</style>

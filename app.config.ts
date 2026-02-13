@@ -1,8 +1,8 @@
-// https://nuxt.com/docs/api/configuration/app-config
-export default defineAppConfig({
-  ui: {
-    // Nuxt UI theme: primary from sample (blue), supports light/dark
-    theme: {
+import type { Config } from 'tailwindcss'
+
+export default <Partial<Config>>{
+  theme: {
+    extend: {
       colors: {
         primary: {
           50: '#eff6ff',
@@ -15,6 +15,7 @@ export default defineAppConfig({
           700: '#1d4ed8',
           800: '#1e40af',
           900: '#1e3a8a',
+          950: '#172554',
         },
         accent: {
           400: '#a78bfa',
@@ -24,4 +25,4 @@ export default defineAppConfig({
       },
     },
   },
-})
+}

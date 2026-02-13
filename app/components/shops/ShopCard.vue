@@ -15,13 +15,13 @@
       </div>
       <p v-if="shop.description" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ shop.description }}</p>
       <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-        <div v-if="shop.phone" class="flex items-center gap-1">
+        <div v-if="shop.phone_number" class="flex items-center gap-1">
           <UIcon name="i-lucide-phone" class="w-4 h-4 shrink-0" />
-          {{ shop.phone }}
+          {{ shop.phone_number }}
         </div>
-        <div v-if="shop.email" class="flex items-center gap-1 truncate">
+        <div v-if="shop.business_email" class="flex items-center gap-1 truncate">
           <UIcon name="i-lucide-mail" class="w-4 h-4 shrink-0" />
-          {{ shop.email }}
+          {{ shop.business_email }}
         </div>
       </div>
       <div v-if="showActions" class="flex gap-2 pt-2 border-t dark:border-gray-700">

@@ -35,6 +35,6 @@ const props = withDefaults(
   { container: true, showFooter: true }
 )
 const containerClass = computed(() =>
-  'mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 lg:py-8' + (props.container ? ' max-w-7xl' : '')
+  'mx-auto w-full px-4 sm:px-6 lg:px-8' + (props.container ? ' max-w-7xl' : '')
 )
 </script>

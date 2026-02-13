@@ -26,13 +26,13 @@ export interface Shop {
   description: string | null
   logo: string | null
   cover_image: string | null
-  email: string | null
-  phone: string | null
-  address: string
+  business_email: string | null
+  phone_number: string | null
+  address_line: string
   city: string
   state: string
   country: string
-  postal_code: string
+  zip_code: string
   latitude: number | null
   longitude: number | null
   is_verified: boolean
@@ -47,12 +47,12 @@ export interface Shop {
 
 export interface ShopCreateInput {
   name: string
-  description?: string
-  email?: string
-  phone?: string
-  address: string
+  description?: string | null
+  business_email: string
+  phone_number?: string | null
+  address_line: string
   city: string
   state: string
   country: string
-  postal_code: string
+  zip_code: string
 }
