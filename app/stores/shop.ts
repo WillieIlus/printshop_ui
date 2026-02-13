@@ -72,7 +72,8 @@ export const useShopStore = defineStore('shop', () => {
     error.value = null
     try {
       const { $api } = useNuxtApp()
-      myShops.value = await $api<Shop[]>(API.shopsMyShops())
+      const response = await $api<{ owned: Shop[]; member_of: Shop[] }>(API.shopsMyShops())
+      myShops.value = [...(response.owned ?? []), ...(response.member_of ?? [])]
     } catch (err: unknown) {
       error.value = parseDjangoError(err, 'Failed to fetch my shops')
       console.error('fetchMyShops error:', err)
@@ -104,6 +105,9 @@ export const useShopStore = defineStore('shop', () => {
         method: 'POST',
         body: data,
       })
+      if (!Array.isArray(myShops.value)) {
+        myShops.value = []
+      }
       myShops.value.push(shop)
       return { success: true, shop }
     } catch (err: unknown) {
