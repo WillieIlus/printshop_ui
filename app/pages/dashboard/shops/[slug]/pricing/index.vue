@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex justify-between items-center">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Pricing Management</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">Set up your rate card for customers</p>
@@ -200,11 +200,64 @@
         </CommonEmptyState>
       </div>
     </template>
+
+    <!-- Modals with table-style forms -->
+    <UModal v-model:open="printingModalOpen" :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'">
+      <template #body>
+        <PricingPrintingPriceForm
+          :price="editingPrintingPrice"
+          :machine-options="machineOptions"
+          :loading="formLoading"
+          @submit="submitPrintingPrice"
+          @cancel="closePrintingModal"
+        />
+      </template>
+    </UModal>
+    <UModal v-model:open="paperModalOpen" :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'">
+      <template #body>
+        <PricingPaperPriceForm
+          :price="editingPaperPrice"
+          :loading="formLoading"
+          @submit="submitPaperPrice"
+          @cancel="closePaperModal"
+        />
+      </template>
+    </UModal>
+    <UModal v-model:open="finishingModalOpen" :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'">
+      <template #body>
+        <PricingFinishingServiceForm
+          :service="editingFinishingService"
+          :loading="formLoading"
+          @submit="submitFinishingService"
+          @cancel="closeFinishingModal"
+        />
+      </template>
+    </UModal>
+    <UModal v-model:open="discountModalOpen" :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'">
+      <template #body>
+        <PricingVolumeDiscountForm
+          :discount="editingDiscount"
+          :loading="formLoading"
+          @submit="submitVolumeDiscount"
+          @cancel="closeDiscountModal"
+        />
+      </template>
+    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PrintingPrice, PaperPrice, FinishingService, VolumeDiscount } from '~/shared/types'
+import type {
+  PrintingPrice,
+  PaperPrice,
+  FinishingService,
+  VolumeDiscount,
+  PrintingPriceForm,
+  PaperPriceForm,
+  FinishingServiceForm,
+  VolumeDiscountForm,
+} from '~/shared/types'
+import { API } from '~/shared/api-paths'
 import { usePricingStore } from '~/stores/pricing'
 
 type TabId = 'printing' | 'paper' | 'finishing' | 'discounts'
@@ -237,11 +290,57 @@ const tabs = computed(() => [
 // Loading state
 const loading = ref(true)
 
-// Modal functions (placeholders - would need actual modal implementation)
-const openPrintingModal = (_price?: PrintingPrice) => {
-  toast.add({ title: 'Coming soon', description: 'Printing price form modal' })
+// Modals
+const printingModalOpen = ref(false)
+const paperModalOpen = ref(false)
+const finishingModalOpen = ref(false)
+const discountModalOpen = ref(false)
+const editingPrintingPrice = ref<PrintingPrice | null>(null)
+const editingPaperPrice = ref<PaperPrice | null>(null)
+const editingFinishingService = ref<FinishingService | null>(null)
+const editingDiscount = ref<VolumeDiscount | null>(null)
+const formLoading = ref(false)
+const machines = ref<Array<{ id: number; name: string }>>([])
+
+const machineOptions = computed(() =>
+  machines.value.map((m) => ({ label: m.name, value: m.id }))
+)
+
+async function fetchMachines() {
+  try {
+    const { $api } = useNuxtApp()
+    machines.value = await $api<Array<{ id: number; name: string }>>(API.shopMachines(slug.value))
+  } catch {
+    machines.value = []
+  }
+}
+
+const openPrintingModal = (price?: PrintingPrice) => {
+  editingPrintingPrice.value = price ?? null
+  printingModalOpen.value = true
 }
 const editPrintingPrice = (price: PrintingPrice) => openPrintingModal(price)
+const closePrintingModal = () => {
+  printingModalOpen.value = false
+  editingPrintingPrice.value = null
+}
+async function submitPrintingPrice(data: PrintingPriceForm) {
+  formLoading.value = true
+  try {
+    if (editingPrintingPrice.value) {
+      await pricingStore.updatePrintingPrice(slug.value, editingPrintingPrice.value.id, data)
+      toast.add({ title: 'Updated', description: 'Printing price updated' })
+    } else {
+      await pricingStore.createPrintingPrice(slug.value, data)
+      toast.add({ title: 'Added', description: 'Printing price added' })
+    }
+    closePrintingModal()
+  } catch (err: any) {
+    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
 const deletePrintingPrice = async (id: number) => {
   if (confirm('Delete this printing price?')) {
     await pricingStore.deletePrintingPrice(slug.value, id)
@@ -249,10 +348,33 @@ const deletePrintingPrice = async (id: number) => {
   }
 }
 
-const openPaperModal = (_price?: PaperPrice) => {
-  toast.add({ title: 'Coming soon', description: 'Paper price form modal' })
+const openPaperModal = (price?: PaperPrice) => {
+  editingPaperPrice.value = price ?? null
+  paperModalOpen.value = true
 }
 const editPaperPrice = (price: PaperPrice) => openPaperModal(price)
+const closePaperModal = () => {
+  paperModalOpen.value = false
+  editingPaperPrice.value = null
+}
+async function submitPaperPrice(data: PaperPriceForm & { gsm?: string | number }) {
+  formLoading.value = true
+  const payload = { ...data, gsm: Number(data.gsm) }
+  try {
+    if (editingPaperPrice.value) {
+      await pricingStore.updatePaperPrice(slug.value, editingPaperPrice.value.id, payload)
+      toast.add({ title: 'Updated', description: 'Paper price updated' })
+    } else {
+      await pricingStore.createPaperPrice(slug.value, payload)
+      toast.add({ title: 'Added', description: 'Paper price added' })
+    }
+    closePaperModal()
+  } catch (err: any) {
+    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
 const deletePaperPrice = async (id: number) => {
   if (confirm('Delete this paper price?')) {
     await pricingStore.deletePaperPrice(slug.value, id)
@@ -260,10 +382,32 @@ const deletePaperPrice = async (id: number) => {
   }
 }
 
-const openFinishingModal = (_service?: FinishingService) => {
-  toast.add({ title: 'Coming soon', description: 'Finishing service form modal' })
+const openFinishingModal = (service?: FinishingService) => {
+  editingFinishingService.value = service ?? null
+  finishingModalOpen.value = true
 }
 const editFinishingService = (service: FinishingService) => openFinishingModal(service)
+const closeFinishingModal = () => {
+  finishingModalOpen.value = false
+  editingFinishingService.value = null
+}
+async function submitFinishingService(data: FinishingServiceForm) {
+  formLoading.value = true
+  try {
+    if (editingFinishingService.value) {
+      await pricingStore.updateFinishingService(slug.value, editingFinishingService.value.id, data)
+      toast.add({ title: 'Updated', description: 'Finishing service updated' })
+    } else {
+      await pricingStore.createFinishingService(slug.value, data)
+      toast.add({ title: 'Added', description: 'Finishing service added' })
+    }
+    closeFinishingModal()
+  } catch (err: any) {
+    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
 const deleteFinishingService = async (id: number) => {
   if (confirm('Delete this finishing service?')) {
     await pricingStore.deleteFinishingService(slug.value, id)
@@ -271,13 +415,36 @@ const deleteFinishingService = async (id: number) => {
   }
 }
 
-const openDiscountModal = (_discount?: VolumeDiscount) => {
-  toast.add({ title: 'Coming soon', description: 'Volume discount form modal' })
+const openDiscountModal = (discount?: VolumeDiscount) => {
+  editingDiscount.value = discount ?? null
+  discountModalOpen.value = true
 }
 const editDiscount = (discount: VolumeDiscount) => openDiscountModal(discount)
-const deleteDiscount = async (_id: number) => {
+const closeDiscountModal = () => {
+  discountModalOpen.value = false
+  editingDiscount.value = null
+}
+async function submitVolumeDiscount(data: VolumeDiscountForm) {
+  formLoading.value = true
+  try {
+    if (editingDiscount.value) {
+      await pricingStore.updateVolumeDiscount(slug.value, editingDiscount.value.id, data)
+      toast.add({ title: 'Updated', description: 'Volume discount updated' })
+    } else {
+      await pricingStore.createVolumeDiscount(slug.value, data)
+      toast.add({ title: 'Added', description: 'Volume discount added' })
+    }
+    closeDiscountModal()
+  } catch (err: any) {
+    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
+const deleteDiscount = async (id: number) => {
   if (confirm('Delete this discount?')) {
-    toast.add({ title: 'Coming soon', description: 'Delete discount' })
+    await pricingStore.deleteVolumeDiscount(slug.value, id)
+    toast.add({ title: 'Deleted', description: 'Volume discount deleted' })
   }
 }
 
@@ -289,6 +456,7 @@ onMounted(async () => {
       pricingStore.fetchPaperPrices(slug.value),
       pricingStore.fetchFinishingServices(slug.value),
       pricingStore.fetchVolumeDiscounts(slug.value),
+      fetchMachines(),
     ])
   } catch (err) {
     console.error('Error fetching pricing:', err)

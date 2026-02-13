@@ -301,6 +301,44 @@ export const usePricingStore = defineStore('pricing', {
     },
 
     /**
+     * Create a volume discount
+     */
+    async createVolumeDiscount(slug: string, data: VolumeDiscountForm) {
+      const { $api } = useNuxtApp()
+      const created = await $api<VolumeDiscount>(API.shopVolumeDiscounts(slug), {
+        method: 'POST',
+        body: data,
+      })
+      this.volumeDiscounts.push(created)
+      return created
+    },
+
+    /**
+     * Update a volume discount
+     */
+    async updateVolumeDiscount(slug: string, pk: number, data: Partial<VolumeDiscountForm>) {
+      const { $api } = useNuxtApp()
+      const updated = await $api<VolumeDiscount>(API.shopVolumeDiscountDetail(slug, pk), {
+        method: 'PATCH',
+        body: data,
+      })
+      const index = this.volumeDiscounts.findIndex((d) => d.id === pk)
+      if (index !== -1) {
+        this.volumeDiscounts[index] = updated
+      }
+      return updated
+    },
+
+    /**
+     * Delete a volume discount
+     */
+    async deleteVolumeDiscount(slug: string, pk: number) {
+      const { $api } = useNuxtApp()
+      await $api(API.shopVolumeDiscountDetail(slug, pk), { method: 'DELETE' })
+      this.volumeDiscounts = this.volumeDiscounts.filter((d) => d.id !== pk)
+    },
+
+    /**
      * Clear all pricing data
      */
     clearPricing() {

@@ -1,6 +1,6 @@
 <template>
   <VeeField v-slot="{ field, errors }" :name="name" :label="label">
-    <UFormField :label="label" :required="required">
+    <UFormField :label="hideLabel ? undefined : label" :required="required">
       <UInput
         v-bind="field"
         :type="type"
@@ -32,6 +32,7 @@ defineProps<{
   icon?: string
   disabled?: boolean
   required?: boolean
+  hideLabel?: boolean
 }>()
 </script>
 
