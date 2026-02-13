@@ -29,10 +29,11 @@ export interface Quote {
 
 export interface ProductTemplate {
   id: number
-  shop: number
+  shop?: number
   name: string
   description: string | null
-  base_price: string
-  unit: string
+  base_price?: string
+  unit?: string
+  defaults?: Record<string, unknown>
   is_active: boolean
 }

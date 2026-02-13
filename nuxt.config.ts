@@ -55,6 +55,7 @@ export default defineNuxtConfig({
     preference: 'system',
     fallback: 'light',
     classSuffix: '',
+    storageKey: 'printshop-color-mode',
   },
 
   routeRules: {

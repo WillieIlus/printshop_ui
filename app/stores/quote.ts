@@ -199,6 +199,26 @@ export const useQuoteStore = defineStore('quote', () => {
     }
   }
 
+  async function createProductTemplate(shopSlug: string, data: Partial<ProductTemplate>) {
+    loading.value = true
+    error.value = null
+    try {
+      const { $api } = useNuxtApp()
+      const product = await $api<ProductTemplate>(API.productTemplates(shopSlug), {
+        method: 'POST',
+        body: data,
+      })
+      productTemplates.value.push(product)
+      return { success: true, product }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to create product template'
+      error.value = message
+      return { success: false, error: message }
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     quotes,
     myQuotes,
@@ -221,5 +241,6 @@ export const useQuoteStore = defineStore('quote', () => {
     deleteQuoteItem,
     requestQuote,
     fetchProductTemplates,
+    createProductTemplate,
   }
 })

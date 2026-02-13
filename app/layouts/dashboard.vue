@@ -51,18 +51,55 @@
           </template>
           <div class="my-2 border-t border-slate-200 dark:border-slate-700 pt-2">
             <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">My Shops</p>
-            <template v-if="shopStore.myShops.length">
-              <NuxtLink
-                v-for="shop in shopStore.myShops"
-                :key="shop.slug"
-                :to="`/dashboard/shops/${shop.slug}`"
-                class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                :class="{ 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400': isShopActive(shop.slug) }"
-              >
-                <UIcon name="i-lucide-store" class="w-4 h-4 shrink-0" />
-                <span class="truncate">{{ shop.name }}</span>
-              </NuxtLink>
-            </template>
+            <ClientOnly>
+              <template v-if="shopStore.myShops.length">
+                <template v-for="shop in shopStore.myShops" :key="shop.slug">
+                <NuxtLink
+                  :to="`/dashboard/shops/${shop.slug}`"
+                  class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  :class="{ 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400': isShopActive(shop.slug) }"
+                >
+                  <UIcon name="i-lucide-store" class="w-4 h-4 shrink-0" />
+                  <span class="truncate">{{ shop.name }}</span>
+                </NuxtLink>
+                <div
+                  v-if="isShopActive(shop.slug)"
+                  class="ml-4 mt-1 space-y-0.5 border-l border-slate-200 dark:border-slate-700 pl-3"
+                >
+                  <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/quotes`"
+                    class="block text-xs text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    Quotes
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/products`"
+                    class="block text-xs text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    Products
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/pricing`"
+                    class="block text-xs text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    Pricing
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/members`"
+                    class="block text-xs text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    Team
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/hours`"
+                    class="block text-xs text-slate-600 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400"
+                  >
+                    Hours
+                  </NuxtLink>
+                </div>
+              </template>
+              </template>
+            </ClientOnly>
             <NuxtLink
               to="/dashboard/shops/create"
               class="mt-2 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20"

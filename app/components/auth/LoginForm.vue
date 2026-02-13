@@ -40,7 +40,10 @@
         :loading="loading"
         :disabled="!meta.valid || loading || isRateLimited"
       >
-        {{ isRateLimited ? `Please wait ${Math.ceil((authStore.rateLimitUntil - now) / 1000)}s...` : 'Sign In' }}
+        <ClientOnly>
+          {{ isRateLimited ? `Please wait ${Math.ceil((authStore.rateLimitUntil - now) / 1000)}s...` : 'Sign In' }}
+          <template #fallback>Sign In</template>
+        </ClientOnly>
       </UButton>
       <p class="text-center text-sm text-gray-600 dark:text-gray-400">
         Don't have an account?

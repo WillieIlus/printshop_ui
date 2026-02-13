@@ -5,7 +5,7 @@
         <span class="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-white">
           <UIcon name="i-lucide-printer" class="w-5 h-5" />
         </span>
-        <span class="text-slate-400 text-sm">© {{ new Date().getFullYear() }} PrintShop. All rights reserved.</span>
+        <span class="text-slate-400 text-sm">© <ClientOnly>{{ new Date().getFullYear() }}<template #fallback>2025</template></ClientOnly> PrintShop. All rights reserved.</span>
       </div>
       <div class="flex gap-6 text-sm text-slate-400">
         <NuxtLink to="/" class="hover:text-white transition-colors">Home</NuxtLink>
