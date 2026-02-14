@@ -37,8 +37,8 @@ const stats = computed(() => [
     label: 'Total Shops',
     value: shopStore.myShops.length,
     icon: 'i-lucide-store',
-    bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-    iconColor: 'text-blue-600 dark:text-blue-400',
+    bgColor: 'bg-flamingo-50 dark:bg-flamingo-900/30',
+    iconColor: 'text-flamingo-600 dark:text-flamingo-400',
   },
   {
     label: 'Active Quotes',

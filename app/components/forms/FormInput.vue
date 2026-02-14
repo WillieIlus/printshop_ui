@@ -1,30 +1,74 @@
+<!-- FormInput.vue — Styled form input following PrintShop flamingo design -->
 <template>
   <VeeField v-slot="{ field, errors }" :name="name" :label="label">
-    <UFormField :label="hideLabel ? undefined : label" :required="required">
-      <UInput
-        v-bind="field"
-        :type="type"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :color="errors.length ? 'error' : undefined"
-        :leading-icon="icon"
-        :ui="{
-          base: 'bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md',
-          leading: { pointer: 'pointer-events-none' },
-          input: icon ? 'pl-10' : ''
-        }"
-      />
-      <div class="h-5 mt-1">
-        <p v-if="errors.length" class="text-red-500 text-xs">
+    <div>
+      <label
+        v-if="!hideLabel"
+        :for="name"
+        class="mb-1.5 block text-sm font-medium text-gray-700"
+      >
+        {{ label }}
+        <span v-if="required" class="text-flamingo-500">*</span>
+      </label>
+
+      <div class="relative">
+        <!-- Leading Icon -->
+        <div
+          v-if="icon"
+          class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5"
+        >
+          <UIcon
+            :name="icon"
+            class="h-5 w-5 text-gray-400 transition-colors"
+            :class="{ 'text-flamingo-500': errors.length }"
+          />
+        </div>
+
+        <input
+          v-bind="field"
+          :id="name"
+          :type="computedType"
+          :placeholder="placeholder"
+          :disabled="disabled"
+          class="w-full rounded-xl border bg-gray-50 py-3 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-flamingo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          :class="[
+            icon ? 'pl-10' : 'pl-4',
+            showPasswordToggle ? 'pr-12' : 'pr-4',
+            errors.length
+              ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+              : 'border-gray-200',
+          ]"
+        />
+
+        <!-- Password Toggle -->
+        <button
+          v-if="showPasswordToggle"
+          type="button"
+          class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600"
+          @click="passwordVisible = !passwordVisible"
+        >
+          <UIcon
+            :name="passwordVisible ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+            class="h-5 w-5"
+          />
+        </button>
+      </div>
+
+      <!-- Error Message -->
+      <div class="mt-1 h-5">
+        <p v-if="errors.length" class="flex items-center gap-1 text-xs text-red-500">
+          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 flex-shrink-0" />
           {{ errors[0] }}
         </p>
       </div>
-    </UFormField>
+    </div>
   </VeeField>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { ref, computed } from 'vue'
+
+const props = withDefaults(defineProps<{
   name: string
   label: string
   type?: string
@@ -33,25 +77,23 @@ defineProps<{
   disabled?: boolean
   required?: boolean
   hideLabel?: boolean
-}>()
+}>(), {
+  type: 'text',
+  placeholder: '',
+  icon: '',
+  disabled: false,
+  required: false,
+  hideLabel: false,
+})
+
+const passwordVisible = ref(false)
+
+const showPasswordToggle = computed(() => props.type === 'password')
+
+const computedType = computed(() => {
+  if (props.type === 'password') {
+    return passwordVisible.value ? 'text' : 'password'
+  }
+  return props.type
+})
 </script>
-
-<style scoped>
-:deep(.uinput) {
-  background-color: #f3f4f6;
-}
-
-:deep(input) {
-  padding-left: 2.5rem;
-  background-color: transparent;
-}
-
-:deep([class*="leading"]) {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  pointer-events: none;
-}
-</style>

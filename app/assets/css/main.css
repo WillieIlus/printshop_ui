@@ -1,20 +1,31 @@
 @import "tailwindcss";
 
-/* Only custom properties allowed here */
+/* Flamingo color palette (#F05224) - primary brand */
 @theme {
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-950: #172554;
+  --color-flamingo-50: #fef4ee;
+  --color-flamingo-100: #fde6d7;
+  --color-flamingo-200: #fbc9ad;
+  --color-flamingo-300: #f7a37a;
+  --color-flamingo-400: #f37344;
+  --color-flamingo-500: #f05224;
+  --color-flamingo-600: #e13515;
+  --color-flamingo-700: #bb2513;
+  --color-flamingo-800: #942018;
+  --color-flamingo-900: #781d16;
+  --color-flamingo-950: #410b09;
 
-  --color-accent-500: #8b5cf6;
+  /* Map primary to flamingo for compatibility */
+  --color-primary-50: #fef4ee;
+  --color-primary-100: #fde6d7;
+  --color-primary-200: #fbc9ad;
+  --color-primary-300: #f7a37a;
+  --color-primary-400: #f37344;
+  --color-primary-500: #f05224;
+  --color-primary-600: #e13515;
+  --color-primary-700: #bb2513;
+  --color-primary-800: #942018;
+  --color-primary-900: #781d16;
+  --color-primary-950: #410b09;
 }
 
 html {

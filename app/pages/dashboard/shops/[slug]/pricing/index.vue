@@ -5,32 +5,32 @@
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Pricing Management</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">Set up your rate card for customers</p>
       </div>
-      <UButton :to="`/shops/${slug}`" target="_blank" variant="outline">
+      <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
         <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
         Preview Public Page
       </UButton>
     </div>
 
     <!-- Tab Navigation -->
-    <div class="border-b border-gray-200">
-      <nav class="flex gap-6">
-        <button 
-          v-for="tab in tabs" 
-          :key="tab.id"
-          @click="setActiveTab(tab.id)"
-          :class="[
-            'pb-4 text-sm font-medium border-b-2 transition-colors',
-            activeTab === tab.id 
-              ? 'border-blue-600 text-blue-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
+    <div class="flex gap-1 overflow-x-auto rounded-xl border border-gray-200 bg-white p-1.5">
+      <button
+        v-for="tab in tabs"
+        :key="tab.id"
+        class="flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-all"
+        :class="activeTab === tab.id
+          ? 'bg-flamingo-500 text-white shadow-sm'
+          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'"
+        @click="setActiveTab(tab.id)"
+      >
+        {{ tab.name }}
+        <span
+          v-if="tab.count !== undefined"
+          class="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+          :class="activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'"
         >
-          {{ tab.name }}
-          <span v-if="tab.count !== undefined" class="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-            {{ tab.count }}
-          </span>
-        </button>
-      </nav>
+          {{ tab.count }}
+        </span>
+      </button>
     </div>
 
     <!-- Loading State -->
@@ -42,7 +42,7 @@
       <div v-if="activeTab === 'printing'" class="space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Set the price per printed side for each paper size and color mode.</p>
-          <UButton color="primary" @click="openPrintingModal()">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPrintingModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Printing Price
           </UButton>
@@ -82,7 +82,7 @@
           </table>
         </div>
         <CommonEmptyState v-else title="No printing prices" description="Add printing prices to let customers calculate costs.">
-          <UButton color="primary" @click="openPrintingModal()">Add First Printing Price</UButton>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPrintingModal()">Add First Printing Price</UButton>
         </CommonEmptyState>
       </div>
 
@@ -90,7 +90,7 @@
       <div v-if="activeTab === 'paper'" class="space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Set paper prices by GSM (weight). Customers see this as their rate card.</p>
-          <UButton color="primary" @click="openPaperModal()">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Paper Price
           </UButton>
@@ -128,7 +128,7 @@
           </table>
         </div>
         <CommonEmptyState v-else title="No paper prices" description="Add paper prices by GSM to create your rate card.">
-          <UButton color="primary" @click="openPaperModal()">Add First Paper Price</UButton>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">Add First Paper Price</UButton>
         </CommonEmptyState>
       </div>
 
@@ -136,7 +136,7 @@
       <div v-if="activeTab === 'finishing'" class="space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Add finishing services like lamination, binding, and cutting.</p>
-          <UButton color="primary" @click="openFinishingModal()">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Finishing Service
           </UButton>
@@ -166,7 +166,7 @@
           </div>
         </div>
         <CommonEmptyState v-else title="No finishing services" description="Add services like lamination and binding.">
-          <UButton color="primary" @click="openFinishingModal()">Add First Finishing Service</UButton>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">Add First Finishing Service</UButton>
         </CommonEmptyState>
       </div>
 
@@ -174,7 +174,7 @@
       <div v-if="activeTab === 'discounts'" class="space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Set up bulk discounts for large orders.</p>
-          <UButton color="primary" @click="openDiscountModal()">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Volume Discount
           </UButton>
@@ -196,7 +196,7 @@
           </div>
         </div>
         <CommonEmptyState v-else title="No volume discounts" description="Encourage bulk orders with volume discounts.">
-          <UButton color="primary" @click="openDiscountModal()">Add First Discount</UButton>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">Add First Discount</UButton>
         </CommonEmptyState>
       </div>
     </template>

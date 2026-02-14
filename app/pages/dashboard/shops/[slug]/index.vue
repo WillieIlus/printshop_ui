@@ -26,7 +26,7 @@
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        <UCard :to="`/dashboard/shops/${slug}/quotes`" as="NuxtLink" class="hover:ring-2 ring-primary-500">
+        <UCard :to="`/dashboard/shops/${slug}/quotes`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
               <UIcon name="i-lucide-file-text" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -37,7 +37,7 @@
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/products`" as="NuxtLink" class="hover:ring-2 ring-primary-500">
+        <UCard :to="`/dashboard/shops/${slug}/products`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
               <UIcon name="i-lucide-package" class="w-5 h-5 text-green-600 dark:text-green-400" />
@@ -48,7 +48,7 @@
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/pricing`" as="NuxtLink" class="hover:ring-2 ring-primary-500">
+        <UCard :to="`/dashboard/shops/${slug}/pricing`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
               <UIcon name="i-lucide-banknote" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -59,7 +59,7 @@
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/members`" as="NuxtLink" class="hover:ring-2 ring-primary-500">
+        <UCard :to="`/dashboard/shops/${slug}/members`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
               <UIcon name="i-lucide-users" class="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -70,7 +70,7 @@
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/hours`" as="NuxtLink" class="hover:ring-2 ring-primary-500">
+        <UCard :to="`/dashboard/shops/${slug}/hours`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
               <UIcon name="i-lucide-clock" class="w-5 h-5 text-orange-600 dark:text-orange-400" />
@@ -85,7 +85,7 @@
       <div class="grid md:grid-cols-3 gap-6">
         <UCard>
           <div class="text-center">
-            <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">{{ quoteCount }}</p>
+            <p class="text-3xl font-bold text-flamingo-600 dark:text-flamingo-400">{{ quoteCount }}</p>
             <p class="text-gray-600 dark:text-gray-400">Total Quotes</p>
           </div>
         </UCard>
