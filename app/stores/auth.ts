@@ -1,5 +1,6 @@
 import type { AuthTokens, AuthUser, LoginCredentials, SignupCredentials } from '~/shared/types'
 import { API } from '~/shared/api-paths'
+import { authCookieStorage } from '~/utils/auth-cookie-storage'
 
 const AUTH_STORAGE_KEY = 'auth'
 
@@ -13,44 +14,6 @@ function extractErrorMessage(err: unknown, rateLimitStatus: number, rateLimitMes
     }
   }
   return err instanceof Error ? err.message : 'Login failed'
-}
-
-function getAuthStorage(rememberMe: boolean): Storage {
-  return rememberMe ? localStorage : sessionStorage
-}
-
-/** Custom storage: uses localStorage when remember_me, else sessionStorage */
-const authStorage = {
-  getItem(key: string) {
-    if (import.meta.server) return null
-    try {
-      const fromLocal = localStorage.getItem(key)
-      if (fromLocal) {
-        const parsed = JSON.parse(fromLocal) as { rememberMe?: boolean }
-        if (parsed.rememberMe) return fromLocal
-      }
-      return sessionStorage.getItem(key)
-    } catch {
-      return null
-    }
-  },
-  setItem(key: string, value: string) {
-    if (import.meta.server) return
-    try {
-      const parsed = JSON.parse(value) as { rememberMe?: boolean }
-      const rememberMe = !!parsed.rememberMe
-      const storage = getAuthStorage(rememberMe)
-      const otherStorage = getAuthStorage(!rememberMe)
-      otherStorage.removeItem(key)
-      storage.setItem(key, value)
-    } catch {
-      localStorage.setItem(key, value)
-    }
-  },
-  removeItem(key: string) {
-    localStorage.removeItem(key)
-    sessionStorage.removeItem(key)
-  },
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -126,13 +89,13 @@ export const useAuthStore = defineStore('auth', () => {
     if (!tokens.value?.refresh) return false
     try {
       const { $api } = useNuxtApp()
-      const response = await $api<{ access: string }>(API.auth.refresh, {
+      const response = await $api<{ access: string; refresh?: string }>(API.auth.refresh, {
         method: 'POST',
         body: { refresh: tokens.value.refresh },
       })
       tokens.value = {
-        ...tokens.value,
         access: response.access,
+        refresh: response.refresh ?? tokens.value.refresh,
       }
       return true
     } catch {
@@ -206,7 +169,7 @@ export const useAuthStore = defineStore('auth', () => {
 }, {
   persist: {
     key: AUTH_STORAGE_KEY,
-    storage: authStorage,
+    storage: authCookieStorage,
     pick: ['tokens', 'rememberMe'],
   },
 })

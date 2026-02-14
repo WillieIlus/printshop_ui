@@ -30,7 +30,7 @@ function goBack() {
 async function onSubmit(data: ShopCreateInput) {
   const result = await shopStore.createShop(data)
   if (result.success && result.shop) {
-    notification.success('Shop created')
+    notification.success('Shop created! Add machines, then stock and prices.')
     await navigateTo(`/dashboard/shops/${result.shop.slug}`)
   } else {
     notification.error(shopStore.error ?? 'Create failed')

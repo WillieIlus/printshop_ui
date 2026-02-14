@@ -67,10 +67,16 @@
                   class="ml-4 mt-1 space-y-0.5 border-l border-gray-200 dark:border-gray-700 pl-3"
                 >
                   <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/quotes`"
+                    :to="`/dashboard/shops/${shop.slug}/machines`"
                     class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
                   >
-                    Quotes
+                    Machines
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/pricing`"
+                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
+                  >
+                    Stock & prices
                   </NuxtLink>
                   <NuxtLink
                     :to="`/dashboard/shops/${shop.slug}/products`"
@@ -79,10 +85,10 @@
                     Products
                   </NuxtLink>
                   <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/pricing`"
+                    :to="`/dashboard/shops/${shop.slug}/quotes`"
                     class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
                   >
-                    Pricing
+                    Quotes
                   </NuxtLink>
                   <NuxtLink
                     :to="`/dashboard/shops/${shop.slug}/members`"

@@ -1,25 +1,32 @@
 <template>
-  <UCard>
-    <template #header>
+  <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm ring-1 ring-gray-100/50 dark:border-gray-800 dark:bg-gray-900/50 dark:ring-gray-800/50">
+    <!-- Header -->
+    <div class="border-b border-gray-100 px-6 py-4 dark:border-gray-800">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
-    </template>
-    <div v-if="props.activities.length" class="space-y-3">
-      <div
-        v-for="(activity, i) in props.activities"
-        :key="i"
-        class="flex items-start gap-3 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-      >
-        <div class="p-2 rounded-lg shrink-0 bg-gray-100 dark:bg-gray-700">
-          <UIcon :name="activity.icon" class="w-4 h-4 text-gray-600 dark:text-gray-400" />
-        </div>
-        <div class="min-w-0">
-          <p class="text-sm font-medium text-gray-900 dark:text-white">{{ activity.title }}</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">{{ activity.time }}</p>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4">
+      <div v-if="props.activities.length" class="space-y-2">
+        <div
+          v-for="(activity, i) in props.activities"
+          :key="i"
+          class="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50/50 p-3 transition-colors hover:bg-gray-100/50 dark:border-gray-800 dark:bg-gray-800/50 dark:hover:bg-gray-800"
+        >
+          <div
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-gray-200 dark:ring-gray-700"
+          >
+            <UIcon :name="activity.icon" class="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ activity.title }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">{{ activity.time }}</p>
+          </div>
         </div>
       </div>
+      <p v-else class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">No recent activity</p>
     </div>
-    <p v-else class="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">No recent activity</p>
-  </UCard>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -30,6 +30,7 @@ export default defineNuxtConfig({
 
   piniaPersistedstate: {
     storage: 'localStorage',
+    // Auth store uses custom cookie storage (see stores/auth.ts)
   },
 
   veeValidate: {
@@ -60,6 +61,7 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/auth/**': { ssr: false },
+    '/dashboard/**': { ssr: false },
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },

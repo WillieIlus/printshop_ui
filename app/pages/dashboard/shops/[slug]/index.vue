@@ -25,15 +25,59 @@
           </UButton>
         </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        <UCard :to="`/dashboard/shops/${slug}/quotes`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
+      <!-- Setup checklist: Machines → Stock & Prices -->
+      <div v-if="setupProgress < 3" class="rounded-xl border border-flamingo-200 bg-flamingo-50/50 p-4 mb-6">
+        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Setup your shop</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Add machines first, then paper stock and prices to start quoting.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <NuxtLink
+            :to="`/dashboard/shops/${slug}/machines`"
+            class="flex items-center gap-2 text-sm font-medium"
+            :class="hasMachines ? 'text-green-600' : 'text-flamingo-600 hover:underline'"
+          >
+            <UIcon :name="hasMachines ? 'i-lucide-check-circle' : 'i-lucide-printer'" class="w-4 h-4" />
+            1. Machines {{ hasMachines ? `(${machineCount})` : '' }}
+          </NuxtLink>
+          <NuxtLink
+            :to="`/dashboard/shops/${slug}/pricing`"
+            class="flex items-center gap-2 text-sm font-medium"
+            :class="hasPricing ? 'text-green-600' : 'text-gray-600 hover:text-flamingo-600'"
+          >
+            <UIcon :name="hasPricing ? 'i-lucide-check-circle' : 'i-lucide-banknote'" class="w-4 h-4" />
+            2. Stock & prices
+          </NuxtLink>
+          <NuxtLink
+            :to="`/dashboard/shops/${slug}/products`"
+            class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-flamingo-600"
+          >
+            <UIcon name="i-lucide-package" class="w-4 h-4" />
+            3. Products (optional)
+          </NuxtLink>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <UCard :to="`/dashboard/shops/${slug}/machines`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <UIcon name="i-lucide-file-text" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div class="p-2 bg-flamingo-100 dark:bg-flamingo-900/30 rounded-lg">
+              <UIcon name="i-lucide-printer" class="w-5 h-5 text-flamingo-600 dark:text-flamingo-400" />
             </div>
             <div>
-              <p class="font-medium text-gray-900 dark:text-white">Quotes</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Manage quotes</p>
+              <p class="font-medium text-gray-900 dark:text-white">Machines</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Printers & equipment</p>
+            </div>
+          </div>
+        </UCard>
+        <UCard :to="`/dashboard/shops/${slug}/pricing`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+              <UIcon name="i-lucide-banknote" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-900 dark:text-white">Stock & prices</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Paper, printing, finishing</p>
             </div>
           </div>
         </UCard>
@@ -48,18 +92,18 @@
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/pricing`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
+        <UCard :to="`/dashboard/shops/${slug}/quotes`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">
-            <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
-              <UIcon name="i-lucide-banknote" class="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <UIcon name="i-lucide-file-text" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p class="font-medium text-gray-900 dark:text-white">Pricing</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Rate card & prices</p>
+              <p class="font-medium text-gray-900 dark:text-white">Quotes</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Manage quotes</p>
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/members`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
+        <UCard :to="`/dashboard/shops/${slug}/members`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500 order-last">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
               <UIcon name="i-lucide-users" class="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -70,7 +114,7 @@
             </div>
           </div>
         </UCard>
-        <UCard :to="`/dashboard/shops/${slug}/hours`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
+        <UCard :to="`/dashboard/shops/${slug}/hours`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500 order-last">
           <div class="flex items-center gap-3">
             <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
               <UIcon name="i-lucide-clock" class="w-5 h-5 text-orange-600 dark:text-orange-400" />
@@ -109,6 +153,8 @@
 <script setup lang="ts">
 import { useShopStore } from '~/stores/shop'
 import { useQuoteStore } from '~/stores/quote'
+import { useMachineStore } from '~/stores/machine'
+import { usePricingStore } from '~/stores/pricing'
 
 definePageMeta({
   layout: 'dashboard',
@@ -118,12 +164,37 @@ definePageMeta({
 const route = useRoute()
 const shopStore = useShopStore()
 const quoteStore = useQuoteStore()
+const machineStore = useMachineStore()
+const pricingStore = usePricingStore()
 const slug = computed(() => route.params.slug as string)
 const shop = computed(() => shopStore.currentShop)
 const quoteCount = computed(() => quoteStore.quotes.length)
 
+const hasMachines = computed(() => machineStore.machines.length > 0)
+const machineCount = computed(() => machineStore.machines.length)
+const hasPricing = computed(
+  () =>
+    pricingStore.paperPrices.length > 0 ||
+    pricingStore.printingPrices.length > 0 ||
+    pricingStore.finishingServices.length > 0
+)
+const setupProgress = computed(() => {
+  let n = 0
+  if (hasMachines.value) n++
+  if (hasPricing.value) n++
+  return n
+})
+
 onMounted(async () => {
   await shopStore.fetchShopBySlug(slug.value)
-  if (slug.value) await quoteStore.fetchShopQuotes(slug.value)
+  if (slug.value) {
+    await Promise.all([
+      quoteStore.fetchShopQuotes(slug.value),
+      machineStore.fetchMachines(slug.value),
+      pricingStore.fetchPrintingPrices(slug.value),
+      pricingStore.fetchPaperPrices(slug.value),
+      pricingStore.fetchFinishingServices(slug.value),
+    ])
+  }
 })
 </script>

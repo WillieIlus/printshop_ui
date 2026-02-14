@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <div class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Pricing Management</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Set up your rate card for customers</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Stock & prices</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Paper prices, printing rates, finishing services</p>
       </div>
       <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
         <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
@@ -40,9 +40,19 @@
     <template v-else>
       <!-- Printing Prices -->
       <div v-if="activeTab === 'printing'" class="space-y-4">
+        <div v-if="!machineStore.machines.length" class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p class="text-sm text-amber-800">
+            <UIcon name="i-lucide-alert-circle" class="inline w-4 h-4 mr-1" />
+            Add machines first in <NuxtLink :to="`/dashboard/shops/${slug}/machines`" class="font-semibold text-amber-700 hover:underline">Machines</NuxtLink> before setting printing prices.
+          </p>
+        </div>
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Set the price per printed side for each paper size and color mode.</p>
-          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPrintingModal()">
+          <UButton
+            class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+            :disabled="!machineStore.machines.length"
+            @click="openPrintingModal()"
+          >
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Printing Price
           </UButton>
@@ -81,8 +91,17 @@
             </tbody>
           </table>
         </div>
-        <CommonEmptyState v-else title="No printing prices" description="Add printing prices to let customers calculate costs.">
-          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPrintingModal()">Add First Printing Price</UButton>
+        <CommonEmptyState v-else title="No printing prices" description="Add machines first, then add printing prices per machine and paper size.">
+          <NuxtLink v-if="!machineStore.machines.length" :to="`/dashboard/shops/${slug}/machines`">
+            <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600">Add machines first</UButton>
+          </NuxtLink>
+          <UButton
+            v-else
+            class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+            @click="openPrintingModal()"
+          >
+            Add first printing price
+          </UButton>
         </CommonEmptyState>
       </div>
 
@@ -257,8 +276,8 @@ import type {
   FinishingServiceForm,
   VolumeDiscountForm,
 } from '~/shared/types'
-import { API } from '~/shared/api-paths'
 import { usePricingStore } from '~/stores/pricing'
+import { useMachineStore } from '~/stores/machine'
 
 type TabId = 'printing' | 'paper' | 'finishing' | 'discounts'
 
@@ -300,20 +319,9 @@ const editingPaperPrice = ref<PaperPrice | null>(null)
 const editingFinishingService = ref<FinishingService | null>(null)
 const editingDiscount = ref<VolumeDiscount | null>(null)
 const formLoading = ref(false)
-const machines = ref<Array<{ id: number; name: string }>>([])
+const machineStore = useMachineStore()
 
-const machineOptions = computed(() =>
-  machines.value.map((m) => ({ label: m.name, value: m.id }))
-)
-
-async function fetchMachines() {
-  try {
-    const { $api } = useNuxtApp()
-    machines.value = await $api<Array<{ id: number; name: string }>>(API.shopMachines(slug.value))
-  } catch {
-    machines.value = []
-  }
-}
+const machineOptions = computed(() => machineStore.machineOptions)
 
 const openPrintingModal = (price?: PrintingPrice) => {
   editingPrintingPrice.value = price ?? null
@@ -456,7 +464,7 @@ onMounted(async () => {
       pricingStore.fetchPaperPrices(slug.value),
       pricingStore.fetchFinishingServices(slug.value),
       pricingStore.fetchVolumeDiscounts(slug.value),
-      fetchMachines(),
+      machineStore.fetchMachines(slug.value),
     ])
   } catch (err) {
     console.error('Error fetching pricing:', err)
