@@ -17,7 +17,10 @@
         label="Type"
         :options="typeOptions"
         placeholder="Select type"
-        portal="#modal-portal"
+        portal="body"
+        :create-item="{ when: 'always' }"
+        :format-create-value="formatCreateValue"
+        @create="onCreateType"
       />
       <div class="flex justify-end gap-2 pt-4">
         <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
@@ -48,12 +51,24 @@ defineEmits<{
   cancel: []
 }>()
 
-const typeOptions = [
+const typeOptions = ref([
   { label: 'Digital Printer', value: 'DIGITAL' },
   { label: 'Large Format', value: 'LARGE_FORMAT' },
   { label: 'Offset Press', value: 'OFFSET' },
   { label: 'Finishing Equipment', value: 'FINISHING' },
-]
+])
+
+function formatCreateValue(raw: string): string {
+  const label = raw.trim()
+  if (!label) return ''
+  return label.toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '')
+}
+
+function onCreateType(value: string) {
+  const val = formatCreateValue(value)
+  if (!val || typeOptions.value.some((o) => o.value === val)) return
+  typeOptions.value = [...typeOptions.value, { label: value.trim(), value: val }]
+}
 
 const schema = object({
   name: string().required('Name is required').max(150),

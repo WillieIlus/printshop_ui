@@ -97,6 +97,14 @@ body {
   @apply text-amber-200;
 }
 
+/* SelectMenu dropdown must appear above modals (modal uses z-[99999]) */
+#modal-portal [data-slot="content"],
+#modal-portal [data-reka-combobox-content],
+body > [data-slot="content"],
+body [data-reka-combobox-content] {
+  z-index: 100000 !important;
+}
+
 /* Page & layout transitions (avoids parentNode bug during navigation) */
 .page-enter-active,
 .page-leave-active,

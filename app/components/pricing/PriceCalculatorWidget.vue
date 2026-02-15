@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { RateCard, PriceCalculationInput, PriceCalculationResult } from '~/shared/types'
+import { usePricingStore } from '~/stores/pricing'
 
 interface Props {
   slug: string

@@ -53,15 +53,16 @@ export const useShopStore = defineStore('shop', () => {
     try {
       const { $api } = useNuxtApp()
       const response = await $api<PaginatedResponse<Shop>>(API.shops(), { params })
-      shops.value = response.results
+      shops.value = response?.results ?? []
       pagination.value = {
-        count: response.count,
-        next: response.next,
-        previous: response.previous,
+        count: response?.count ?? 0,
+        next: response?.next ?? null,
+        previous: response?.previous ?? null,
       }
     } catch (err: unknown) {
       error.value = parseDjangoError(err, 'Failed to fetch shops')
       console.error('fetchShops error:', err)
+      shops.value = []
     } finally {
       loading.value = false
     }
@@ -85,9 +86,16 @@ export const useShopStore = defineStore('shop', () => {
   async function fetchShopBySlug(slug: string) {
     loading.value = true
     error.value = null
+    // Only clear when fetching a different shop. Clearing while same shop is displayed causes
+    // Vue unmount errors when navigating between shop sub-pages (e.g. index -> request-quote).
+    const isSameShop = currentShop.value?.slug === slug
+    if (!isSameShop) {
+      currentShop.value = null
+    }
     try {
       const { $api } = useNuxtApp()
-      currentShop.value = await $api<Shop>(API.shopDetail(slug))
+      const data = await $api<Shop>(API.shopDetail(slug))
+      currentShop.value = data
     } catch (err: unknown) {
       error.value = parseDjangoError(err, 'Failed to fetch shop')
       console.error('fetchShopBySlug error:', err)

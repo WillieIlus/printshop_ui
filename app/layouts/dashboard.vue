@@ -73,6 +73,12 @@
                     Machines
                   </NuxtLink>
                   <NuxtLink
+                    :to="`/dashboard/shops/${shop.slug}/materials`"
+                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
+                  >
+                    Paper stock
+                  </NuxtLink>
+                  <NuxtLink
                     :to="`/dashboard/shops/${shop.slug}/pricing`"
                     class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
                   >
@@ -135,8 +141,6 @@
         <slot />
       </main>
     </div>
-
-    <UNotifications />
   </div>
 </template>
 

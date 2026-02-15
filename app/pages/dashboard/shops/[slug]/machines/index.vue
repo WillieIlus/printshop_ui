@@ -67,50 +67,21 @@
       </CommonEmptyState>
     </template>
 
-    <!-- Modal: Teleport to app-level portal (outside layout overflow-hidden) -->
-    <Teleport to="#modal-portal">
-      <div
-        v-if="modalOpen"
-      class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="machine-modal-title"
-      @click.self="closeModal"
+    <CommonSimpleModal
+      :open="modalOpen"
+      :title="editing ? 'Edit machine' : 'Add machine'"
+      :description="editing ? 'Edit printer or equipment details.' : 'Add a printer or equipment. Required before setting printing prices.'"
+      @update:open="onModalOpenChange"
     >
-      <div
-        class="absolute inset-0 bg-black/50"
-        aria-hidden="true"
-        @click="closeModal"
+      <MachinesMachineForm
+        v-if="formReady"
+        :key="editing?.id ?? 'new'"
+        :machine="editing"
+        :loading="formLoading"
+        @submit="onSubmit"
+        @cancel="closeModal"
       />
-      <div
-        class="relative rounded-xl shadow-xl border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 max-w-lg w-full max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col"
-        role="document"
-      >
-        <div class="flex justify-between items-center p-4 sm:px-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
-          <h2 id="machine-modal-title" class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ editing ? 'Edit machine' : 'Add machine' }}
-          </h2>
-          <button
-            type="button"
-            class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Close"
-            @click="closeModal"
-          >
-            <UIcon name="i-lucide-x" class="w-5 h-5" />
-          </button>
-        </div>
-        <div class="p-4 sm:p-6 overflow-y-auto flex-1">
-          <MachinesMachineForm
-            :key="editing?.id ?? 'new'"
-            :machine="editing"
-            :loading="formLoading"
-            @submit="onSubmit"
-            @cancel="closeModal"
-          />
-        </div>
-      </div>
-    </div>
-    </Teleport>
+    </CommonSimpleModal>
   </div>
 </template>
 
@@ -138,6 +109,7 @@ const machines = computed(() => {
   return (shopStore.currentShop?.machines ?? []) as Machine[]
 })
 const modalOpen = ref(false)
+const formReady = ref(false)
 const editing = ref<Machine | null>(null)
 const formLoading = ref(false)
 
@@ -154,6 +126,21 @@ function closeModal() {
   modalOpen.value = false
   editing.value = null
 }
+
+function onModalOpenChange(open: boolean) {
+  modalOpen.value = open
+  if (!open) editing.value = null
+}
+
+watch(modalOpen, (open) => {
+  if (open) {
+    formReady.value = false
+    nextTick(() => { formReady.value = true })
+  } else {
+    formReady.value = false
+    editing.value = null
+  }
+})
 
 async function onSubmit(data: { name: string; machine_type?: string | { value: string } }) {
   formLoading.value = true

@@ -40,7 +40,7 @@
 
           <!-- User Avatar / Login -->
           <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
-            <UPopover mode="click" :popper="{ placement: 'bottom-end' }">
+            <UPopover mode="click" :content="{ placement: 'bottom-end' }">
               <button class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 transition-all hover:border-gray-300 hover:shadow-sm">
                 <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-flamingo-400 to-flamingo-600 text-xs font-bold text-white">
                   {{ userInitials }}
@@ -48,7 +48,7 @@
                 <span class="hidden text-sm font-medium text-gray-700 sm:inline">{{ userName }}</span>
                 <UIcon name="i-lucide-chevron-down" class="h-4 w-4 text-gray-400" />
               </button>
-              <template #panel>
+              <template #content>
                 <div class="w-48 border border-gray-200 bg-white rounded-xl shadow-xl p-2 flex flex-col gap-1">
                   <NuxtLink to="/dashboard" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">Dashboard</NuxtLink>
                   <NuxtLink to="/dashboard/profile" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">Profile</NuxtLink>

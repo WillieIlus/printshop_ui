@@ -91,12 +91,13 @@
     </template>
 
     <CommonSimpleModal
-      v-if="modalOpen"
       :open="modalOpen"
       :title="editing ? 'Edit paper stock' : 'Add paper stock'"
-      @update:open="modalOpen = $event"
+      :description="editing ? 'Edit paper inventory details.' : 'Add paper inventory by size, GSM and type.'"
+      @update:open="onModalOpenChange"
     >
       <MaterialsPaperStockForm
+        v-if="formReady"
         :key="editing?.id ?? 'new'"
         :stock="editing"
         :loading="formLoading"
@@ -106,10 +107,10 @@
     </CommonSimpleModal>
 
     <CommonSimpleModal
-      v-if="adjustModalOpen"
       :open="adjustModalOpen"
       title="Adjust stock"
-      @update:open="adjustModalOpen = $event"
+      description="Add or remove sheets from inventory."
+      @update:open="onAdjustModalOpenChange"
     >
         <div v-if="adjustingItem" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -158,6 +159,7 @@ const toast = useToast()
 
 const slug = computed(() => route.params.slug as string)
 const modalOpen = ref(false)
+const formReady = ref(false)
 const editing = ref<PaperStock | null>(null)
 const formLoading = ref(false)
 const adjustModalOpen = ref(false)
@@ -179,6 +181,21 @@ function closeModal() {
   editing.value = null
 }
 
+function onModalOpenChange(open: boolean) {
+  modalOpen.value = open
+  if (!open) editing.value = null
+}
+
+watch(modalOpen, (open) => {
+  if (open) {
+    formReady.value = false
+    nextTick(() => { formReady.value = true })
+  } else {
+    formReady.value = false
+    editing.value = null
+  }
+})
+
 function openAdjustModal(item: PaperStock) {
   adjustingItem.value = item
   adjustmentValue.value = ''
@@ -189,6 +206,11 @@ function closeAdjustModal() {
   adjustModalOpen.value = false
   adjustingItem.value = null
   adjustmentValue.value = ''
+}
+
+function onAdjustModalOpenChange(open: boolean) {
+  adjustModalOpen.value = open
+  if (!open) adjustingItem.value = null
 }
 
 async function onSubmit(data: {

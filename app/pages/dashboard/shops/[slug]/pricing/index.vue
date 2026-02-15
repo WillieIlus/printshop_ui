@@ -225,12 +225,14 @@
 
     <!-- Modals with table-style forms -->
     <CommonSimpleModal
-      v-if="printingModalOpen"
       :open="printingModalOpen"
       :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'"
-      @update:open="printingModalOpen = $event"
+      :description="editingPrintingPrice ? 'Edit price per printed side.' : 'Set price per printed side for paper size and color mode.'"
+      @update:open="onPrintingModalOpenChange"
     >
       <PricingPrintingPriceForm
+        v-if="printingFormReady"
+        :key="editingPrintingPrice?.id ?? 'new'"
         :price="editingPrintingPrice"
         :machine-options="machineOptions"
         :loading="formLoading"
@@ -239,12 +241,14 @@
       />
     </CommonSimpleModal>
     <CommonSimpleModal
-      v-if="paperModalOpen"
       :open="paperModalOpen"
       :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'"
-      @update:open="paperModalOpen = $event"
+      :description="editingPaperPrice ? 'Edit paper price by GSM.' : 'Set paper price by GSM for your rate card.'"
+      @update:open="onPaperModalOpenChange"
     >
       <PricingPaperPriceForm
+        v-if="paperFormReady"
+        :key="editingPaperPrice?.id ?? 'new'"
         :price="editingPaperPrice"
         :loading="formLoading"
         @submit="submitPaperPrice"
@@ -252,12 +256,14 @@
       />
     </CommonSimpleModal>
     <CommonSimpleModal
-      v-if="finishingModalOpen"
       :open="finishingModalOpen"
       :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'"
-      @update:open="finishingModalOpen = $event"
+      :description="editingFinishingService ? 'Edit finishing service details.' : 'Add finishing services like lamination and binding.'"
+      @update:open="onFinishingModalOpenChange"
     >
       <PricingFinishingServiceForm
+        v-if="finishingFormReady"
+        :key="editingFinishingService?.id ?? 'new'"
         :service="editingFinishingService"
         :loading="formLoading"
         @submit="submitFinishingService"
@@ -265,12 +271,14 @@
       />
     </CommonSimpleModal>
     <CommonSimpleModal
-      v-if="discountModalOpen"
       :open="discountModalOpen"
       :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'"
-      @update:open="discountModalOpen = $event"
+      :description="editingDiscount ? 'Edit bulk discount details.' : 'Set up bulk discounts for large orders.'"
+      @update:open="onDiscountModalOpenChange"
     >
       <PricingVolumeDiscountForm
+        v-if="discountFormReady"
+        :key="editingDiscount?.id ?? 'new'"
         :discount="editingDiscount"
         :loading="formLoading"
         @submit="submitVolumeDiscount"
@@ -329,6 +337,10 @@ const printingModalOpen = ref(false)
 const paperModalOpen = ref(false)
 const finishingModalOpen = ref(false)
 const discountModalOpen = ref(false)
+const printingFormReady = ref(false)
+const paperFormReady = ref(false)
+const finishingFormReady = ref(false)
+const discountFormReady = ref(false)
 const editingPrintingPrice = ref<PrintingPrice | null>(null)
 const editingPaperPrice = ref<PaperPrice | null>(null)
 const editingFinishingService = ref<FinishingService | null>(null)
@@ -347,6 +359,19 @@ const closePrintingModal = () => {
   printingModalOpen.value = false
   editingPrintingPrice.value = null
 }
+function onPrintingModalOpenChange(open: boolean) {
+  printingModalOpen.value = open
+  if (!open) editingPrintingPrice.value = null
+}
+watch(printingModalOpen, (open) => {
+  if (open) {
+    printingFormReady.value = false
+    nextTick(() => { printingFormReady.value = true })
+  } else {
+    printingFormReady.value = false
+    editingPrintingPrice.value = null
+  }
+})
 async function submitPrintingPrice(data: PrintingPriceForm) {
   formLoading.value = true
   try {
@@ -380,6 +405,19 @@ const closePaperModal = () => {
   paperModalOpen.value = false
   editingPaperPrice.value = null
 }
+function onPaperModalOpenChange(open: boolean) {
+  paperModalOpen.value = open
+  if (!open) editingPaperPrice.value = null
+}
+watch(paperModalOpen, (open) => {
+  if (open) {
+    paperFormReady.value = false
+    nextTick(() => { paperFormReady.value = true })
+  } else {
+    paperFormReady.value = false
+    editingPaperPrice.value = null
+  }
+})
 async function submitPaperPrice(data: PaperPriceForm & { gsm?: string | number }) {
   formLoading.value = true
   const payload = { ...data, gsm: Number(data.gsm) }
@@ -414,6 +452,19 @@ const closeFinishingModal = () => {
   finishingModalOpen.value = false
   editingFinishingService.value = null
 }
+function onFinishingModalOpenChange(open: boolean) {
+  finishingModalOpen.value = open
+  if (!open) editingFinishingService.value = null
+}
+watch(finishingModalOpen, (open) => {
+  if (open) {
+    finishingFormReady.value = false
+    nextTick(() => { finishingFormReady.value = true })
+  } else {
+    finishingFormReady.value = false
+    editingFinishingService.value = null
+  }
+})
 async function submitFinishingService(data: FinishingServiceForm) {
   formLoading.value = true
   try {
@@ -447,6 +498,19 @@ const closeDiscountModal = () => {
   discountModalOpen.value = false
   editingDiscount.value = null
 }
+function onDiscountModalOpenChange(open: boolean) {
+  discountModalOpen.value = open
+  if (!open) editingDiscount.value = null
+}
+watch(discountModalOpen, (open) => {
+  if (open) {
+    discountFormReady.value = false
+    nextTick(() => { discountFormReady.value = true })
+  } else {
+    discountFormReady.value = false
+    editingDiscount.value = null
+  }
+})
 async function submitVolumeDiscount(data: VolumeDiscountForm) {
   formLoading.value = true
   try {
