@@ -10,6 +10,7 @@
       <div class="flex gap-2">
         <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
         <UButton
+          type="button"
           class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
           @click="openModal()"
         >
@@ -61,7 +62,7 @@
         title="No machines yet"
         description="Add your first printer or equipment. You'll need at least one machine before setting printing prices."
       >
-        <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openModal()">
+        <UButton type="button" class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openModal()">
           Add first machine
         </UButton>
       </CommonEmptyState>
