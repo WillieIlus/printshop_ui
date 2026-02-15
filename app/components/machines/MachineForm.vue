@@ -17,6 +17,7 @@
         label="Type"
         :options="typeOptions"
         placeholder="Select type"
+        portal="#modal-portal"
       />
       <div class="flex justify-end gap-2 pt-4">
         <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>

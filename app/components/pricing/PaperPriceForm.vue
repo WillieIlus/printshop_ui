@@ -12,6 +12,7 @@
               placeholder="Select size"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>
@@ -38,6 +39,7 @@
               placeholder="Select type"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>

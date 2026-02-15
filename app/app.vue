@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <UApp>
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-  </div>
+    <div id="modal-portal" />
+  </UApp>
 </template>

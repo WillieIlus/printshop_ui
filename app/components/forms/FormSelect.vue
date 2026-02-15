@@ -16,6 +16,7 @@
         :disabled="disabled"
         value-attribute="value"
         :color="errors.length ? 'error' : undefined"
+        :portal="portal"
         class="w-full"
         :ui="{
           base: errors.length
@@ -37,13 +38,18 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  name: string
-  label: string
-  options: Array<{ label: string; value: string | number }>
-  placeholder?: string
-  disabled?: boolean
-  required?: boolean
-  hideLabel?: boolean
-}>()
+withDefaults(
+  defineProps<{
+    name: string
+    label: string
+    options: Array<{ label: string; value: string | number }>
+    placeholder?: string
+    disabled?: boolean
+    required?: boolean
+    hideLabel?: boolean
+    /** Portal target for dropdown (e.g. "#modal-portal" when inside a modal) */
+    portal?: string | boolean
+  }>(),
+  { portal: true }
+)
 </script>

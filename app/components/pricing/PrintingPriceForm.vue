@@ -12,6 +12,7 @@
               placeholder="Select machine"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>
@@ -25,6 +26,7 @@
               placeholder="Select size"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>
@@ -38,6 +40,7 @@
               placeholder="Select color"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>

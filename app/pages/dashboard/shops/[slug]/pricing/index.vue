@@ -5,10 +5,13 @@
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Stock & prices</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">Paper prices, printing rates, finishing services</p>
       </div>
-      <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
+      <div class="flex gap-2">
+        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+        <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
         <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
         Preview Public Page
       </UButton>
+      </div>
     </div>
 
     <!-- Tab Navigation -->
@@ -221,47 +224,59 @@
     </template>
 
     <!-- Modals with table-style forms -->
-    <UModal v-model:open="printingModalOpen" :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'">
-      <template #body>
-        <PricingPrintingPriceForm
-          :price="editingPrintingPrice"
-          :machine-options="machineOptions"
-          :loading="formLoading"
-          @submit="submitPrintingPrice"
-          @cancel="closePrintingModal"
-        />
-      </template>
-    </UModal>
-    <UModal v-model:open="paperModalOpen" :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'">
-      <template #body>
-        <PricingPaperPriceForm
-          :price="editingPaperPrice"
-          :loading="formLoading"
-          @submit="submitPaperPrice"
-          @cancel="closePaperModal"
-        />
-      </template>
-    </UModal>
-    <UModal v-model:open="finishingModalOpen" :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'">
-      <template #body>
-        <PricingFinishingServiceForm
-          :service="editingFinishingService"
-          :loading="formLoading"
-          @submit="submitFinishingService"
-          @cancel="closeFinishingModal"
-        />
-      </template>
-    </UModal>
-    <UModal v-model:open="discountModalOpen" :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'">
-      <template #body>
-        <PricingVolumeDiscountForm
-          :discount="editingDiscount"
-          :loading="formLoading"
-          @submit="submitVolumeDiscount"
-          @cancel="closeDiscountModal"
-        />
-      </template>
-    </UModal>
+    <CommonSimpleModal
+      v-if="printingModalOpen"
+      :open="printingModalOpen"
+      :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'"
+      @update:open="printingModalOpen = $event"
+    >
+      <PricingPrintingPriceForm
+        :price="editingPrintingPrice"
+        :machine-options="machineOptions"
+        :loading="formLoading"
+        @submit="submitPrintingPrice"
+        @cancel="closePrintingModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      v-if="paperModalOpen"
+      :open="paperModalOpen"
+      :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'"
+      @update:open="paperModalOpen = $event"
+    >
+      <PricingPaperPriceForm
+        :price="editingPaperPrice"
+        :loading="formLoading"
+        @submit="submitPaperPrice"
+        @cancel="closePaperModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      v-if="finishingModalOpen"
+      :open="finishingModalOpen"
+      :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'"
+      @update:open="finishingModalOpen = $event"
+    >
+      <PricingFinishingServiceForm
+        :service="editingFinishingService"
+        :loading="formLoading"
+        @submit="submitFinishingService"
+        @cancel="closeFinishingModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      v-if="discountModalOpen"
+      :open="discountModalOpen"
+      :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'"
+      @update:open="discountModalOpen = $event"
+    >
+      <PricingVolumeDiscountForm
+        :discount="editingDiscount"
+        :loading="formLoading"
+        @submit="submitVolumeDiscount"
+        @cancel="closeDiscountModal"
+      />
+    </CommonSimpleModal>
   </div>
 </template>
 
