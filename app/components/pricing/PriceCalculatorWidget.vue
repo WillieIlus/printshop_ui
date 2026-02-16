@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { usePricingStore } from '~/stores/pricing'
+import { useLocalQuotesStore } from '~/stores/localQuotes'
+import { useNotification } from '~/composables/useNotification'
+import { formatKES } from '~/utils/formatters'
 import type { RateCard, PriceCalculationInput, PriceCalculationResult } from '~/shared/types'
 
 interface Props {
   slug: string
   rateCard?: RateCard
+  shopName?: string
+  shopPhone?: string
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), { shopName: '', shopPhone: '' })
 const emit = defineEmits<{
   (e: 'calculated', result: PriceCalculationResult): void
 }>()
@@ -35,6 +40,8 @@ const result = ref<PriceCalculationResult | null>(null)
 const calculating = ref(false)
 const error = ref<string | null>(null)
 const overridePrice = ref<string | null>(null)
+const saving = ref(false)
+const savedQuoteId = ref<string | null>(null)
 
 // Calculate price
 const calculatePrice = async () => {
@@ -67,20 +74,67 @@ watch([sheetSize, gsm, quantity, sides, paperType, selectedFinishing], () => {
   debounceTimer = setTimeout(calculatePrice, 500)
 })
 
-// Format price
-const formatPrice = (price: string) => {
-  const num = parseFloat(price)
-  return `KES ${num.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
 
 // Initial calculation
 onMounted(() => {
   calculatePrice()
 })
+
+// Quote snapshot for Copy/WhatsApp
+const quoteSnapshot = computed(() => {
+  const price = overridePrice.value && overridePrice.value !== ''
+    ? overridePrice.value
+    : result.value?.grand_total ?? '0'
+  const finishingNames = props.rateCard?.finishing
+    ?.filter((f) => selectedFinishing.value.includes(f.id))
+    .map((f) => f.name) ?? []
+  return {
+    shopName: props.shopName || 'Print Shop',
+    shopPhone: props.shopPhone,
+    sheetSize: sheetSize.value,
+    gsm: gsm.value,
+    paperType: paperType.value,
+    quantity: quantity.value,
+    sides: sides.value,
+    finishingNames: finishingNames.length ? finishingNames : undefined,
+    suggestedPrice: price,
+    validityDays: 7,
+  }
+})
+
+const localQuotesStore = useLocalQuotesStore()
+const notification = useNotification()
+
+async function handleSaveQuote() {
+  if (!quoteSnapshot.value || !result.value) return
+  saving.value = true
+  try {
+    const costRows = [
+      { label: 'Paper', amount: result.value.total_paper, configured: parseFloat(result.value.total_paper) > 0 },
+      { label: 'Printing', amount: result.value.total_printing, configured: parseFloat(result.value.total_printing) > 0 },
+      { label: 'Finishing', amount: result.value.total_finishing, configured: parseFloat(result.value.total_finishing) > 0 },
+    ]
+    const quote = localQuotesStore.addQuote({
+      shopSlug: props.slug,
+      shopName: props.shopName || 'Print Shop',
+      snapshot: quoteSnapshot.value,
+      costBreakdown: costRows,
+      suggestedPrice: overridePrice.value || result.value.grand_total,
+      overridePrice: overridePrice.value,
+      status: 'draft',
+    })
+    savedQuoteId.value = quote.id
+    notification.success('Quote saved locally')
+  } catch (err) {
+    notification.error(err instanceof Error ? err.message : 'Failed to save')
+  } finally {
+    saving.value = false
+  }
+}
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+  <div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
 
     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
       <UIcon name="i-lucide-calculator" class="w-6 h-6 text-emerald-600" />
@@ -88,84 +142,82 @@ onMounted(() => {
     </h3>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Left: Input Form -->
-      <div class="space-y-4">
-        <!-- Paper Size -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Paper Size</label>
-          <select v-model="sheetSize" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            <option value="A5">A5</option>
-            <option value="A4">A4</option>
-            <option value="A3">A3</option>
-            <option value="SRA3">SRA3</option>
-          </select>
-        </div>
-
-        <!-- Paper Weight (GSM) -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Paper Weight (GSM)</label>
-          <select v-model="gsm" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            <option v-for="g in availableGSM" :key="g" :value="g">{{ g }} gsm</option>
-          </select>
-        </div>
-
-        <!-- Paper Type -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Paper Type</label>
-          <select v-model="paperType" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            <option value="GLOSS">Gloss</option>
-            <option value="MATTE">Matte</option>
-            <option value="BOND">Bond</option>
-            <option value="ART">Art Paper</option>
-          </select>
-        </div>
-
-        <!-- Quantity -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Quantity (sheets)</label>
-          <input 
-            v-model.number="quantity" 
-            type="number" 
-            min="1" 
-            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
-
-        <!-- Sides -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Print Sides</label>
-          <div class="flex gap-4">
-            <label class="flex items-center">
-              <input type="radio" v-model="sides" :value="1" class="text-blue-600 focus:ring-blue-500" />
-              <span class="ml-2 text-sm text-gray-700">Single-sided</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" v-model="sides" :value="2" class="text-blue-600 focus:ring-blue-500" />
-              <span class="ml-2 text-sm text-gray-700">Double-sided</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Finishing Options -->
-        <div v-if="rateCard?.finishing?.length">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Finishing (optional)</label>
-          <div class="space-y-2 max-h-40 overflow-y-auto">
-            <label 
-              v-for="service in rateCard.finishing" 
-              :key="service.id" 
-              class="flex items-center p-2 rounded hover:bg-gray-50"
-            >
-              <input 
-                type="checkbox" 
-                v-model="selectedFinishing" 
-                :value="service.id" 
-                class="text-blue-600 focus:ring-blue-500 rounded"
+      <!-- Left: Input Form (collapsible sections) -->
+      <div class="space-y-3">
+        <QuotesQuoteInputsSection title="Print Specs" :default-open="true">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Size</label>
+              <select v-model="sheetSize" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                <option value="A5">A5</option>
+                <option value="A4">A4</option>
+                <option value="A3">A3</option>
+                <option value="SRA3">SRA3</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity (sheets)</label>
+              <input
+                v-model.number="quantity"
+                type="number"
+                min="1"
+                class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
               />
-              <span class="ml-2 text-sm text-gray-700">{{ service.name }}</span>
-              <span class="ml-auto text-sm text-gray-500">{{ formatPrice(service.price) }}/{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Print Sides</label>
+              <div class="flex gap-4">
+                <label class="flex items-center">
+                  <input type="radio" v-model="sides" :value="1" class="text-emerald-600 focus:ring-emerald-500" />
+                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Single-sided</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" v-model="sides" :value="2" class="text-emerald-600 focus:ring-emerald-500" />
+                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Double-sided</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </QuotesQuoteInputsSection>
+
+        <QuotesQuoteInputsSection title="Materials" :default-open="true">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Type</label>
+              <select v-model="paperType" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                <option value="GLOSS">Gloss</option>
+                <option value="MATTE">Matte</option>
+                <option value="BOND">Bond</option>
+                <option value="ART">Art Paper</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Weight (GSM)</label>
+              <select v-model="gsm" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                <option v-for="g in availableGSM" :key="g" :value="g">{{ g }} gsm</option>
+              </select>
+            </div>
+          </div>
+        </QuotesQuoteInputsSection>
+
+        <QuotesQuoteInputsSection v-if="rateCard?.finishing?.length" title="Finishing & Delivery" :default-open="false">
+          <div class="space-y-2 max-h-40 overflow-y-auto">
+            <label
+              v-for="service in rateCard.finishing"
+              :key="service.id"
+              class="flex items-center p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <input
+                type="checkbox"
+                v-model="selectedFinishing"
+                :value="service.id"
+                class="text-emerald-600 focus:ring-emerald-500 rounded"
+              />
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ service.name }}</span>
+              <span class="ml-auto text-sm text-gray-500">{{ formatKES(service.price) }}/{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
             </label>
           </div>
-        </div>
+        </QuotesQuoteInputsSection>
       </div>
 
       <!-- Right: Business Output Panel (sticky on desktop) -->
@@ -186,9 +238,17 @@ onMounted(() => {
           @update:override-price="overridePrice = $event"
         >
           <template #actions>
+            <QuotesQuoteActions
+              :snapshot="quoteSnapshot"
+              :show-save="true"
+              :show-print="!!savedQuoteId"
+              :print-url="savedQuoteId ? `/quote/print?id=${savedQuoteId}` : null"
+              :saving="saving"
+              @save="handleSaveQuote"
+            />
             <NuxtLink
               :to="`/shops/${props.slug}/request-quote`"
-              class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+              class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors mt-2"
             >
               Request Quote
               <UIcon name="i-lucide-arrow-right" class="w-4 h-4" />

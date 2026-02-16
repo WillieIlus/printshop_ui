@@ -143,6 +143,7 @@ const navLinks = [
   { label: 'Templates Gallery', to: '/#demo-gallery' },
   { label: 'Pricing Models', to: '/#models' },
   { label: 'Shops', to: '/shops' },
+  { label: 'My Quotes', to: '/quotes' },
 ]
 
 const userName = computed(() => {

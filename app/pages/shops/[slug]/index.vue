@@ -30,6 +30,8 @@
           v-if="rateCard" 
           :slug="slug" 
           :rate-card="rateCard"
+          :shop-name="shop?.name"
+          :shop-phone="shop?.phone_number ?? undefined"
           @calculated="onPriceCalculated"
         />
       </div>

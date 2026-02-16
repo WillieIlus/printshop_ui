@@ -47,35 +47,45 @@
 
 ---
 
-## Phase 2 — Fast Quote Workflow (Checkpoint 2.1–2.2)
+## Phase 2 — Fast Quote Workflow ✅
 
-### Checkpoint 2.1: Copy as WhatsApp
-- Add "Copy as WhatsApp" button to output panel
-- Format: job spec, quantity, suggested price, validity, contact
+### 2.1 Copy as WhatsApp ✅
+- `utils/quoteMessage.ts`: `buildQuoteMessage()`, `getWhatsAppShareUrl()`
+- `QuoteActions.vue`: Copy (clipboard), WhatsApp (deep link)
+- Message: shop name, job summary, suggested price, validity, contact
 
-### Checkpoint 2.2: Save Quote + Export PDF
-- "Save Quote" → create quote with customer + pricing data (if API supports)
-- "Export PDF" → open print-friendly route, `window.print()`
+### 2.2 Save Quote (Option A: local) ✅
+- `stores/localQuotes.ts`: addQuote, updateQuote, getById, removeQuote, localStorage persist
+- Save Quote button in Output Panel → saves snapshot + cost breakdown
+
+### 2.3 Export PDF ✅
+- `pages/quote/print.vue`: print-friendly layout, `window.print()` on mount
+- `/quote/print?id=draft_xxx` — opens in new tab, auto-prints
 
 ---
 
 ## Phase 3 — Language & KES (Checkpoint 3.1)
 
-### Checkpoint 3.1: Replace labels, KES formatting
-- "Suggested Selling Price", "Your Profit", "Cost Breakdown", "Underpricing Risk"
-- `formatCurrency(value, 'KES')` — add KES to formatters, use consistently
+### 3.1 Labels + formatKES ✅
+- "Suggested Selling Price", "Your Profit", "Profit Margin", "Cost Breakdown", "Underpricing Risk"
+- "Set Customer Price" (was Override price)
+- `formatKES()` in formatters — used throughout
 
 ---
 
-## Phase 4 — IA Improvements (Checkpoint 4.1–4.2)
+## Phase 4 — IA Improvements ✅
 
-### Checkpoint 4.1: Unified quote creation page for shop owners
-- New/refactored: `/dashboard/shops/[slug]/quotes/create` with job specs + customer + output panel
-- Collapsible sections: Paper, Print, Finishing, Customer
+### 4.1 Collapsible sections ✅
+- `QuoteInputsSection.vue`: collapsible wrapper
+- PriceCalculatorWidget: Print Specs (open), Materials (open), Finishing & Delivery (closed)
 
-### Checkpoint 4.2: Sticky output panel
-- Desktop: sticky sidebar
-- Mobile: sticky bottom bar or collapsible summary
+### 4.2 Sticky output panel ✅
+- Desktop: `lg:sticky lg:top-24` on output panel
+- Output panel always visible in right column
+
+### 4.3 Quotes list ✅
+- `pages/quotes/index.vue`: list of locally saved quotes, Export PDF, Delete
+- "My Quotes" in header nav
 
 ---
 

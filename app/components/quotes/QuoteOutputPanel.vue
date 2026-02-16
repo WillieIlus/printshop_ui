@@ -18,7 +18,7 @@
 
     <!-- Override input -->
     <div v-if="showOverride">
-      <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Override price (optional)</label>
+      <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Set Customer Price (optional)</label>
       <UInput
         :model-value="overridePrice"
         type="number"
