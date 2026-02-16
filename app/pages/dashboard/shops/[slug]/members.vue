@@ -1,15 +1,24 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Team members</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Team members"
+        :subtitle="slug"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <DashboardSkeletonState v-if="loading" variant="card" :show-header="false" />
+    <div v-else class="col-span-12">
+      <DashboardSectionCard>
+        <ShopsShopMembers :members="shopStore.shopMembers" />
+      </DashboardSectionCard>
     </div>
-    <CommonLoadingSpinner v-if="loading" />
-    <ShopsShopMembers v-else :members="shopStore.shopMembers" />
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

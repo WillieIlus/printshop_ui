@@ -1,20 +1,27 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add product template</h1>
-        <p class="text-gray-600 dark:text-gray-400">Create a preset for quick quoting</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Add product template"
+        subtitle="Create a preset for quick quoting"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }, { label: 'Products', to: `/dashboard/shops/${slug}/products` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <div class="col-span-12">
+      <DashboardSectionCard>
+        <ProductsProductTemplateForm
+          :loading="quoteStore.loading"
+          @submit="onSubmit"
+          @cancel="goBack"
+        />
+      </DashboardSectionCard>
     </div>
-    <UCard>
-      <ProductsProductTemplateForm
-        :loading="quoteStore.loading"
-        @submit="onSubmit"
-        @cancel="goBack"
-      />
-    </UCard>
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

@@ -44,6 +44,16 @@ body {
   }
 }
 
+/* Dashboard design system: calmer, layered surfaces */
+.text-muted {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+.dashboard-surface {
+  /* Calmer than marketing: subtle app surface, layered in dark mode */
+  @apply bg-gray-100/90 dark:bg-[#0f1419];
+}
+
 /* Page & layout transitions (avoids parentNode bug during navigation) */
 .page-enter-active,
 .page-leave-active,

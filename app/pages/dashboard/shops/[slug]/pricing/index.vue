@@ -1,18 +1,22 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Stock & prices</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Paper prices, printing rates, finishing services</p>
-      </div>
-      <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
-        <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
-        Preview Public Page
-      </UButton>
-    </div>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Stock & prices"
+        subtitle="Paper prices, printing rates, finishing services"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
+      >
+        <template #actions>
+          <UButton :to="`/shops/${slug}`" target="_blank" variant="outline">
+            <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
+            Preview Public Page
+          </UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
 
     <!-- Tab Navigation -->
-    <div class="flex gap-1 overflow-x-auto rounded-xl border border-gray-200 bg-white p-1.5">
+    <div class="col-span-12 flex gap-1 overflow-x-auto rounded-xl border border-gray-200/60 bg-white p-1.5 dark:border-gray-800/60 dark:bg-gray-900/50">
       <button
         v-for="tab in tabs"
         :key="tab.id"
@@ -34,12 +38,12 @@
     </div>
 
     <!-- Loading State -->
-    <CommonLoadingSpinner v-if="loading" />
+    <DashboardSkeletonState v-if="loading" variant="table" :show-header="false" class="col-span-12" />
 
     <!-- Tab Content -->
     <template v-else>
       <!-- Printing Prices -->
-      <div v-if="activeTab === 'printing'" class="space-y-4">
+      <div v-if="activeTab === 'printing'" class="col-span-12 space-y-4">
         <div v-if="!machineStore.machines.length" class="rounded-xl border border-amber-200 bg-amber-50 p-4">
           <p class="text-sm text-amber-800">
             <UIcon name="i-lucide-alert-circle" class="inline w-4 h-4 mr-1" />
@@ -106,7 +110,7 @@
       </div>
 
       <!-- Paper Prices -->
-      <div v-if="activeTab === 'paper'" class="space-y-4">
+      <div v-if="activeTab === 'paper'" class="col-span-12 space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Set paper prices by GSM (weight). Customers see this as their rate card.</p>
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">
@@ -152,7 +156,7 @@
       </div>
 
       <!-- Finishing Services -->
-      <div v-if="activeTab === 'finishing'" class="space-y-4">
+      <div v-if="activeTab === 'finishing'" class="col-span-12 space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Add finishing services like lamination, binding, and cutting.</p>
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">
@@ -190,7 +194,7 @@
       </div>
 
       <!-- Volume Discounts -->
-      <div v-if="activeTab === 'discounts'" class="space-y-4">
+      <div v-if="activeTab === 'discounts'" class="col-span-12 space-y-4">
         <div class="flex justify-between items-center">
           <p class="text-sm text-gray-600">Set up bulk discounts for large orders.</p>
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">
@@ -262,7 +266,7 @@
         />
       </template>
     </UModal>
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,25 +1,30 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Quotes</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <div class="flex gap-2">
-        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
-        <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
-          <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
-          New quote
-        </UButton>
-      </div>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Quotes"
+        :subtitle="slug"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+          <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
+            New quote
+          </UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <DashboardSkeletonState v-if="quoteStore.loading" variant="list" :show-header="false" />
+    <div v-else class="col-span-12">
+      <QuotesQuoteList :quotes="quoteStore.quotes">
+        <template #card-actions="{ quote }">
+          <UButton :to="`/dashboard/shops/${slug}/quotes/${quote.id}`" variant="ghost" size="sm">View</UButton>
+        </template>
+      </QuotesQuoteList>
     </div>
-    <CommonLoadingSpinner v-if="quoteStore.loading" />
-    <QuotesQuoteList v-else :quotes="quoteStore.quotes">
-      <template #card-actions="{ quote }">
-        <UButton :to="`/dashboard/shops/${slug}/quotes/${quote.id}`" variant="ghost" size="sm">View</UButton>
-      </template>
-    </QuotesQuoteList>
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

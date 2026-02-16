@@ -1,14 +1,23 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create shop</h1>
-        <p class="text-gray-600 dark:text-gray-400">Add a new business listing</p>
-      </div>
-      <UButton to="/dashboard/shops" variant="ghost" size="sm">Back</UButton>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Create shop"
+        subtitle="Add a new business listing"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }]"
+      >
+        <template #actions>
+          <UButton to="/dashboard/shops" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <div class="col-span-12">
+      <DashboardSectionCard>
+        <ShopsShopForm :loading="shopStore.loading" :error="shopStore.error" @submit="onSubmit" @cancel="goBack" />
+      </DashboardSectionCard>
     </div>
-    <ShopsShopForm :loading="shopStore.loading" :error="shopStore.error" @submit="onSubmit" @cancel="goBack" />
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

@@ -11,12 +11,12 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
+  <div class="empty-state rounded-xl border border-gray-200/60 bg-white p-8 text-center dark:border-gray-800/60 dark:bg-gray-900/50">
     <div class="flex justify-center">
-      <UIcon :name="icon" class="w-12 h-12 text-gray-400" />
+      <UIcon :name="icon" class="w-14 h-14 text-gray-300 dark:text-gray-600" />
     </div>
-    <h3 class="mt-4 text-lg font-medium text-gray-900">{{ title }}</h3>
-    <p v-if="description" class="mt-2 text-sm text-gray-500">{{ description }}</p>
+    <h3 class="mt-4 text-base font-medium text-gray-900 dark:text-white">{{ title }}</h3>
+    <p v-if="description" class="mt-2 text-sm text-muted">{{ description }}</p>
     <div v-if="$slots.default" class="mt-6">
       <slot />
     </div>

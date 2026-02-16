@@ -1,22 +1,34 @@
 <template>
-  <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Claims</h1>
-      <p class="text-gray-600 dark:text-gray-400">Manage shop ownership claims</p>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Claims"
+        subtitle="Manage shop ownership claims"
+      />
+    </template>
+
+    <DashboardSkeletonState v-if="claimStore.loading" variant="card" :show-header="false" />
+    <template v-else-if="claimStore.claims.length">
+      <div
+        v-for="c in claimStore.claims"
+        :key="c.id"
+        class="col-span-12 sm:col-span-6 lg:col-span-4"
+      >
+        <ClaimsClaimCard :claim="c">
+          <template #actions>
+            <UButton :to="`/dashboard/claims/${c.id}`" variant="outline" size="sm">View</UButton>
+          </template>
+        </ClaimsClaimCard>
+      </div>
+    </template>
+    <div v-else class="col-span-12">
+      <CommonEmptyState
+        title="No claims yet"
+        description="Shop ownership claims will appear here."
+        icon="i-lucide-shield-check"
+      />
     </div>
-    <CommonLoadingSpinner v-if="claimStore.loading" />
-    <div v-else-if="claimStore.claims.length" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <ClaimsClaimCard v-for="c in claimStore.claims" :key="c.id" :claim="c">
-        <template #actions>
-          <UButton :to="`/dashboard/claims/${c.id}`" variant="outline" size="sm">View</UButton>
-        </template>
-      </ClaimsClaimCard>
-    </div>
-    <UCard v-else class="text-center py-12">
-      <UIcon name="i-lucide-shield-check" class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-      <p class="text-gray-600 dark:text-gray-400">No claims yet.</p>
-    </UCard>
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

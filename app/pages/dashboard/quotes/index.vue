@@ -1,12 +1,17 @@
 <template>
-  <div class="space-y-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">My quotes</h1>
-      <p class="text-gray-600 dark:text-gray-400">All quotes you've requested</p>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="My quotes"
+        subtitle="All quotes you've requested"
+      />
+    </template>
+
+    <DashboardSkeletonState v-if="quoteStore.loading" variant="list" :show-header="false" />
+    <div v-else class="col-span-12">
+      <QuotesQuoteList :quotes="quoteStore.myQuotes" />
     </div>
-    <CommonLoadingSpinner v-if="quoteStore.loading" />
-    <QuotesQuoteList v-else :quotes="quoteStore.myQuotes" />
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,22 +1,30 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit shop</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Edit shop"
+        :subtitle="slug"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <DashboardSkeletonState v-if="shopStore.loading && !shopStore.currentShop" variant="card" :show-header="false" />
+    <div v-else-if="shopStore.currentShop" class="col-span-12">
+      <DashboardSectionCard>
+        <ShopsShopForm
+          :shop="shopStore.currentShop"
+          :loading="shopStore.loading"
+          :error="shopStore.error"
+          @submit="onSubmit"
+          @cancel="goBack"
+        />
+      </DashboardSectionCard>
     </div>
-    <CommonLoadingSpinner v-if="shopStore.loading && !shopStore.currentShop" />
-    <ShopsShopForm
-      v-else-if="shopStore.currentShop"
-      :shop="shopStore.currentShop"
-      :loading="shopStore.loading"
-      :error="shopStore.error"
-      @submit="onSubmit"
-      @cancel="goBack"
-    />
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">
