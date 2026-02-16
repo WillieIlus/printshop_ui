@@ -1,7 +1,7 @@
 <template>
   <UCard>
     <div class="flex flex-col sm:flex-row items-start gap-4">
-      <UAvatar :src="profile?.avatar" :alt="String(profile?.user)" size="xl" class="shrink-0" />
+      <UAvatar :src="profile?.avatar ?? undefined" :alt="String(profile?.user)" size="xl" class="shrink-0" />
       <div class="min-w-0 flex-1">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Profile</h3>
         <p v-if="profile?.bio" class="mt-1 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ profile.bio }}</p>

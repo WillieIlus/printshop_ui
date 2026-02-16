@@ -1,9 +1,9 @@
 <template>
   <VeeForm
-    v-slot="{ meta }"
+    v-slot="{}"
     :validation-schema="schema"
     :initial-values="initialValues"
-    @submit="$emit('submit', $event)"
+    @submit="(values: Record<string, unknown>) => $emit('submit', values as { name: string; machine_type: string })"
   >
     <div class="space-y-4">
       <FormsFormInput

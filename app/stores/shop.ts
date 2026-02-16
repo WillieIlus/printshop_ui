@@ -1,5 +1,4 @@
-import type { Shop, ShopCreateInput, OpeningHours, ShopMember, PaginatedResponse } from '~/shared/types'
-import type { SocialLink } from '~/shared/types'
+import type { Shop, ShopCreateInput, OpeningHours, ShopMember, PaginatedResponse, SocialLink } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
 export const useShopStore = defineStore('shop', () => {

@@ -44,10 +44,7 @@ export const usePricingStore = defineStore('pricing', {
     paperPricesByGSM: (state) => {
       const grouped: Record<number, PaperPrice[]> = {}
       for (const price of state.paperPrices) {
-        if (!grouped[price.gsm]) {
-          grouped[price.gsm] = []
-        }
-        grouped[price.gsm].push(price)
+        (grouped[price.gsm] ??= []).push(price)
       }
       return grouped
     },
@@ -58,10 +55,7 @@ export const usePricingStore = defineStore('pricing', {
     finishingByCategory: (state) => {
       const grouped: Record<string, FinishingService[]> = {}
       for (const service of state.finishingServices) {
-        if (!grouped[service.category]) {
-          grouped[service.category] = []
-        }
-        grouped[service.category].push(service)
+        (grouped[service.category] ??= []).push(service)
       }
       return grouped
     },
@@ -88,8 +82,8 @@ export const usePricingStore = defineStore('pricing', {
       try {
         const { $api } = useNuxtApp()
         this.rateCard = await $api<RateCard>(API.shopRateCard(slug))
-      } catch (err: any) {
-        this.error = err.message || 'Failed to fetch rate card'
+      } catch (err: unknown) {
+        this.error = (err instanceof Error ? err.message : null) || 'Failed to fetch rate card'
         throw err
       } finally {
         this.loading = false
@@ -112,8 +106,8 @@ export const usePricingStore = defineStore('pricing', {
           }
         )
         return this.calculationResult
-      } catch (err: any) {
-        this.error = err.message || 'Failed to calculate price'
+      } catch (err: unknown) {
+        this.error = (err instanceof Error ? err.message : null) || 'Failed to calculate price'
         throw err
       } finally {
         this.loading = false
@@ -130,8 +124,8 @@ export const usePricingStore = defineStore('pricing', {
       try {
         const { $api } = useNuxtApp()
         this.printingPrices = await $api<PrintingPrice[]>(API.shopPrintingPrices(slug))
-      } catch (err: any) {
-        this.error = err.message
+      } catch (err: unknown) {
+        this.error = err instanceof Error ? err.message : 'Failed'
         throw err
       } finally {
         this.loading = false
@@ -184,8 +178,8 @@ export const usePricingStore = defineStore('pricing', {
       try {
         const { $api } = useNuxtApp()
         this.paperPrices = await $api<PaperPrice[]>(API.shopPaperPrices(slug))
-      } catch (err: any) {
-        this.error = err.message
+      } catch (err: unknown) {
+        this.error = err instanceof Error ? err.message : 'Failed'
         throw err
       } finally {
         this.loading = false
@@ -238,8 +232,8 @@ export const usePricingStore = defineStore('pricing', {
       try {
         const { $api } = useNuxtApp()
         this.finishingServices = await $api<FinishingService[]>(API.shopFinishingServices(slug))
-      } catch (err: any) {
-        this.error = err.message
+      } catch (err: unknown) {
+        this.error = err instanceof Error ? err.message : 'Failed'
         throw err
       } finally {
         this.loading = false
@@ -292,8 +286,8 @@ export const usePricingStore = defineStore('pricing', {
       try {
         const { $api } = useNuxtApp()
         this.volumeDiscounts = await $api<VolumeDiscount[]>(API.shopVolumeDiscounts(slug))
-      } catch (err: any) {
-        this.error = err.message
+      } catch (err: unknown) {
+        this.error = err instanceof Error ? err.message : 'Failed'
         throw err
       } finally {
         this.loading = false

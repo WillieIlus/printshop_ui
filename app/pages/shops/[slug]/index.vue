@@ -5,7 +5,7 @@
       <!-- Shop Header -->
       <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
         <div class="flex items-start gap-6">
-          <UAvatar :src="shop.logo" :alt="shop.name" size="2xl" class="shrink-0" />
+          <UAvatar :src="shop.logo ?? undefined" :alt="shop.name" size="2xl" class="shrink-0" />
           <div class="min-w-0 flex-1">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ shop.name }}</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ shop.city }}, {{ shop.state }}</p>
@@ -92,7 +92,7 @@ onMounted(async () => {
   // Fetch rate card
   try {
     await pricingStore.fetchRateCard(slug.value)
-  } catch (err) {
+  } catch {
     // Rate card might not be available - that's okay
     console.log('Rate card not available for this shop')
   }

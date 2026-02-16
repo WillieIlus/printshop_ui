@@ -343,8 +343,8 @@ async function submitPrintingPrice(data: PrintingPriceForm) {
       toast.add({ title: 'Added', description: 'Printing price added' })
     }
     closePrintingModal()
-  } catch (err: any) {
-    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
   } finally {
     formLoading.value = false
   }
@@ -377,8 +377,8 @@ async function submitPaperPrice(data: PaperPriceForm & { gsm?: string | number }
       toast.add({ title: 'Added', description: 'Paper price added' })
     }
     closePaperModal()
-  } catch (err: any) {
-    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
   } finally {
     formLoading.value = false
   }
@@ -410,8 +410,8 @@ async function submitFinishingService(data: FinishingServiceForm) {
       toast.add({ title: 'Added', description: 'Finishing service added' })
     }
     closeFinishingModal()
-  } catch (err: any) {
-    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
   } finally {
     formLoading.value = false
   }
@@ -443,8 +443,8 @@ async function submitVolumeDiscount(data: VolumeDiscountForm) {
       toast.add({ title: 'Added', description: 'Volume discount added' })
     }
     closeDiscountModal()
-  } catch (err: any) {
-    toast.add({ title: 'Error', description: err.message || 'Failed to save', color: 'error' })
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
   } finally {
     formLoading.value = false
   }

@@ -74,8 +74,9 @@ const loginSchema = object({
   password: string().min(8, 'Password must be at least 8 characters').required('Password is required'),
 })
 
-async function onSubmit(values: { email: string; password: string }) {
-  const result = await login(values.email, values.password, rememberMe.value)
+async function onSubmit(values: Record<string, unknown>) {
+  const { email, password } = values as { email: string; password: string }
+  const result = await login(email, password, rememberMe.value)
   if (!result.success) {
     notification.error(result.error || 'Login failed')
   }

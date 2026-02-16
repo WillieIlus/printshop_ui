@@ -11,7 +11,7 @@
         </UButton>
         <UDropdownMenu>
           <UButton color="neutral" variant="ghost" class="flex items-center gap-2">
-            <UAvatar :src="profile?.avatar" :alt="user?.first_name" size="sm" />
+            <UAvatar :src="profile?.avatar ?? undefined" :alt="user?.first_name ?? undefined" size="sm" />
             <span class="hidden md:block text-gray-900 dark:text-white">{{ user?.first_name }} {{ user?.last_name }}</span>
             <UIcon name="i-lucide-chevron-down" class="w-4 h-4" />
           </UButton>
@@ -33,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+import { useProfileStore } from '~/stores/profile'
+
 const { user, logout } = useAuth()
 const profileStore = useProfileStore()
 const profile = computed(() => profileStore.profile)

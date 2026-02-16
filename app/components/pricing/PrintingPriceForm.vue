@@ -1,5 +1,5 @@
 <template>
-  <VeeForm v-slot="{ meta }" :validation-schema="schema" :initial-values="initialValues" @submit="$emit('submit', $event)">
+  <VeeForm v-slot="{ meta }" :validation-schema="schema" :initial-values="initialValues" @submit="(values: Record<string, unknown>) => $emit('submit', values as unknown as PrintingPriceForm)">
     <table class="w-full text-sm">
       <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
         <tr>

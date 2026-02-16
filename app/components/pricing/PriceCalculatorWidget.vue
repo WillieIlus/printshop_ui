@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { usePricingStore } from '~/stores/pricing'
 import type { RateCard, PriceCalculationInput, PriceCalculationResult } from '~/shared/types'
 
 interface Props {
@@ -50,9 +51,9 @@ const calculatePrice = async () => {
     }
     
     result.value = await pricingStore.calculatePrice(props.slug, input)
-    emit('calculated', result.value)
-  } catch (err: any) {
-    error.value = err.message || 'Failed to calculate price'
+    if (result.value) emit('calculated', result.value)
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Failed to calculate price'
   } finally {
     calculating.value = false
   }
