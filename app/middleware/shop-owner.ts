@@ -10,9 +10,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const shopSlug = to.params.slug as string
   if (shopSlug) {
     await shopStore.fetchShopBySlug(shopSlug)
-    const ownerId = typeof shopStore.currentShop?.owner === 'object'
+    if (!shopStore.currentShop) {
+      return navigateTo('/dashboard')
+    }
+    const ownerId = typeof shopStore.currentShop.owner === 'object'
       ? shopStore.currentShop.owner?.id
-      : shopStore.currentShop?.owner
+      : shopStore.currentShop.owner
     if (ownerId !== authStore.user?.id) {
       return navigateTo('/dashboard')
     }

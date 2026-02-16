@@ -19,5 +19,5 @@ definePageMeta({
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
-const id = computed(() => route.params.id as string)
+const _id = computed(() => route.params.id as string)
 </script>

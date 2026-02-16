@@ -10,7 +10,8 @@ const REMEMBER_ME_DAYS = 30
 function getCookie(name: string): string | null {
   if (import.meta.server || typeof document === 'undefined') return null
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
-  return match ? decodeURIComponent(match[2]) : null
+  const val = match?.[2]
+  return val ? decodeURIComponent(val) : null
 }
 
 function setCookie(name: string, value: string, maxAgeDays?: number) {
@@ -37,7 +38,7 @@ function clearLegacyStorage() {
 
 /** Storage adapter for Pinia persist - uses cookies instead of localStorage */
 export const authCookieStorage = {
-  getItem(key: string): string | null {
+  getItem(_key: string): string | null {
     if (import.meta.server || typeof document === 'undefined') return null
     clearLegacyStorage()
     const val = getCookie(AUTH_COOKIE_NAME)
@@ -50,7 +51,7 @@ export const authCookieStorage = {
     }
   },
 
-  setItem(key: string, value: string): void {
+  setItem(_key: string, value: string): void {
     try {
       const parsed = JSON.parse(value) as { rememberMe?: boolean }
       const rememberMe = !!parsed.rememberMe
@@ -60,7 +61,7 @@ export const authCookieStorage = {
     }
   },
 
-  removeItem(key: string): void {
+  removeItem(_key: string): void {
     removeCookie(AUTH_COOKIE_NAME)
   },
 }

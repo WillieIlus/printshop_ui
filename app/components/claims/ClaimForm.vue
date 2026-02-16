@@ -22,7 +22,7 @@ const schema = object({
   shop: number().required('Shop is required'),
   notes: string().optional(),
 })
-function onSubmit(values: { shop: number; notes?: string }) {
-  emit('submit', values)
+function onSubmit(values: Record<string, unknown>) {
+  emit('submit', values as { shop: number; notes?: string })
 }
 </script>

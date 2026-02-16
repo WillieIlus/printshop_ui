@@ -97,6 +97,6 @@ function cleanPayload(values: Record<string, unknown>): Record<string, unknown> 
 
 function onSubmit(values: Record<string, unknown>) {
   const cleaned = cleanPayload(values)
-  emit('submit', cleaned as ShopCreateInput)
+  emit('submit', cleaned as unknown as ShopCreateInput)
 }
 </script>

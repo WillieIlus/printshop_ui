@@ -21,7 +21,7 @@
             class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
           >
-            <UAvatar :src="shop.logo" :alt="shop.name" size="xs" />
+            <UAvatar :src="shop.logo ?? undefined" :alt="shop.name" size="xs" />
             <span class="truncate">{{ shop.name }}</span>
           </NuxtLink>
         </template>
@@ -39,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+import { useShopStore } from '~/stores/shop'
+
 const shopStore = useShopStore()
 const menuItems = [
   { to: '/dashboard', icon: 'i-lucide-layout-dashboard', label: 'Dashboard' },

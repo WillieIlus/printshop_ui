@@ -228,8 +228,8 @@ async function confirmDelete(machine: Machine) {
   try {
     await machineStore.deleteMachine(slug.value, machine.id)
     toast.add({ title: 'Deleted', description: 'Machine removed' })
-  } catch (err: any) {
-    toast.add({ title: 'Error', description: err.message ?? 'Failed to delete', color: 'error' })
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete', color: 'error' })
   }
 }
 

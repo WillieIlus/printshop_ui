@@ -58,14 +58,14 @@ const signupSchema = object({
     .required('Please confirm your password'),
 })
 
-async function onSubmit(values: {
-  first_name: string
-  last_name: string
-  email: string
-  password: string
-  password_confirm: string
-}) {
-  const result = await signup(values)
+async function onSubmit(values: Record<string, unknown>) {
+  const result = await signup(values as {
+    first_name: string
+    last_name: string
+    email: string
+    password: string
+    password_confirm: string
+  })
   if (!result.success) {
     notification.error(result.error || 'Signup failed')
   } else {

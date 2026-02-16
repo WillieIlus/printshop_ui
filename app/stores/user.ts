@@ -1,5 +1,4 @@
-import type { User } from '~/shared/types'
-import type { PaginatedResponse } from '~/shared/types'
+import type { User, PaginatedResponse } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
 export const useUserStore = defineStore('user', () => {

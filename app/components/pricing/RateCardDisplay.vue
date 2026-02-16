@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { RateCard } from '~/shared/types'
+import { formatKES } from '~/utils/formatters'
 
 interface Props {
   rateCard: RateCard
@@ -7,12 +8,6 @@ interface Props {
 }
 
 defineProps<Props>()
-
-// Format price for display
-const formatPrice = (price: string) => {
-  const num = parseFloat(price)
-  return `KES ${num.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
-}
 </script>
 
 <template>
@@ -44,8 +39,8 @@ const formatPrice = (price: string) => {
             <tr v-for="(price, index) in rateCard.printing" :key="index" class="hover:bg-gray-50">
               <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.sheet_size }}</td>
               <td class="px-4 py-3 text-sm text-gray-600">{{ price.color_mode }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatPrice(price.price_per_side) }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatPrice(price.price_double_sided) }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatKES(price.price_per_side) }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatKES(price.price_double_sided) }}</td>
             </tr>
           </tbody>
         </table>
@@ -73,7 +68,7 @@ const formatPrice = (price: string) => {
             <tr v-for="(price, index) in rateCard.paper" :key="index" class="hover:bg-gray-50">
               <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.gsm }} gsm</td>
               <td class="px-4 py-3 text-sm text-gray-600">{{ price.paper_type }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatPrice(price.price_per_sheet) }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatKES(price.price_per_sheet) }}</td>
             </tr>
           </tbody>
         </table>
@@ -108,7 +103,7 @@ const formatPrice = (price: string) => {
               </td>
               <td class="px-4 py-3 text-sm text-gray-600">{{ service.category }}</td>
               <td class="px-4 py-3 text-sm text-gray-600">{{ service.charge_by }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatPrice(service.price) }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900 text-right font-medium">{{ formatKES(service.price) }}</td>
             </tr>
           </tbody>
         </table>
