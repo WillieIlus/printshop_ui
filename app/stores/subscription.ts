@@ -74,6 +74,8 @@ export const useSubscriptionStore = defineStore('subscription', {
         const { $api } = useNuxtApp()
         this.plans = await $api<SubscriptionPlanInfo[]>(API.plans())
         return this.plans
+      } catch (err) {
+        throw err
       } finally {
         this.plansLoading = false
       }

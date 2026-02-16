@@ -18,12 +18,17 @@
           <select
             v-model="selectedPlanId"
             class="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 px-4 text-sm text-gray-900 dark:text-white focus:border-flamingo-500 focus:outline-none focus:ring-2 focus:ring-flamingo-500/20"
+            :disabled="!plans.length"
           >
+            <option v-if="!plans.length" value="">No plans available</option>
             <option v-for="p in plans" :key="p.id" :value="p.id">
               {{ p.name }} — KES {{ p.price }}/{{ (p.billing_period ?? 'MONTHLY').toLowerCase() }}
               ({{ p.max_printing_machines || '∞' }} printing, {{ p.max_finishing_machines || '∞' }} finishing)
             </option>
           </select>
+          <p v-if="!plans.length" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+            Plans could not be loaded. Check your connection and try again.
+          </p>
         </div>
 
         <div>
@@ -43,7 +48,7 @@
           <UButton
             class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
             :loading="initiating"
-            :disabled="!selectedPlanId || !phone.trim() || initiating"
+            :disabled="!selectedPlanId || !phone.trim() || initiating || !plans.length"
             @click="initiatePayment"
           >
             Pay via M-Pesa

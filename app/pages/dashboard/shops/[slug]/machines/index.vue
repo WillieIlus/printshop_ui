@@ -211,7 +211,6 @@ async function onSubmit(data: { name: string; machine_type?: string | { value: s
     }
     closeModal()
   } catch (err: unknown) {
-    console.error('Machine create/update failed:', err)
     const msg = err instanceof Error ? err.message : machineStore.error ?? 'Failed to save'
     toast.add({ title: 'Error', description: msg, color: 'error' })
     if (msg.toLowerCase().includes('upgrade')) {
@@ -238,11 +237,21 @@ function onKeydown(e: KeyboardEvent) {
 }
 onMounted(async () => {
   document.addEventListener('keydown', onKeydown)
-  await Promise.all([
-    machineStore.fetchMachines(slug.value),
-    subscriptionStore.fetchSubscription(slug.value),
-    subscriptionStore.fetchPlans(),
-  ])
+  try {
+    await machineStore.fetchMachines(slug.value)
+  } catch {
+    // Machines may come from shop embed
+  }
+  try {
+    await subscriptionStore.fetchSubscription(slug.value)
+  } catch (err) {
+    if (import.meta.dev) console.error('[machines] fetchSubscription error', err)
+  }
+  try {
+    await subscriptionStore.fetchPlans()
+  } catch (err) {
+    // Plans/subscription optional; page works with defaults
+  }
 })
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
