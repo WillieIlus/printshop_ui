@@ -7,9 +7,12 @@
         </template>
       </QuotesQuoteCard>
     </div>
-    <UCard v-else class="text-center py-8">
-      <p class="text-sm text-gray-500 dark:text-gray-400">No quotes yet.</p>
-    </UCard>
+    <DashboardEmptyState
+      v-else
+      title="No quotes yet"
+      description="Quotes you request will appear here."
+      icon="i-lucide-file-text"
+    />
   </div>
 </template>
 
