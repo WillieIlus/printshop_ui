@@ -87,4 +87,10 @@ export const API = {
   shopPaperStockDetail: (slug: string, id: number) => `shops/${slug}/paper-stock/${id}/`,
   shopPaperStockAdjust: (slug: string, id: number) => `shops/${slug}/paper-stock/${id}/adjust/`,
   shopPricing: (slug: string) => `shops/${slug}/pricing/`,
+
+  // Subscription & payments
+  shopSubscription: (slug: string) => `shops/${slug}/subscription/`,
+  shopStkPush: (slug: string) => `shops/${slug}/payments/mpesa/stk-push/`,
+  plans: () => 'plans/',
+  paymentStatus: (id: number) => `payments/${id}/status/`,
 } as const

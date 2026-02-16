@@ -44,6 +44,10 @@ import { object, string } from 'yup'
 const props = defineProps<{
   machine: Machine | null
   loading?: boolean
+  /** If false, hide printing types (Digital, Large Format, Offset) */
+  canAddPrinting?: boolean
+  /** If false, hide Finishing Equipment */
+  canAddFinishing?: boolean
 }>()
 
 defineEmits<{
@@ -51,12 +55,23 @@ defineEmits<{
   cancel: []
 }>()
 
-const typeOptions = ref([
+const PRINTING_TYPES = [
   { label: 'Digital Printer', value: 'DIGITAL' },
   { label: 'Large Format', value: 'LARGE_FORMAT' },
   { label: 'Offset Press', value: 'OFFSET' },
-  { label: 'Finishing Equipment', value: 'FINISHING' },
-])
+]
+const FINISHING_TYPE = { label: 'Finishing Equipment', value: 'FINISHING' }
+
+const customTypes = ref<{ label: string; value: string }[]>([])
+
+const typeOptions = computed(() => {
+  const canPrint = props.canAddPrinting !== false
+  const canFinish = props.canAddFinishing !== false
+  const base = canPrint ? [...PRINTING_TYPES] : []
+  if (canFinish) base.push(FINISHING_TYPE)
+  const allowed = base.length ? base : [...PRINTING_TYPES, FINISHING_TYPE]
+  return [...allowed, ...customTypes.value]
+})
 
 function formatCreateValue(raw: string): string {
   const label = raw.trim()
@@ -66,8 +81,8 @@ function formatCreateValue(raw: string): string {
 
 function onCreateType(value: string) {
   const val = formatCreateValue(value)
-  if (!val || typeOptions.value.some((o) => o.value === val)) return
-  typeOptions.value = [...typeOptions.value, { label: value.trim(), value: val }]
+  if (!val || customTypes.value.some((o) => o.value === val)) return
+  customTypes.value = [...customTypes.value, { label: value.trim(), value: val }]
 }
 
 const schema = object({

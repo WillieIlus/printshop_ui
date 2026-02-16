@@ -2,7 +2,17 @@
   <div class="space-y-6">
     <div class="flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Machines</h1>
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Machines</h1>
+          <UBadge
+            v-if="subscription?.plan_name"
+            color="neutral"
+            variant="soft"
+            size="sm"
+          >
+            {{ subscription.plan_name }}
+          </UBadge>
+        </div>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
           Add your printers and equipment. Required before setting printing prices.
         </p>
@@ -10,11 +20,20 @@
       <div class="flex gap-2">
         <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
         <UButton
+          v-if="canAddMachine"
           class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
           @click="openModal()"
         >
           <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
           Add machine
+        </UButton>
+        <UButton
+          v-else
+          class="rounded-xl bg-amber-500 hover:bg-amber-600"
+          @click="upgradeModalOpen = true"
+        >
+          <UIcon name="i-lucide-lock" class="w-4 h-4 mr-2" />
+          Upgrade to add more
         </UButton>
       </div>
     </div>
@@ -61,8 +80,20 @@
         title="No machines yet"
         description="Add your first printer or equipment. You'll need at least one machine before setting printing prices."
       >
-        <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openModal()">
+        <UButton
+          v-if="canAddMachine"
+          class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+          @click="openModal()"
+        >
           Add first machine
+        </UButton>
+        <UButton
+          v-else
+          class="rounded-xl bg-amber-500 hover:bg-amber-600"
+          @click="upgradeModalOpen = true"
+        >
+          <UIcon name="i-lucide-lock" class="w-4 h-4 mr-2" />
+          Upgrade to add machines
         </UButton>
       </CommonEmptyState>
     </template>
@@ -78,10 +109,20 @@
         :key="editing?.id ?? 'new'"
         :machine="editing"
         :loading="formLoading"
+        :can-add-printing="subscription?.can_add_printing_machine ?? true"
+        :can-add-finishing="subscription?.can_add_finishing_machine ?? true"
         @submit="onSubmit"
         @cancel="closeModal"
       />
     </CommonSimpleModal>
+
+    <SubscriptionUpgradeModal
+      :open="upgradeModalOpen"
+      :shop-slug="slug"
+      :reason="subscription ? `Your plan allows ${subscription.usage.printing_machines}/${subscription.limits.max_printing_machines || '∞'} printing and ${subscription.usage.finishing_machines}/${subscription.limits.max_finishing_machines || '∞'} finishing machines.` : 'Upgrade to add more machines.'"
+      :plans="subscriptionStore.plans"
+      @update:open="upgradeModalOpen = $event"
+    />
   </div>
 </template>
 
@@ -89,6 +130,7 @@
 import type { Machine } from '~/stores/machine'
 import { useMachineStore } from '~/stores/machine'
 import { useShopStore } from '~/stores/shop'
+import { useSubscriptionStore } from '~/stores/subscription'
 
 definePageMeta({
   layout: 'dashboard',
@@ -98,9 +140,18 @@ definePageMeta({
 const route = useRoute()
 const machineStore = useMachineStore()
 const shopStore = useShopStore()
+const subscriptionStore = useSubscriptionStore()
 const toast = useToast()
 
 const slug = computed(() => route.params.slug as string)
+
+const subscription = computed(() => subscriptionStore.getSubscription(slug.value))
+const canAddMachine = computed(
+  () =>
+    (subscription.value?.can_add_printing_machine ?? true) ||
+    (subscription.value?.can_add_finishing_machine ?? false)
+)
+const upgradeModalOpen = ref(false)
 
 // Shop detail API (public) embeds machines; machines API (auth required) may fail.
 // Use shop.machines as fallback since shop-owner middleware already loaded the shop.
@@ -156,12 +207,17 @@ async function onSubmit(data: { name: string; machine_type?: string | { value: s
     } else {
       await machineStore.createMachine(slug.value, payload)
       toast.add({ title: 'Added', description: 'Machine added' })
+      await subscriptionStore.fetchSubscription(slug.value)
     }
     closeModal()
   } catch (err: unknown) {
     console.error('Machine create/update failed:', err)
     const msg = err instanceof Error ? err.message : machineStore.error ?? 'Failed to save'
     toast.add({ title: 'Error', description: msg, color: 'error' })
+    if (msg.toLowerCase().includes('upgrade')) {
+      closeModal()
+      upgradeModalOpen.value = true
+    }
   } finally {
     formLoading.value = false
   }
@@ -182,7 +238,11 @@ function onKeydown(e: KeyboardEvent) {
 }
 onMounted(async () => {
   document.addEventListener('keydown', onKeydown)
-  await machineStore.fetchMachines(slug.value)
+  await Promise.all([
+    machineStore.fetchMachines(slug.value),
+    subscriptionStore.fetchSubscription(slug.value),
+    subscriptionStore.fetchPlans(),
+  ])
 })
 onUnmounted(() => {
   document.removeEventListener('keydown', onKeydown)
