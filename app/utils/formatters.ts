@@ -26,6 +26,14 @@ export function formatCurrency(value: string | number | null | undefined, curren
   return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(num)
 }
 
+/** Kenyan Shilling — consistent business formatting */
+export function formatKES(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) return '—'
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  if (Number.isNaN(num)) return '—'
+  return `KES ${num.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+
 export function formatPhone(value: string | null | undefined): string {
   if (!value) return '—'
   const digits = value.replace(/\D/g, '')

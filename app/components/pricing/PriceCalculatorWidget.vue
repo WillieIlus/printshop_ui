@@ -34,6 +34,7 @@ const availableGSM = computed(() => {
 const result = ref<PriceCalculationResult | null>(null)
 const calculating = ref(false)
 const error = ref<string | null>(null)
+const overridePrice = ref<string | null>(null)
 
 // Calculate price
 const calculatePrice = async () => {
@@ -81,11 +82,9 @@ onMounted(() => {
 <template>
   <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
 
-    <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-      <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-      </svg>
-      Instant Price Calculator
+    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+      <UIcon name="i-lucide-calculator" class="w-6 h-6 text-emerald-600" />
+      Quote in under 60 seconds
     </h3>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -169,71 +168,33 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Right: Results -->
-      <div class="bg-gray-50 rounded-xl p-6">
-        <h4 class="text-lg font-semibold text-gray-800 mb-4">Price Breakdown</h4>
-
-        <div v-if="calculating" class="flex items-center justify-center py-8">
-          <LoadingSpinner />
+      <!-- Right: Business Output Panel (sticky on desktop) -->
+      <div class="lg:sticky lg:top-24 self-start">
+        <div v-if="calculating" class="flex items-center justify-center py-12 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+          <CommonLoadingSpinner />
         </div>
 
-        <div v-else-if="error" class="text-red-600 text-sm py-4">
-          {{ error }}
+        <div v-else-if="error" class="rounded-xl border-2 border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-5">
+          <p class="text-red-600 dark:text-red-400 text-sm">{{ error }}</p>
         </div>
 
-        <div v-else-if="result" class="space-y-3">
-          <!-- Printing Cost -->
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Printing ({{ result.printing_price_per_side }}/side × {{ result.sides }} × {{ result.quantity }})</span>
-            <span class="font-medium">{{ formatPrice(result.total_printing) }}</span>
-          </div>
-
-          <!-- Paper Cost -->
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-600">Paper ({{ result.paper_price_per_sheet }}/sheet × {{ result.quantity }})</span>
-            <span class="font-medium">{{ formatPrice(result.total_paper) }}</span>
-          </div>
-
-          <!-- Finishing Cost -->
-          <div v-if="parseFloat(result.total_finishing) > 0" class="space-y-1">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Finishing</span>
-              <span class="font-medium">{{ formatPrice(result.total_finishing) }}</span>
-            </div>
-            <div v-for="(item, index) in result.finishing_breakdown" :key="index" class="flex justify-between text-xs text-gray-500 pl-4">
-              <span>- {{ item.name }}</span>
-              <span>{{ formatPrice(item.total) }}</span>
-            </div>
-          </div>
-
-          <!-- Divider -->
-          <div class="border-t border-gray-300 my-4"></div>
-
-          <!-- Grand Total -->
-          <div class="flex justify-between text-lg">
-            <span class="font-semibold text-gray-800">Total</span>
-            <span class="font-bold text-blue-600">{{ formatPrice(result.grand_total) }}</span>
-          </div>
-
-          <!-- Price Per Sheet -->
-          <div class="flex justify-between text-sm text-gray-500">
-            <span>Price per sheet</span>
-            <span>{{ formatPrice(result.price_per_sheet) }}</span>
-          </div>
-        </div>
-
-        <!-- Request Quote Button -->
-        <div class="mt-6">
-          <NuxtLink 
-            :to="`/shops/${slug}/request-quote`"
-            class="w-full inline-flex justify-center items-center px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Request Quote
-            <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </NuxtLink>
-        </div>
+        <QuotesQuoteOutputPanel
+          v-else
+          :pricing="result"
+          :override-price="overridePrice"
+          :show-override="true"
+          @update:override-price="overridePrice = $event"
+        >
+          <template #actions>
+            <NuxtLink
+              :to="`/shops/${props.slug}/request-quote`"
+              class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              Request Quote
+              <UIcon name="i-lucide-arrow-right" class="w-4 h-4" />
+            </NuxtLink>
+          </template>
+        </QuotesQuoteOutputPanel>
       </div>
     </div>
   </div>
