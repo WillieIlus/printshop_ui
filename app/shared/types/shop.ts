@@ -61,8 +61,18 @@ export interface Shop {
   /** From ShopDetailSerializer; list views use owner_name instead */
   member_count?: number
   members?: ShopMember[]
+  /** From ShopDetailSerializer; shop's machines/equipment */
+  machines?: ShopMachine[]
   created_at: string
   updated_at?: string
+}
+
+/** Machine displayed on public shop page */
+export interface ShopMachine {
+  id: number
+  name: string
+  machine_type?: string
+  type_display?: string
 }
 
 export interface ShopCreateInput {

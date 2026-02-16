@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Hero (sample.txt: gray-900, blob effects, primary-400 accent) -->
-    <section id="top" class="relative overflow-hidden bg-gray-900 py-20 sm:py-32">
+    <section id="top" class="relative overflow-hidden bg-gray-900 py-20 sm:py-32 w-screen max-w-none left-1/2 -translate-x-1/2">
       <div class="absolute inset-0 opacity-20">
         <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse" />
         <div class="absolute top-0 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse animation-delay-2000" />

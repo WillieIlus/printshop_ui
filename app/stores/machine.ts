@@ -53,7 +53,8 @@ export const useMachineStore = defineStore('machine', {
       this.error = null
       try {
         const { $api } = useNuxtApp()
-        this.machines = await $api<Machine[]>(API.shopMachines(shopSlug))
+        const response = await $api<Machine[] | { results: Machine[] }>(API.shopMachines(shopSlug))
+        this.machines = Array.isArray(response) ? response : (response?.results ?? [])
         return this.machines
       } catch (err) {
         this.error = err instanceof Error ? err.message : 'Failed to fetch machines'

@@ -24,6 +24,24 @@
         <ShopsShopSocialLinks v-if="shop.social_links?.length" :links="shop.social_links" class="mt-6" />
       </div>
 
+      <!-- Machines / Equipment -->
+      <div v-if="shop.machines?.length" class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Our Equipment</h2>
+        <div class="flex flex-wrap gap-3">
+          <div
+            v-for="machine in shop.machines"
+            :key="machine.id"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-4 py-2.5"
+          >
+            <UIcon name="i-lucide-printer" class="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0" />
+            <span class="text-sm font-medium text-gray-900 dark:text-white">{{ machine.name }}</span>
+            <UBadge v-if="machine.type_display ?? machine.machine_type" color="neutral" variant="soft" size="xs">
+              {{ machine.type_display ?? machine.machine_type }}
+            </UBadge>
+          </div>
+        </div>
+      </div>
+
       <!-- Price Calculator -->
       <div id="price-calculator">
         <PricingPriceCalculatorWidget 
@@ -75,6 +93,18 @@ const slug = computed(() => route.params.slug as string)
 const shop = computed(() => shopStore.currentShop)
 const rateCard = computed(() => pricingStore.rateCard)
 
+onMounted(async () => {
+  await shopStore.fetchShopBySlug(slug.value)
+  try {
+    await pricingStore.fetchRateCard(slug.value)
+  } catch (err) {
+    console.log('Rate card not available for this shop')
+  }
+})
+onUnmounted(() => {
+  pricingStore.clearPricing()
+})
+
 // Scroll to rate card
 const scrollToRateCard = () => {
   document.getElementById('rate-card')?.scrollIntoView({ behavior: 'smooth' })
@@ -84,22 +114,4 @@ const scrollToRateCard = () => {
 const onPriceCalculated = (result: PriceCalculationResult) => {
   console.log('Price calculated:', result)
 }
-
-// Fetch shop and rate card
-onMounted(async () => {
-  await shopStore.fetchShopBySlug(slug.value)
-  
-  // Fetch rate card
-  try {
-    await pricingStore.fetchRateCard(slug.value)
-  } catch (err) {
-    // Rate card might not be available - that's okay
-    console.log('Rate card not available for this shop')
-  }
-})
-
-// Clean up on unmount
-onUnmounted(() => {
-  pricingStore.clearPricing()
-})
 </script>

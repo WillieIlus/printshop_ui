@@ -70,9 +70,21 @@ export const API = {
   shopFinishingServiceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/finishing/${pk}/`,
   shopVolumeDiscounts: (slug: string) => `shops/${slug}/pricing/discounts/`,
   shopVolumeDiscountDetail: (slug: string, pk: number) => `shops/${slug}/pricing/discounts/${pk}/`,
-  // Inventory (machines, materials, stock)
+  // Inventory (machines, materials, paper stock)
   shopMachines: (slug: string) => `shops/${slug}/machines/`,
   shopMachineDetail: (slug: string, id: number) => `shops/${slug}/machines/${id}/`,
+  shopMachineCapabilities: (slug: string, machinePk: number) => `shops/${slug}/machines/${machinePk}/capabilities/`,
+  shopMachineCapabilityDetail: (slug: string, machinePk: number, pk: number) =>
+    `shops/${slug}/machines/${machinePk}/capabilities/${pk}/`,
   shopMaterials: (slug: string) => `shops/${slug}/materials/`,
   shopMaterialDetail: (slug: string, id: number) => `shops/${slug}/materials/${id}/`,
+  shopMaterialStock: (slug: string, materialPk: number) => `shops/${slug}/materials/${materialPk}/stock/`,
+  shopMaterialStockDetail: (slug: string, materialPk: number, pk: number) =>
+    `shops/${slug}/materials/${materialPk}/stock/${pk}/`,
+  shopMaterialStockAdjust: (slug: string, materialPk: number, pk: number) =>
+    `shops/${slug}/materials/${materialPk}/stock/${pk}/adjust/`,
+  shopPaperStock: (slug: string) => `shops/${slug}/paper-stock/`,
+  shopPaperStockDetail: (slug: string, id: number) => `shops/${slug}/paper-stock/${id}/`,
+  shopPaperStockAdjust: (slug: string, id: number) => `shops/${slug}/paper-stock/${id}/adjust/`,
+  shopPricing: (slug: string) => `shops/${slug}/pricing/`,
 } as const
