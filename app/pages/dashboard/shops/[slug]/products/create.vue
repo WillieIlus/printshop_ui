@@ -1,19 +1,23 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add product template</h1>
-        <p class="text-gray-600 dark:text-gray-400">Create a preset for quick quoting</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Add product template"
+      subtitle="Create a preset for quick quoting"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
+
+    <div class="col-span-12">
+      <DashboardSectionCard>
+        <ProductsProductTemplateForm
+          :loading="quoteStore.loading"
+          @submit="onSubmit"
+          @cancel="goBack"
+        />
+      </DashboardSectionCard>
     </div>
-    <UCard>
-      <ProductsProductTemplateForm
-        :loading="quoteStore.loading"
-        @submit="onSubmit"
-        @cancel="goBack"
-      />
-    </UCard>
   </div>
 </template>
 

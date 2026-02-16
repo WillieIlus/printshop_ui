@@ -1,14 +1,18 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Team members</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Team members"
+      :subtitle="slug"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
+
+    <DashboardSkeletonState v-if="loading" variant="block" />
+    <div v-else class="col-span-12">
+      <ShopsShopMembers :members="shopStore.shopMembers" />
     </div>
-    <CommonLoadingSpinner v-if="loading" />
-    <ShopsShopMembers v-else :members="shopStore.shopMembers" />
   </div>
 </template>
 

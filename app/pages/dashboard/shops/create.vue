@@ -1,13 +1,17 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create shop</h1>
-        <p class="text-gray-600 dark:text-gray-400">Add a new business listing</p>
-      </div>
-      <UButton to="/dashboard/shops" variant="ghost" size="sm">Back</UButton>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Create shop"
+      subtitle="Add a new business listing"
+    >
+      <template #actions>
+        <UButton to="/dashboard/shops" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
+
+    <div class="col-span-12">
+      <ShopsShopForm :loading="shopStore.loading" :error="shopStore.error" @submit="onSubmit" @cancel="goBack" />
     </div>
-    <ShopsShopForm :loading="shopStore.loading" :error="shopStore.error" @submit="onSubmit" @cancel="goBack" />
   </div>
 </template>
 

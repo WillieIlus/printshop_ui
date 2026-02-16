@@ -1,24 +1,26 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Quotes</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <div class="flex gap-2">
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Quotes"
+      :subtitle="slug"
+    >
+      <template #actions>
         <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
         <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
           <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
           New quote
         </UButton>
-      </div>
-    </div>
-    <CommonLoadingSpinner v-if="quoteStore.loading" />
-    <QuotesQuoteList v-else :quotes="quoteStore.quotes">
-      <template #card-actions="{ quote }">
-        <UButton :to="`/dashboard/shops/${slug}/quotes/${quote.id}`" variant="ghost" size="sm">View</UButton>
       </template>
-    </QuotesQuoteList>
+    </DashboardPageHeader>
+
+    <DashboardSkeletonState v-if="quoteStore.loading" variant="cards" :card-count="6" />
+    <div v-else class="col-span-12">
+      <QuotesQuoteList :quotes="quoteStore.quotes">
+        <template #card-actions="{ quote }">
+          <UButton :to="`/dashboard/shops/${slug}/quotes/${quote.id}`" variant="ghost" size="sm">View</UButton>
+        </template>
+      </QuotesQuoteList>
+    </div>
   </div>
 </template>
 

@@ -1,20 +1,31 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Claim #{{ id }}</h1>
-      </div>
-      <UButton to="/dashboard/claims" variant="ghost" size="sm">Back</UButton>
-    </div>
-    <CommonLoadingSpinner v-if="claimStore.loading" />
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader :title="`Claim #${id}`">
+      <template #actions>
+        <UButton to="/dashboard/claims" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
+
+    <DashboardSkeletonState v-if="claimStore.loading" variant="block" />
     <template v-else-if="claimStore.currentClaim">
-      <UCard>
-        <div class="space-y-2">
-          <p><span class="text-gray-500 dark:text-gray-400">Status:</span> <UBadge :color="statusColor" variant="soft">{{ claimStore.currentClaim.status }}</UBadge></p>
-          <p v-if="claimStore.currentClaim.shop_details"><span class="text-gray-500 dark:text-gray-400">Shop:</span> {{ claimStore.currentClaim.shop_details.name }}</p>
-          <p><span class="text-gray-500 dark:text-gray-400">Created:</span> {{ formatDate(claimStore.currentClaim.created_at) }}</p>
-        </div>
-      </UCard>
+      <div class="col-span-12">
+        <DashboardSectionCard title="Claim details">
+          <div class="space-y-2">
+            <p class="text-sm">
+              <span class="font-medium text-gray-500 dark:text-gray-400">Status:</span>
+              <UBadge :color="statusColor" variant="soft" class="ml-1">{{ claimStore.currentClaim.status }}</UBadge>
+            </p>
+            <p v-if="claimStore.currentClaim.shop_details" class="text-sm">
+              <span class="font-medium text-gray-500 dark:text-gray-400">Shop:</span>
+              <span class="text-gray-900 dark:text-white">{{ claimStore.currentClaim.shop_details.name }}</span>
+            </p>
+            <p class="text-sm">
+              <span class="font-medium text-gray-500 dark:text-gray-400">Created:</span>
+              <span class="text-gray-900 dark:text-white">{{ formatDate(claimStore.currentClaim.created_at) }}</span>
+            </p>
+          </div>
+        </DashboardSectionCard>
+      </div>
     </template>
   </div>
 </template>

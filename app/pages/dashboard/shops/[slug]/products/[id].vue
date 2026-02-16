@@ -1,13 +1,17 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Product template</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Product template"
+      :subtitle="slug"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
+
+    <div class="col-span-12">
+      <p class="text-sm text-gray-500 dark:text-gray-400">Product detail / edit (wire to API by id).</p>
     </div>
-    <p class="text-sm text-gray-500 dark:text-gray-400">Product detail / edit (wire to API by id).</p>
   </div>
 </template>
 
