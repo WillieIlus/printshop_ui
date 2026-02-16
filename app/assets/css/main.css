@@ -57,3 +57,6 @@ body {
 .layout-leave-to {
   opacity: 0;
 }
+
+/* Dashboard: calmer than marketing, one accent for key actions only */
+/* Prefer subtle surfaces over heavy borders; layered surfaces in dark mode */

@@ -127,12 +127,10 @@
         @click="sidebarOpen = false"
       />
 
-      <main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
-        <div v-if="$slots.title || $slots.actions" class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div v-if="$slots.title"><slot name="title" /></div>
-          <div v-if="$slots.actions" class="shrink-0"><slot name="actions" /></div>
-        </div>
-        <slot />
+      <main class="flex-1 overflow-auto">
+        <DashboardLayout>
+          <slot />
+        </DashboardLayout>
       </main>
     </div>
 
