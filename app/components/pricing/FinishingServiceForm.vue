@@ -24,6 +24,7 @@
               placeholder="Select category"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>
@@ -37,6 +38,7 @@
               placeholder="Select"
               required
               hide-label
+              portal="#modal-portal"
             />
           </td>
         </tr>

@@ -58,6 +58,34 @@
         </div>
       </div>
 
+      <!-- Machines overview -->
+      <div v-if="machineStore.machines.length" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Machines</h2>
+          <NuxtLink :to="`/dashboard/shops/${slug}/machines`" class="text-sm font-medium text-flamingo-600 dark:text-flamingo-400 hover:underline">
+            Manage
+          </NuxtLink>
+        </div>
+        <div class="p-4">
+          <div class="flex flex-wrap gap-3">
+            <div
+              v-for="machine in machineStore.machines"
+              :key="machine.id"
+              class="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-4 py-2.5"
+            >
+              <UIcon name="i-lucide-printer" class="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0" />
+              <span class="text-sm font-medium text-gray-900 dark:text-white">{{ machine.name }}</span>
+              <UBadge v-if="machine.type_display ?? machine.machine_type" color="neutral" variant="soft" size="xs">
+                {{ machine.type_display ?? machine.machine_type }}
+              </UBadge>
+              <UBadge :color="machine.is_active !== false ? 'success' : 'neutral'" variant="soft" size="xs">
+                {{ machine.is_active !== false ? 'Active' : 'Inactive' }}
+              </UBadge>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <UCard :to="`/dashboard/shops/${slug}/machines`" as="NuxtLink" class="hover:ring-2 ring-flamingo-500">
           <div class="flex items-center gap-3">

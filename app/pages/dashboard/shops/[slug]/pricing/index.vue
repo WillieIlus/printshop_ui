@@ -5,10 +5,13 @@
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Stock & prices</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">Paper prices, printing rates, finishing services</p>
       </div>
-      <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
+      <div class="flex gap-2">
+        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+        <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
         <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
         Preview Public Page
       </UButton>
+      </div>
     </div>
 
     <!-- Tab Navigation -->
@@ -221,47 +224,67 @@
     </template>
 
     <!-- Modals with table-style forms -->
-    <UModal v-model:open="printingModalOpen" :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'">
-      <template #body>
-        <PricingPrintingPriceForm
-          :price="editingPrintingPrice"
-          :machine-options="machineOptions"
-          :loading="formLoading"
-          @submit="submitPrintingPrice"
-          @cancel="closePrintingModal"
-        />
-      </template>
-    </UModal>
-    <UModal v-model:open="paperModalOpen" :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'">
-      <template #body>
-        <PricingPaperPriceForm
-          :price="editingPaperPrice"
-          :loading="formLoading"
-          @submit="submitPaperPrice"
-          @cancel="closePaperModal"
-        />
-      </template>
-    </UModal>
-    <UModal v-model:open="finishingModalOpen" :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'">
-      <template #body>
-        <PricingFinishingServiceForm
-          :service="editingFinishingService"
-          :loading="formLoading"
-          @submit="submitFinishingService"
-          @cancel="closeFinishingModal"
-        />
-      </template>
-    </UModal>
-    <UModal v-model:open="discountModalOpen" :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'">
-      <template #body>
-        <PricingVolumeDiscountForm
-          :discount="editingDiscount"
-          :loading="formLoading"
-          @submit="submitVolumeDiscount"
-          @cancel="closeDiscountModal"
-        />
-      </template>
-    </UModal>
+    <CommonSimpleModal
+      :open="printingModalOpen"
+      :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'"
+      :description="editingPrintingPrice ? 'Edit price per printed side.' : 'Set price per printed side for paper size and color mode.'"
+      @update:open="onPrintingModalOpenChange"
+    >
+      <PricingPrintingPriceForm
+        v-if="printingFormReady"
+        :key="editingPrintingPrice?.id ?? 'new'"
+        :price="editingPrintingPrice"
+        :machine-options="machineOptions"
+        :loading="formLoading"
+        @submit="submitPrintingPrice"
+        @cancel="closePrintingModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      :open="paperModalOpen"
+      :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'"
+      :description="editingPaperPrice ? 'Edit paper price by GSM.' : 'Set paper price by GSM for your rate card.'"
+      @update:open="onPaperModalOpenChange"
+    >
+      <PricingPaperPriceForm
+        v-if="paperFormReady"
+        :key="editingPaperPrice?.id ?? 'new'"
+        :price="editingPaperPrice"
+        :loading="formLoading"
+        @submit="submitPaperPrice"
+        @cancel="closePaperModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      :open="finishingModalOpen"
+      :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'"
+      :description="editingFinishingService ? 'Edit finishing service details.' : 'Add finishing services like lamination and binding.'"
+      @update:open="onFinishingModalOpenChange"
+    >
+      <PricingFinishingServiceForm
+        v-if="finishingFormReady"
+        :key="editingFinishingService?.id ?? 'new'"
+        :service="editingFinishingService"
+        :loading="formLoading"
+        @submit="submitFinishingService"
+        @cancel="closeFinishingModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      :open="discountModalOpen"
+      :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'"
+      :description="editingDiscount ? 'Edit bulk discount details.' : 'Set up bulk discounts for large orders.'"
+      @update:open="onDiscountModalOpenChange"
+    >
+      <PricingVolumeDiscountForm
+        v-if="discountFormReady"
+        :key="editingDiscount?.id ?? 'new'"
+        :discount="editingDiscount"
+        :loading="formLoading"
+        @submit="submitVolumeDiscount"
+        @cancel="closeDiscountModal"
+      />
+    </CommonSimpleModal>
   </div>
 </template>
 
@@ -314,6 +337,10 @@ const printingModalOpen = ref(false)
 const paperModalOpen = ref(false)
 const finishingModalOpen = ref(false)
 const discountModalOpen = ref(false)
+const printingFormReady = ref(false)
+const paperFormReady = ref(false)
+const finishingFormReady = ref(false)
+const discountFormReady = ref(false)
 const editingPrintingPrice = ref<PrintingPrice | null>(null)
 const editingPaperPrice = ref<PaperPrice | null>(null)
 const editingFinishingService = ref<FinishingService | null>(null)
@@ -332,6 +359,19 @@ const closePrintingModal = () => {
   printingModalOpen.value = false
   editingPrintingPrice.value = null
 }
+function onPrintingModalOpenChange(open: boolean) {
+  printingModalOpen.value = open
+  if (!open) editingPrintingPrice.value = null
+}
+watch(printingModalOpen, (open) => {
+  if (open) {
+    printingFormReady.value = false
+    nextTick(() => { printingFormReady.value = true })
+  } else {
+    printingFormReady.value = false
+    editingPrintingPrice.value = null
+  }
+})
 async function submitPrintingPrice(data: PrintingPriceForm) {
   formLoading.value = true
   try {
@@ -365,6 +405,19 @@ const closePaperModal = () => {
   paperModalOpen.value = false
   editingPaperPrice.value = null
 }
+function onPaperModalOpenChange(open: boolean) {
+  paperModalOpen.value = open
+  if (!open) editingPaperPrice.value = null
+}
+watch(paperModalOpen, (open) => {
+  if (open) {
+    paperFormReady.value = false
+    nextTick(() => { paperFormReady.value = true })
+  } else {
+    paperFormReady.value = false
+    editingPaperPrice.value = null
+  }
+})
 async function submitPaperPrice(data: PaperPriceForm & { gsm?: string | number }) {
   formLoading.value = true
   const payload = { ...data, gsm: Number(data.gsm) }
@@ -399,6 +452,19 @@ const closeFinishingModal = () => {
   finishingModalOpen.value = false
   editingFinishingService.value = null
 }
+function onFinishingModalOpenChange(open: boolean) {
+  finishingModalOpen.value = open
+  if (!open) editingFinishingService.value = null
+}
+watch(finishingModalOpen, (open) => {
+  if (open) {
+    finishingFormReady.value = false
+    nextTick(() => { finishingFormReady.value = true })
+  } else {
+    finishingFormReady.value = false
+    editingFinishingService.value = null
+  }
+})
 async function submitFinishingService(data: FinishingServiceForm) {
   formLoading.value = true
   try {
@@ -432,6 +498,19 @@ const closeDiscountModal = () => {
   discountModalOpen.value = false
   editingDiscount.value = null
 }
+function onDiscountModalOpenChange(open: boolean) {
+  discountModalOpen.value = open
+  if (!open) editingDiscount.value = null
+}
+watch(discountModalOpen, (open) => {
+  if (open) {
+    discountFormReady.value = false
+    nextTick(() => { discountFormReady.value = true })
+  } else {
+    discountFormReady.value = false
+    editingDiscount.value = null
+  }
+})
 async function submitVolumeDiscount(data: VolumeDiscountForm) {
   formLoading.value = true
   try {

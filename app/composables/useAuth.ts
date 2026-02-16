@@ -14,7 +14,11 @@ export function useAuth() {
   async function login(email: string, password: string, rememberMe = false) {
     const result = await authStore.login({ email, password, remember_me: rememberMe })
     if (result.success) {
-      await profileStore.fetchProfile()
+      try {
+        await profileStore.fetchProfile()
+      } catch {
+        // Profile fetch may fail (e.g. 500) - still allow navigation
+      }
       await router.push('/dashboard')
     }
     return result
@@ -23,7 +27,11 @@ export function useAuth() {
   async function signup(data: SignupCredentials) {
     const result = await authStore.signup(data)
     if (result.success) {
-      await profileStore.fetchProfile()
+      try {
+        await profileStore.fetchProfile()
+      } catch {
+        // Profile fetch may fail - still allow navigation
+      }
       await router.push('/dashboard')
     }
     return result

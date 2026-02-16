@@ -38,10 +38,71 @@ body {
   @apply bg-gray-50 text-gray-900;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    @apply bg-gray-950 text-gray-100;
-  }
+/* Dark mode: dark backgrounds with white/light text (Nuxt UI uses .dark class) */
+.dark body {
+  @apply bg-gray-950 text-gray-100;
+}
+
+/* Dark mode: reverse common light surfaces to dark */
+.dark .bg-white {
+  @apply bg-gray-900;
+}
+.dark .bg-gray-50 {
+  @apply bg-gray-800;
+}
+.dark .bg-gray-100 {
+  @apply bg-gray-700;
+}
+.dark .text-gray-900 {
+  @apply text-white;
+}
+.dark .text-gray-800 {
+  @apply text-gray-100;
+}
+.dark .text-gray-700 {
+  @apply text-gray-200;
+}
+.dark .text-gray-600 {
+  @apply text-gray-300;
+}
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+.dark .border-gray-200 {
+  @apply border-gray-700;
+}
+.dark .border-gray-100 {
+  @apply border-gray-800;
+}
+.dark .divide-gray-200 > * + * {
+  border-top-color: rgb(55 65 81);
+}
+.dark .hover\:bg-gray-50:hover {
+  @apply bg-gray-800;
+}
+.dark .hover\:bg-gray-100:hover {
+  @apply bg-gray-700;
+}
+.dark .hover\:text-gray-900:hover {
+  @apply text-white;
+}
+/* Alert/warning boxes */
+.dark .bg-amber-50 {
+  @apply bg-amber-900/30;
+}
+.dark .border-amber-200 {
+  @apply border-amber-800;
+}
+.dark .text-amber-800 {
+  @apply text-amber-200;
+}
+
+/* SelectMenu dropdown must appear above modals (modal uses z-[99999]) */
+#modal-portal [data-slot="content"],
+#modal-portal [data-reka-combobox-content],
+body > [data-slot="content"],
+body [data-reka-combobox-content] {
+  z-index: 100000 !important;
 }
 
 /* Page & layout transitions (avoids parentNode bug during navigation) */

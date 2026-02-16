@@ -1,14 +1,18 @@
 <template>
-  <UModal v-model="isOpen">
-    <div class="p-4 sm:p-6">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ title }}</h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">{{ message }}</p>
+  <CommonSimpleModal
+    v-if="isOpen"
+    :open="isOpen"
+    :title="title"
+    @update:open="emit('update:open', $event)"
+  >
+    <div class="space-y-6">
+      <p class="text-sm text-gray-600 dark:text-gray-400">{{ message }}</p>
       <div class="flex justify-end gap-2">
-        <UButton color="neutral" variant="ghost" @click="isOpen = false">{{ cancelLabel }}</UButton>
+        <UButton color="neutral" variant="ghost" @click="close">{{ cancelLabel }}</UButton>
         <UButton :color="confirmColor" @click="confirm">{{ confirmLabel }}</UButton>
       </div>
     </div>
-  </UModal>
+  </CommonSimpleModal>
 </template>
 
 <script setup lang="ts">
@@ -34,8 +38,11 @@ const isOpen = computed({
   get: () => props.open ?? false,
   set: (v) => emit('update:open', v),
 })
+function close() {
+  emit('update:open', false)
+}
 function confirm() {
   emit('confirm')
-  isOpen.value = false
+  close()
 }
 </script>

@@ -17,6 +17,10 @@
         label="Type"
         :options="typeOptions"
         placeholder="Select type"
+        portal="body"
+        :create-item="{ when: 'always' }"
+        :format-create-value="formatCreateValue"
+        @create="onCreateType"
       />
       <div class="flex justify-end gap-2 pt-4">
         <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
@@ -40,6 +44,10 @@ import { object, string } from 'yup'
 const props = defineProps<{
   machine: Machine | null
   loading?: boolean
+  /** If false, hide printing types (Digital, Large Format, Offset) */
+  canAddPrinting?: boolean
+  /** If false, hide Finishing Equipment */
+  canAddFinishing?: boolean
 }>()
 
 defineEmits<{
@@ -47,12 +55,35 @@ defineEmits<{
   cancel: []
 }>()
 
-const typeOptions = [
+const PRINTING_TYPES = [
   { label: 'Digital Printer', value: 'DIGITAL' },
   { label: 'Large Format', value: 'LARGE_FORMAT' },
   { label: 'Offset Press', value: 'OFFSET' },
-  { label: 'Finishing Equipment', value: 'FINISHING' },
 ]
+const FINISHING_TYPE = { label: 'Finishing Equipment', value: 'FINISHING' }
+
+const customTypes = ref<{ label: string; value: string }[]>([])
+
+const typeOptions = computed(() => {
+  const canPrint = props.canAddPrinting !== false
+  const canFinish = props.canAddFinishing !== false
+  const base = canPrint ? [...PRINTING_TYPES] : []
+  if (canFinish) base.push(FINISHING_TYPE)
+  const allowed = base.length ? base : [...PRINTING_TYPES, FINISHING_TYPE]
+  return [...allowed, ...customTypes.value]
+})
+
+function formatCreateValue(raw: string): string {
+  const label = raw.trim()
+  if (!label) return ''
+  return label.toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '')
+}
+
+function onCreateType(value: string) {
+  const val = formatCreateValue(value)
+  if (!val || customTypes.value.some((o) => o.value === val)) return
+  customTypes.value = [...customTypes.value, { label: value.trim(), value: val }]
+}
 
 const schema = object({
   name: string().required('Name is required').max(150),

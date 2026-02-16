@@ -21,8 +21,6 @@
 
     <footer v-if="$slots.footer" class="shrink-0"><slot name="footer" /></footer>
     <AppFooter v-else-if="showFooter" />
-
-    <UNotifications />
   </div>
 </template>
 
