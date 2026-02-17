@@ -19,6 +19,7 @@ export type ChargeBy = 'PER_SHEET' | 'PER_PIECE' | 'PER_JOB'
 
 /**
  * Printing price - cost per printed side
+ * selling_price_duplex_per_sheet: price for duplex (both sides) per sheet; null if not set
  */
 export interface PrintingPrice {
   id: number
@@ -26,9 +27,45 @@ export interface PrintingPrice {
   sheet_size: SheetSize
   color_mode: ColorMode
   selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string | null
   buying_price_per_side: string | null
   profit_per_side: string
   is_active: boolean
+}
+
+/** DTO for printing price create/update */
+export interface PrintingPriceDTO {
+  id?: number
+  machine: number
+  sheet_size: SheetSize
+  color_mode: ColorMode
+  selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string | null
+}
+
+/** Large format material types (SQM pricing) */
+export type MaterialType = 'BANNER' | 'VINYL' | 'REFLECTIVE'
+
+/**
+ * Material price - selling price per SQM for large format
+ */
+export interface MaterialPrice {
+  id: number
+  material_type: MaterialType
+  unit: 'SQM'
+  selling_price: string
+  buying_price: string | null
+  is_active: boolean
+}
+
+/** DTO for material price create/update */
+export interface MaterialPriceDTO {
+  id?: number
+  material_type: MaterialType
+  unit: 'SQM'
+  selling_price: string
+  buying_price?: string | null
+  is_active?: boolean
 }
 
 /**
@@ -146,6 +183,7 @@ export interface PrintingPriceForm {
   sheet_size: SheetSize
   color_mode: ColorMode
   selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string | null
   buying_price_per_side?: string
 }
 
