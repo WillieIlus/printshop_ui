@@ -49,9 +49,10 @@ export default defineNuxtConfig({
     storesDirs: ['./app/stores/**'],
   },
 
-  piniaPersistedstate: {
-    storage: 'localStorage',
-    // Auth store uses custom cookie storage (see stores/auth.ts)
+  // Pinia persistence: opt-in per store. Sensitive data (tokens) MUST use cookies.
+  piniaPluginPersistedstate: {
+    auto: false, // Only stores with explicit persist: true | {} are persisted
+    storage: 'localStorage', // Default for opt-in stores; auth overrides with cookies (stores/auth.ts)
   },
 
   veeValidate: {

@@ -64,7 +64,7 @@ yarn lint
 
 ### Auth & Shops
 
-- Cookie-based auth (no localStorage)
+- Cookie-based auth (tokens in cookies only; see `app/stores/README.md` for persistence rules)
 - Shop management, members, hours, social links
 - Rate card and pricing configuration for shop owners
 
