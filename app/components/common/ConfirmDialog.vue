@@ -3,11 +3,10 @@
     v-if="isOpen"
     :open="isOpen"
     :title="title"
+    :description="message"
     @update:open="emit('update:open', $event)"
   >
-    <div class="space-y-6">
-      <p class="text-sm text-gray-600 dark:text-gray-400">{{ message }}</p>
-      <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <UButton
           color="neutral"
           variant="ghost"
@@ -24,7 +23,6 @@
         >
           {{ confirmLabel }}
         </UButton>
-      </div>
     </div>
   </CommonSimpleModal>
 </template>

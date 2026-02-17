@@ -44,6 +44,7 @@
         <button
           v-if="showPasswordToggle"
           type="button"
+          aria-label="Toggle password visibility"
           class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600"
           @click="passwordVisible = !passwordVisible"
         >

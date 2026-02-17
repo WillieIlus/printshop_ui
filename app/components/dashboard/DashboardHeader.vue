@@ -10,7 +10,12 @@
           <UIcon name="i-lucide-bell" class="w-5 h-5" />
         </UButton>
         <UDropdownMenu>
-          <UButton color="neutral" variant="ghost" class="flex items-center gap-2">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            class="flex items-center gap-2"
+            aria-label="Account menu"
+          >
             <UAvatar :src="profile?.avatar ?? undefined" :alt="user?.first_name ?? undefined" size="sm" />
             <span class="hidden md:block text-gray-900 dark:text-white">{{ user?.first_name }} {{ user?.last_name }}</span>
             <UIcon name="i-lucide-chevron-down" class="w-4 h-4" />
