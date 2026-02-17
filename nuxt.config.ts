@@ -15,6 +15,27 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
   ],
 
+  // Button hierarchy: primary (solid), secondary (outline/ghost), destructive (error)
+  ui: {
+    button: {
+      default: {
+        rounded: 'rounded-xl',
+      },
+      primary: {
+        color: 'primary',
+        variant: 'solid',
+      },
+      secondary: {
+        color: 'neutral',
+        variant: 'outline',
+      },
+      destructive: {
+        color: 'error',
+        variant: 'solid',
+      },
+    },
+  },
+
   css: ['~/assets/css/main.css'], // Fixed path
 
   runtimeConfig: {
