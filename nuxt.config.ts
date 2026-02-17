@@ -80,10 +80,10 @@ export default defineNuxtConfig({
     storageKey: 'printshop-color-mode',
   },
 
+  // CSR only for private app; public pages (shops, index) use SSR for SEO + share previews
   routeRules: {
     '/auth/**': { ssr: false },
     '/dashboard/**': { ssr: false },
-    '/shops/**': { ssr: false },
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
