@@ -21,9 +21,12 @@
             : 'w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-flamingo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50',
         }"
       />
-      <div class="mt-1 h-5">
+      <p v-if="helper && !errors.length" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        {{ helper }}
+      </p>
+      <div class="mt-1 min-h-[1.25rem]">
         <p v-if="errors.length" class="flex items-center gap-1 text-xs text-red-500">
-          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 flex-shrink-0" />
+          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 shrink-0" />
           {{ errors[0] }}
         </p>
       </div>
@@ -40,6 +43,7 @@ withDefaults(
     rows?: number
     disabled?: boolean
     required?: boolean
+    helper?: string
   }>(),
   { rows: 4 }
 )

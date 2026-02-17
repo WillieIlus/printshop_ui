@@ -1,73 +1,46 @@
 <template>
-  <div>
-    <label
-      v-if="!hideLabel"
-      :for="name"
-      class="mb-1.5 block text-sm font-medium text-gray-700"
-    >
-      {{ label }}
-      <span v-if="required" class="text-flamingo-500">*</span>
-    </label>
-    <USelectMenu
-      :model-value="value"
-      :items="options"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      value-key="value"
-      :color="errorMessage ? 'error' : undefined"
-      :portal="portal"
-      :content="contentProps"
-      :create-item="createItem"
-      :name="name"
-      class="w-full"
-      :ui="{
-        base: errorMessage
-          ? 'w-full rounded-xl border border-red-300 bg-gray-50 py-3 text-sm text-gray-900 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-          : 'w-full rounded-xl border border-gray-200 bg-gray-50 py-3 text-sm text-gray-900 transition-all focus:border-flamingo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50',
-        rounded: 'rounded-xl',
-        padding: 'px-4',
-      }"
-      @update:model-value="onUpdate"
-      @create="onCreate"
-    />
-    <div class="mt-1 h-5">
-      <p v-if="errorMessage" class="flex items-center gap-1 text-xs text-red-500">
-        <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 flex-shrink-0" />
-        {{ errorMessage }}
-      </p>
   <VeeField v-slot="{ field, handleChange, errors }" :name="name" :label="label">
     <div>
       <label
         v-if="!hideLabel"
         :for="name"
-        class="mb-1.5 block text-sm font-medium text-gray-700"
+        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
       >
         {{ label }}
         <span v-if="required" class="text-flamingo-500">*</span>
       </label>
       <USelectMenu
-        v-bind="field"
-        :options="options"
+        :model-value="field.value"
+        :items="options"
         :placeholder="placeholder"
         :disabled="disabled"
-        value-attribute="value"
+        value-key="value"
         :color="errors.length ? 'error' : undefined"
+        :portal="portal"
+        :content="contentProps"
+        :create-item="createItem"
         class="w-full"
         :ui="{
           base: errors.length
-            ? 'w-full rounded-xl border border-red-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-            : 'w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 transition-all focus:border-flamingo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50',
+            ? 'w-full rounded-xl border border-red-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 transition-all focus:border-red-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:border-red-800'
+            : 'w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 transition-all focus:border-flamingo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:border-gray-600',
+          rounded: 'rounded-xl',
+          padding: 'px-4',
         }"
-        @update:model-value="handleChange"
+        @update:model-value="(v: unknown) => handleChange(normalize(v))"
+        @create="onCreate"
       />
-      <div class="mt-1 h-5">
+      <p v-if="helper" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        {{ helper }}
+      </p>
+      <div class="mt-1 min-h-[1.25rem]">
         <p v-if="errors.length" class="flex items-center gap-1 text-xs text-red-500">
-          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 flex-shrink-0" />
+          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 shrink-0" />
           {{ errors[0] }}
         </p>
       </div>
     </div>
-  </div>
+  </VeeField>
 </template>
 
 <script setup lang="ts">
@@ -82,6 +55,7 @@ const props = withDefaults(
     disabled?: boolean
     required?: boolean
     hideLabel?: boolean
+    helper?: string
     /** Portal target for dropdown (e.g. "body" when inside a modal) */
     portal?: string | boolean
     /** Allow creating new items when not in list (Django-style). Pass true or { when: 'always' } */
@@ -96,7 +70,7 @@ const emit = defineEmits<{
   create: [value: string]
 }>()
 
-const { value, errorMessage, setValue } = useField<string | number>(() => props.name)
+const { setValue } = useField<string | number>(() => props.name)
 
 function onCreate(v: string) {
   const val = props.formatCreateValue ? props.formatCreateValue(v) : v
@@ -109,10 +83,6 @@ function normalize(v: unknown): string | number {
   if (typeof v === 'string' || typeof v === 'number') return v
   if (typeof v === 'object' && v !== null && 'value' in v) return (v as { value: unknown }).value as string | number
   return String(v)
-}
-
-function onUpdate(v: unknown) {
-  setValue(normalize(v))
 }
 
 const contentProps = computed(() =>
