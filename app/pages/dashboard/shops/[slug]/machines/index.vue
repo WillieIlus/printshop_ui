@@ -1,80 +1,85 @@
 <template>
   <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Machines</h1>
-          <UBadge
-            v-if="subscription?.plan_name"
-            color="neutral"
-            variant="soft"
-            size="sm"
-          >
-            {{ subscription.plan_name }}
-          </UBadge>
-        </div>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Add your printers and equipment. Required before setting printing prices.
-        </p>
-      </div>
-      <div class="flex gap-2">
-        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+    <CommonPageHeader
+      title="Machines"
+      :description="'Add your printers and equipment. Required before setting printing prices.'"
+      :badge="subscription?.plan_name"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}`" color="neutral" variant="ghost" size="sm">
+          Back
+        </UButton>
         <UButton
           v-if="canAddMachine"
-          class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+          color="primary"
           @click="openModal()"
         >
-          <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
+          <UIcon name="i-lucide-plus" class="mr-2 h-4 w-4" />
           Add machine
         </UButton>
         <UButton
           v-else
-          class="rounded-xl bg-amber-500 hover:bg-amber-600"
+          color="amber"
           @click="upgradeModalOpen = true"
         >
-          <UIcon name="i-lucide-lock" class="w-4 h-4 mr-2" />
+          <UIcon name="i-lucide-lock" class="mr-2 h-4 w-4" />
           Upgrade to add more
         </UButton>
-      </div>
-    </div>
+      </template>
+    </CommonPageHeader>
 
-    <CommonLoadingSpinner v-if="machineStore.loading && !machines.length" />
+    <!-- Skeleton → Empty → Error → Content -->
+    <CommonDataListSkeleton v-if="machineStore.loading && !machines.length" />
+    <CommonErrorState
+      v-else-if="machineStore.error"
+      title="Could not load machines"
+      :message="machineStore.error"
+    >
+      <UButton color="primary" @click="retryFetch">
+        <UIcon name="i-lucide-refresh-cw" class="mr-2 h-4 w-4" />
+        Try again
+      </UButton>
+    </CommonErrorState>
     <template v-else>
-      <div v-if="machines.length" class="rounded-xl border border-gray-200 bg-white overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-              <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr
-              v-for="machine in machines"
-              :key="machine.id"
-              class="hover:bg-gray-50"
-            >
-              <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ machine.name }}</td>
-              <td class="px-4 py-3 text-sm text-gray-600">
-                {{ machine.type_display ?? machine.machine_type ?? 'Digital Printer' }}
-              </td>
-              <td class="px-4 py-3 text-center">
-                <UBadge :color="machine.is_active !== false ? 'success' : 'neutral'" variant="soft" size="xs">
-                  {{ machine.is_active !== false ? 'Active' : 'Inactive' }}
-                </UBadge>
-              </td>
-              <td class="px-4 py-3 text-right">
-                <UButton variant="ghost" size="xs" @click="editMachine(machine)">Edit</UButton>
-                <UButton variant="ghost" size="xs" color="error" @click="confirmDelete(machine)">
-                  Delete
-                </UButton>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <CommonSectionCard v-if="machines.length">
+        <div class="overflow-x-auto -mx-4 sm:mx-0">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Name</th>
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Type</th>
+                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr
+                v-for="machine in machines"
+                :key="machine.id"
+                class="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+              >
+                <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ machine.name }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                  {{ machine.type_display ?? machine.machine_type ?? 'Digital Printer' }}
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <UBadge :color="machine.is_active !== false ? 'success' : 'neutral'" variant="soft" size="xs">
+                    {{ machine.is_active !== false ? 'Active' : 'Inactive' }}
+                  </UBadge>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <div class="flex justify-end gap-1">
+                    <UButton color="neutral" variant="ghost" size="xs" @click="editMachine(machine)">Edit</UButton>
+                    <UButton color="error" variant="ghost" size="xs" @click="openDeleteConfirm(machine)">
+                      Delete
+                    </UButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </CommonSectionCard>
       <CommonEmptyState
         v-else
         title="No machines yet"
@@ -82,21 +87,31 @@
       >
         <UButton
           v-if="canAddMachine"
-          class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+          color="primary"
           @click="openModal()"
         >
           Add first machine
         </UButton>
         <UButton
           v-else
-          class="rounded-xl bg-amber-500 hover:bg-amber-600"
+          color="amber"
           @click="upgradeModalOpen = true"
         >
-          <UIcon name="i-lucide-lock" class="w-4 h-4 mr-2" />
+          <UIcon name="i-lucide-lock" class="mr-2 h-4 w-4" />
           Upgrade to add machines
         </UButton>
       </CommonEmptyState>
     </template>
+
+    <CommonConfirmDialog
+      v-model:open="deleteConfirmOpen"
+      title="Delete machine?"
+      :message="deleteConfirmMessage"
+      confirm-label="Delete"
+      cancel-label="Cancel"
+      confirm-color="error"
+      @confirm="executeDelete"
+    />
 
     <CommonSimpleModal
       :open="modalOpen"
@@ -223,14 +238,35 @@ async function onSubmit(data: { name: string; machine_type?: string | { value: s
   }
 }
 
-async function confirmDelete(machine: Machine) {
-  if (!confirm(`Delete "${machine.name}"? This may affect printing prices.`)) return
+const deleteConfirmOpen = ref(false)
+const machineToDelete = ref<Machine | null>(null)
+const deleteConfirmMessage = computed(() =>
+  machineToDelete.value
+    ? `Delete "${machineToDelete.value.name}"? This may affect printing prices.`
+    : ''
+)
+
+function openDeleteConfirm(machine: Machine) {
+  machineToDelete.value = machine
+  deleteConfirmOpen.value = true
+}
+
+async function executeDelete() {
+  const m = machineToDelete.value
+  if (!m) return
   try {
-    await machineStore.deleteMachine(slug.value, machine.id)
+    await machineStore.deleteMachine(slug.value, m.id)
     toast.add({ title: 'Deleted', description: 'Machine removed' })
   } catch (err: unknown) {
     toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete', color: 'error' })
+  } finally {
+    machineToDelete.value = null
   }
+}
+
+async function retryFetch() {
+  machineStore.error = null
+  await machineStore.fetchMachines(slug.value)
 }
 
 function onKeydown(e: KeyboardEvent) {
