@@ -67,7 +67,8 @@
               <tr>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Size</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Color</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell (per side)</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell (duplex)</th>
                 <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Buy Price</th>
                 <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Profit</th>
                 <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Active</th>
@@ -79,6 +80,7 @@
                 <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.sheet_size }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ price.color_mode }}</td>
                 <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">KES {{ price.selling_price_per_side }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-600">{{ price.selling_price_duplex_per_sheet ? `KES ${price.selling_price_duplex_per_sheet}` : '-' }}</td>
                 <td class="px-4 py-3 text-sm text-right text-gray-500">{{ price.buying_price_per_side ? `KES ${price.buying_price_per_side}` : '-' }}</td>
                 <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit_per_side }}</td>
                 <td class="px-4 py-3 text-center">
@@ -151,6 +153,52 @@
         </div>
         <CommonEmptyState v-else title="No paper prices" description="Add paper prices by GSM to create your rate card.">
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">Add First Paper Price</UButton>
+        </CommonEmptyState>
+      </div>
+
+      <!-- Material Prices (Banner/Vinyl/Reflective SQM) -->
+      <div v-if="activeTab === 'materials'" class="space-y-4">
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-600">Set prices for banner, vinyl, reflective and other large-format materials per SQM.</p>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openMaterialModal()">
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
+            Add Material Price
+          </UButton>
+        </div>
+
+        <div v-if="pricingStore.materialPrices.length" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Material</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Buy Price</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Active</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="price in pricingStore.materialPrices" :key="price.id" class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.material_type }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ price.unit }}</td>
+                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">KES {{ price.selling_price }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500">{{ price.buying_price ? `KES ${price.buying_price}` : '-' }}</td>
+                <td class="px-4 py-3 text-center">
+                  <UBadge :color="price.is_active ? 'success' : 'neutral'" variant="soft">
+                    {{ price.is_active ? 'Yes' : 'No' }}
+                  </UBadge>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <UButton variant="ghost" size="xs" @click="editMaterialPrice(price)">Edit</UButton>
+                  <UButton variant="ghost" size="xs" color="error" @click="deleteMaterialPrice(price.id)">Delete</UButton>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <CommonEmptyState v-else title="No material prices" description="Add prices for banner, vinyl, reflective per SQM.">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openMaterialModal()">Add First Material Price</UButton>
         </CommonEmptyState>
       </div>
 
@@ -271,6 +319,21 @@
       />
     </CommonSimpleModal>
     <CommonSimpleModal
+      :open="materialModalOpen"
+      :title="editingMaterialPrice ? 'Edit Material Price' : 'Add Material Price'"
+      :description="editingMaterialPrice ? 'Edit material price.' : 'Set price for banner, vinyl, reflective per SQM.'"
+      @update:open="onMaterialModalOpenChange"
+    >
+      <PricingMaterialPriceForm
+        v-if="materialFormReady"
+        :key="editingMaterialPrice?.id ?? 'new'"
+        :price="editingMaterialPrice"
+        :loading="formLoading"
+        @submit="submitMaterialPrice"
+        @cancel="closeMaterialModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
       :open="discountModalOpen"
       :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'"
       :description="editingDiscount ? 'Edit bulk discount details.' : 'Set up bulk discounts for large orders.'"
@@ -292,17 +355,19 @@
 import type {
   PrintingPrice,
   PaperPrice,
+  MaterialPrice,
   FinishingService,
   VolumeDiscount,
   PrintingPriceForm,
   PaperPriceForm,
+  MaterialPriceForm,
   FinishingServiceForm,
   VolumeDiscountForm,
 } from '~/shared/types'
 import { usePricingStore } from '~/stores/pricing'
 import { useMachineStore } from '~/stores/machine'
 
-type TabId = 'printing' | 'paper' | 'finishing' | 'discounts'
+type TabId = 'printing' | 'paper' | 'materials' | 'finishing' | 'discounts'
 
 definePageMeta({ 
   layout: 'dashboard',
@@ -325,6 +390,7 @@ function setActiveTab(id: string) {
 const tabs = computed(() => [
   { id: 'paper' as TabId, name: 'Paper Prices', count: pricingStore.paperPrices.length },
   { id: 'printing' as TabId, name: 'Printing Prices', count: pricingStore.printingPrices.length },
+  { id: 'materials' as TabId, name: 'Material Prices', count: pricingStore.materialPrices.length },
   { id: 'finishing' as TabId, name: 'Finishing Services', count: pricingStore.finishingServices.length },
   { id: 'discounts' as TabId, name: 'Volume Discounts', count: pricingStore.volumeDiscounts.length },
 ])
@@ -335,14 +401,17 @@ const loading = ref(true)
 // Modals
 const printingModalOpen = ref(false)
 const paperModalOpen = ref(false)
+const materialModalOpen = ref(false)
 const finishingModalOpen = ref(false)
 const discountModalOpen = ref(false)
 const printingFormReady = ref(false)
 const paperFormReady = ref(false)
+const materialFormReady = ref(false)
 const finishingFormReady = ref(false)
 const discountFormReady = ref(false)
 const editingPrintingPrice = ref<PrintingPrice | null>(null)
 const editingPaperPrice = ref<PaperPrice | null>(null)
+const editingMaterialPrice = ref<MaterialPrice | null>(null)
 const editingFinishingService = ref<FinishingService | null>(null)
 const editingDiscount = ref<VolumeDiscount | null>(null)
 const formLoading = ref(false)
@@ -393,6 +462,52 @@ const deletePrintingPrice = async (id: number) => {
   if (confirm('Delete this printing price?')) {
     await pricingStore.deletePrintingPrice(slug.value, id)
     toast.add({ title: 'Deleted', description: 'Printing price deleted' })
+  }
+}
+
+const openMaterialModal = (price?: MaterialPrice) => {
+  editingMaterialPrice.value = price ?? null
+  materialModalOpen.value = true
+}
+const editMaterialPrice = (price: MaterialPrice) => openMaterialModal(price)
+const closeMaterialModal = () => {
+  materialModalOpen.value = false
+  editingMaterialPrice.value = null
+}
+function onMaterialModalOpenChange(open: boolean) {
+  materialModalOpen.value = open
+  if (!open) editingMaterialPrice.value = null
+}
+watch(materialModalOpen, (open) => {
+  if (open) {
+    materialFormReady.value = false
+    nextTick(() => { materialFormReady.value = true })
+  } else {
+    materialFormReady.value = false
+    editingMaterialPrice.value = null
+  }
+})
+async function submitMaterialPrice(data: MaterialPriceForm) {
+  formLoading.value = true
+  try {
+    if (editingMaterialPrice.value) {
+      await pricingStore.updateMaterialPrice(slug.value, editingMaterialPrice.value.id, data)
+      toast.add({ title: 'Updated', description: 'Material price updated' })
+    } else {
+      await pricingStore.createMaterialPrice(slug.value, data)
+      toast.add({ title: 'Added', description: 'Material price added' })
+    }
+    closeMaterialModal()
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
+const deleteMaterialPrice = async (id: number) => {
+  if (confirm('Delete this material price?')) {
+    await pricingStore.deleteMaterialPrice(slug.value, id)
+    toast.add({ title: 'Deleted', description: 'Material price deleted' })
   }
 }
 
@@ -541,6 +656,7 @@ onMounted(async () => {
     await Promise.all([
       pricingStore.fetchPrintingPrices(slug.value),
       pricingStore.fetchPaperPrices(slug.value),
+      pricingStore.fetchMaterialPrices(slug.value),
       pricingStore.fetchFinishingServices(slug.value),
       pricingStore.fetchVolumeDiscounts(slug.value),
       machineStore.fetchMachines(slug.value),
