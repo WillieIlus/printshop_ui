@@ -5,7 +5,6 @@ import { useLocalQuotesStore } from '~/stores/localQuotes'
 import { useNotification } from '~/composables/useNotification'
 import { formatKES } from '~/utils/formatters'
 import type { RateCard, PriceCalculationInput, PriceCalculationResult } from '~/shared/types'
-import { usePricingStore } from '~/stores/pricing'
 
 interface Props {
   slug: string
@@ -21,12 +20,22 @@ const emit = defineEmits<{
 
 const pricingStore = usePricingStore()
 
-// Form state
+// Mode: sheet-based or large format (SQM)
+type CalcMode = 'sheet' | 'large_format'
+const calcMode = ref<CalcMode>('sheet')
+
+// Form state - sheet mode
 const sheetSize = ref<'A5' | 'A4' | 'A3' | 'SRA3'>('A3')
 const gsm = ref(150)
 const quantity = ref(100)
 const sides = ref<1 | 2>(1)
 const paperType = ref<'GLOSS' | 'MATTE' | 'BOND' | 'ART'>('GLOSS')
+
+// Form state - large format mode
+const materialType = ref<'BANNER' | 'VINYL' | 'REFLECTIVE' | 'CANVAS' | 'MESH'>('BANNER')
+const areaSqm = ref(1)
+const largeFormatQuantity = ref(1)
+
 const selectedFinishing = ref<number[]>([])
 
 // Available GSM options from rate card
@@ -48,17 +57,28 @@ const savedQuoteId = ref<string | null>(null)
 const calculatePrice = async () => {
   calculating.value = true
   error.value = null
-  
+
   try {
-    const input: PriceCalculationInput = {
-      sheet_size: sheetSize.value,
-      gsm: gsm.value,
-      quantity: quantity.value,
-      sides: sides.value,
-      paper_type: paperType.value,
-      finishing_ids: selectedFinishing.value,
+    let input: PriceCalculationInput
+    if (calcMode.value === 'sheet') {
+      input = {
+        sheet_size: sheetSize.value,
+        gsm: gsm.value,
+        quantity: quantity.value,
+        sides: sides.value,
+        paper_type: paperType.value,
+        finishing_ids: selectedFinishing.value,
+      }
+    } else {
+      input = {
+        unit: 'SQM',
+        material_type: materialType.value,
+        area_sqm: areaSqm.value,
+        quantity: largeFormatQuantity.value,
+        finishing_ids: selectedFinishing.value,
+      }
     }
-    
+
     result.value = await pricingStore.calculatePrice(props.slug, input)
     if (result.value) emit('calculated', result.value)
   } catch (err: unknown) {
@@ -70,10 +90,13 @@ const calculatePrice = async () => {
 
 // Auto-calculate on input change (debounced)
 let debounceTimer: ReturnType<typeof setTimeout>
-watch([sheetSize, gsm, quantity, sides, paperType, selectedFinishing], () => {
-  clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(calculatePrice, 500)
-})
+watch(
+  [calcMode, sheetSize, gsm, quantity, sides, paperType, materialType, areaSqm, largeFormatQuantity, selectedFinishing],
+  () => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(calculatePrice, 500)
+  }
+)
 
 
 // Initial calculation
@@ -89,17 +112,28 @@ const quoteSnapshot = computed(() => {
   const finishingNames = props.rateCard?.finishing
     ?.filter((f) => selectedFinishing.value.includes(f.id))
     .map((f) => f.name) ?? []
-  return {
+  const base = {
     shopName: props.shopName || 'Print Shop',
     shopPhone: props.shopPhone,
-    sheetSize: sheetSize.value,
-    gsm: gsm.value,
-    paperType: paperType.value,
-    quantity: quantity.value,
-    sides: sides.value,
     finishingNames: finishingNames.length ? finishingNames : undefined,
     suggestedPrice: price,
     validityDays: 7,
+  }
+  if (calcMode.value === 'sheet') {
+    return {
+      ...base,
+      sheetSize: sheetSize.value,
+      gsm: gsm.value,
+      paperType: paperType.value,
+      quantity: quantity.value,
+      sides: sides.value,
+    }
+  }
+  return {
+    ...base,
+    materialType: materialType.value,
+    areaSqm: areaSqm.value,
+    quantity: largeFormatQuantity.value,
   }
 })
 
@@ -145,58 +179,107 @@ async function handleSaveQuote() {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Left: Input Form (collapsible sections) -->
       <div class="space-y-3">
-        <QuotesQuoteInputsSection title="Print Specs" :default-open="true">
+        <QuotesQuoteInputsSection title="Job Type" :default-open="true">
+          <div class="flex gap-4">
+            <label class="flex items-center">
+              <input type="radio" v-model="calcMode" value="sheet" class="text-emerald-600 focus:ring-emerald-500" />
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Sheet (A4/A3)</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" v-model="calcMode" value="large_format" class="text-emerald-600 focus:ring-emerald-500" />
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Large Format (SQM)</span>
+            </label>
+          </div>
+        </QuotesQuoteInputsSection>
+
+        <template v-if="calcMode === 'sheet'">
+          <QuotesQuoteInputsSection title="Print Specs" :default-open="true">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Size</label>
+                <select v-model="sheetSize" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                  <option value="A5">A5</option>
+                  <option value="A4">A4</option>
+                  <option value="A3">A3</option>
+                  <option value="SRA3">SRA3</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity (sheets)</label>
+                <input
+                  v-model.number="quantity"
+                  type="number"
+                  min="1"
+                  class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Print Sides</label>
+                <div class="flex gap-4">
+                  <label class="flex items-center">
+                    <input type="radio" v-model="sides" :value="1" class="text-emerald-600 focus:ring-emerald-500" />
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Single-sided</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="radio" v-model="sides" :value="2" class="text-emerald-600 focus:ring-emerald-500" />
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Double-sided</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </QuotesQuoteInputsSection>
+
+          <QuotesQuoteInputsSection title="Materials" :default-open="true">
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Type</label>
+                <select v-model="paperType" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                  <option value="GLOSS">Gloss</option>
+                  <option value="MATTE">Matte</option>
+                  <option value="BOND">Bond</option>
+                  <option value="ART">Art Paper</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Weight (GSM)</label>
+                <select v-model="gsm" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                  <option v-for="g in availableGSM" :key="g" :value="g">{{ g }} gsm</option>
+                </select>
+              </div>
+            </div>
+          </QuotesQuoteInputsSection>
+        </template>
+
+        <QuotesQuoteInputsSection v-else title="Large Format (SQM)" :default-open="true">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Size</label>
-              <select v-model="sheetSize" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
-                <option value="A5">A5</option>
-                <option value="A4">A4</option>
-                <option value="A3">A3</option>
-                <option value="SRA3">SRA3</option>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Material Type</label>
+              <select v-model="materialType" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
+                <option value="BANNER">Banner</option>
+                <option value="VINYL">Vinyl</option>
+                <option value="REFLECTIVE">Reflective</option>
+                <option value="CANVAS">Canvas</option>
+                <option value="MESH">Mesh</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity (sheets)</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Area (SQM)</label>
               <input
-                v-model.number="quantity"
+                v-model.number="areaSqm"
                 type="number"
-                min="1"
+                min="0.1"
+                step="0.1"
                 class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Print Sides</label>
-              <div class="flex gap-4">
-                <label class="flex items-center">
-                  <input type="radio" v-model="sides" :value="1" class="text-emerald-600 focus:ring-emerald-500" />
-                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Single-sided</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="radio" v-model="sides" :value="2" class="text-emerald-600 focus:ring-emerald-500" />
-                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Double-sided</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </QuotesQuoteInputsSection>
-
-        <QuotesQuoteInputsSection title="Materials" :default-open="true">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Type</label>
-              <select v-model="paperType" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
-                <option value="GLOSS">Gloss</option>
-                <option value="MATTE">Matte</option>
-                <option value="BOND">Bond</option>
-                <option value="ART">Art Paper</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Paper Weight (GSM)</label>
-              <select v-model="gsm" class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white">
-                <option v-for="g in availableGSM" :key="g" :value="g">{{ g }} gsm</option>
-              </select>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantity</label>
+              <input
+                v-model.number="largeFormatQuantity"
+                type="number"
+                min="1"
+                class="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+              />
             </div>
           </div>
         </QuotesQuoteInputsSection>
