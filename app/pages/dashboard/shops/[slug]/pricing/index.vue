@@ -6,12 +6,72 @@
         <p class="text-gray-600 dark:text-gray-400 mt-1">Paper prices, printing rates, finishing services</p>
       </div>
       <div class="flex gap-2">
+        <UButton
+          variant="outline"
+          size="sm"
+          :loading="defaultsLoading"
+          @click="openViewDefaults"
+        >
+          <UIcon name="i-lucide-file-text" class="w-4 h-4 mr-2" />
+          View defaults
+        </UButton>
         <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
         <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
-        <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
-        Preview Public Page
-      </UButton>
+          <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
+          Preview Public Page
+        </UButton>
       </div>
+    </div>
+
+    <!-- Empty pricing: Load starter defaults -->
+    <div
+      v-if="!loading && !pricingStore.hasPricing"
+      class="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p class="text-sm font-medium text-amber-800 dark:text-amber-200">
+            <UIcon name="i-lucide-sparkles" class="inline w-4 h-4 mr-1" />
+            No pricing configured yet
+          </p>
+          <p class="mt-1 text-sm text-amber-700 dark:text-amber-300">
+            Load starter defaults to get started quickly, then adjust prices to match your shop.
+          </p>
+        </div>
+        <UButton
+          class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600 shrink-0"
+          :loading="seedLoading"
+          @click="loadStarterDefaults"
+        >
+          <UIcon name="i-lucide-download" class="w-4 h-4 mr-2" />
+          Load starter defaults
+        </UButton>
+      </div>
+    </div>
+
+    <!-- Needs review warning -->
+    <div
+      v-if="!loading && pricingStore.hasPricing && pricingStore.hasNeedsReview"
+      class="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4"
+    >
+      <p class="text-sm text-amber-800 dark:text-amber-200">
+        <UIcon name="i-lucide-alert-triangle" class="inline w-4 h-4 mr-1" />
+        Starter prices loaded—adjust before using
+      </p>
+      <p class="mt-1 text-sm text-amber-700 dark:text-amber-300">
+        Edit any price row to confirm and remove the review flag.
+      </p>
+    </div>
+
+    <!-- Error state -->
+    <div
+      v-if="pricingStore.error"
+      class="rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-4"
+    >
+      <p class="text-sm text-red-800 dark:text-red-200">
+        <UIcon name="i-lucide-alert-circle" class="inline w-4 h-4 mr-1" />
+        {{ pricingStore.error }}
+      </p>
     </div>
 
     <!-- Tab Navigation -->
@@ -82,9 +142,12 @@
                 <td class="px-4 py-3 text-sm text-right text-gray-500">{{ price.buying_price_per_side ? `KES ${price.buying_price_per_side}` : '-' }}</td>
                 <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit_per_side }}</td>
                 <td class="px-4 py-3 text-center">
-                  <UBadge :color="price.is_active ? 'success' : 'neutral'" variant="soft">
-                    {{ price.is_active ? 'Yes' : 'No' }}
-                  </UBadge>
+                  <div class="flex items-center justify-center gap-1">
+                    <UBadge :color="price.is_active ? 'success' : 'neutral'" variant="soft">
+                      {{ price.is_active ? 'Yes' : 'No' }}
+                    </UBadge>
+                    <UBadge v-if="price.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
+                  </div>
                 </td>
                 <td class="px-4 py-3 text-right">
                   <UButton variant="ghost" size="xs" @click="editPrintingPrice(price)">Edit</UButton>
@@ -142,8 +205,11 @@
                 <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit }}</td>
                 <td class="px-4 py-3 text-sm text-right text-gray-500">{{ parseFloat(price.margin_percent).toFixed(1) }}%</td>
                 <td class="px-4 py-3 text-right">
-                  <UButton variant="ghost" size="xs" @click="editPaperPrice(price)">Edit</UButton>
-                  <UButton variant="ghost" size="xs" color="error" @click="deletePaperPrice(price.id)">Delete</UButton>
+                  <div class="flex items-center justify-end gap-1">
+                    <UBadge v-if="price.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
+                    <UButton variant="ghost" size="xs" @click="editPaperPrice(price)">Edit</UButton>
+                    <UButton variant="ghost" size="xs" color="error" @click="deletePaperPrice(price.id)">Delete</UButton>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -175,7 +241,10 @@
                 <h3 class="font-medium text-gray-900">{{ service.name }}</h3>
                 <p class="text-sm text-gray-500">{{ service.category }}</p>
               </div>
-              <UBadge v-if="service.is_default" color="info" variant="soft" size="xs">Default</UBadge>
+              <div class="flex gap-1">
+                <UBadge v-if="service.is_default" color="info" variant="soft" size="xs">Default</UBadge>
+                <UBadge v-if="service.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
+              </div>
             </div>
             <div class="mt-3 flex justify-between items-center">
               <span class="text-lg font-semibold text-gray-900">KES {{ service.selling_price }}</span>
@@ -285,6 +354,111 @@
         @cancel="closeDiscountModal"
       />
     </CommonSimpleModal>
+
+    <!-- View defaults modal (read-only) -->
+    <CommonSimpleModal
+      :open="viewDefaultsOpen"
+      title="Starter pricing defaults"
+      description="Reference templates you can load into your shop. These are read-only."
+      @update:open="viewDefaultsOpen = $event"
+    >
+      <div class="space-y-6 max-h-[60vh] overflow-y-auto">
+        <div v-if="defaultsLoading" class="py-8 text-center">
+          <CommonLoadingSpinner />
+        </div>
+        <template v-else>
+          <div v-if="pricingStore.defaultPrinting.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Printing</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Size</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Color</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell/side</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultPrinting" :key="`p-${i}`">
+                    <td class="px-3 py-2">{{ t.sheet_size }}</td>
+                    <td class="px-3 py-2">{{ t.color_mode }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price_per_side }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="pricingStore.defaultPapers.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Paper</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Size</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">GSM</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Type</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultPapers" :key="`pa-${i}`">
+                    <td class="px-3 py-2">{{ t.sheet_size }}</td>
+                    <td class="px-3 py-2">{{ t.gsm }} gsm</td>
+                    <td class="px-3 py-2">{{ t.paper_type }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="pricingStore.defaultMaterials.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Materials</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Material</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Unit</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultMaterials" :key="`m-${i}`">
+                    <td class="px-3 py-2">{{ t.material_name }}</td>
+                    <td class="px-3 py-2">{{ t.unit }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="pricingStore.defaultFinishing.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Finishing</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Name</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Category</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultFinishing" :key="`f-${i}`">
+                    <td class="px-3 py-2">{{ t.name }}</td>
+                    <td class="px-3 py-2">{{ t.category }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="!hasAnyDefaults" class="py-6 text-center text-sm text-gray-500">
+            No default templates available.
+          </div>
+        </template>
+      </div>
+    </CommonSimpleModal>
   </div>
 </template>
 
@@ -347,8 +521,44 @@ const editingFinishingService = ref<FinishingService | null>(null)
 const editingDiscount = ref<VolumeDiscount | null>(null)
 const formLoading = ref(false)
 const machineStore = useMachineStore()
+const viewDefaultsOpen = ref(false)
+const defaultsLoading = ref(false)
+const seedLoading = ref(false)
 
 const machineOptions = computed(() => machineStore.machineOptions)
+
+const hasAnyDefaults = computed(
+  () =>
+    pricingStore.defaultPrinting.length > 0 ||
+    pricingStore.defaultPapers.length > 0 ||
+    pricingStore.defaultMaterials.length > 0 ||
+    pricingStore.defaultFinishing.length > 0
+)
+
+async function openViewDefaults() {
+  viewDefaultsOpen.value = true
+  defaultsLoading.value = true
+  try {
+    await pricingStore.fetchPricingDefaults()
+  } catch (err) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to load defaults', color: 'error' })
+  } finally {
+    defaultsLoading.value = false
+  }
+}
+
+async function loadStarterDefaults() {
+  seedLoading.value = true
+  pricingStore.error = null
+  try {
+    await pricingStore.seedShopDefaults(slug.value)
+    toast.add({ title: 'Loaded', description: 'Starter defaults have been added to your shop.' })
+  } catch (err) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to seed defaults', color: 'error' })
+  } finally {
+    seedLoading.value = false
+  }
+}
 
 const openPrintingModal = (price?: PrintingPrice) => {
   editingPrintingPrice.value = price ?? null
@@ -537,10 +747,12 @@ const deleteDiscount = async (id: number) => {
 
 // Fetch all pricing data
 onMounted(async () => {
+  pricingStore.error = null
   try {
     await Promise.all([
       pricingStore.fetchPrintingPrices(slug.value),
       pricingStore.fetchPaperPrices(slug.value),
+      pricingStore.fetchMaterialPrices(slug.value),
       pricingStore.fetchFinishingServices(slug.value),
       pricingStore.fetchVolumeDiscounts(slug.value),
       machineStore.fetchMachines(slug.value),
