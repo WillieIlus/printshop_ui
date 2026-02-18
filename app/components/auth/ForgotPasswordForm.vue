@@ -34,10 +34,11 @@ const schema = object({
 
 const authStore = useAuthStore()
 
-async function onSubmit(values: { email: string }) {
+async function onSubmit(values: Record<string, unknown>) {
+  const { email } = values as { email: string }
   loading.value = true
   try {
-    const result = await authStore.requestPasswordReset(values.email)
+    const result = await authStore.requestPasswordReset(email)
     if (result.success) {
       notification.success('If an account exists, you will receive a reset link.')
     } else {

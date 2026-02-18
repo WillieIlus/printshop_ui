@@ -171,6 +171,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     error,
     rateLimitUntil,
+    rememberMe,
     isAuthenticated,
     accessToken,
     refreshToken,

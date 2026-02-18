@@ -15,9 +15,9 @@
 <script setup lang="ts">
 import type { Claim } from '~/shared/types'
 const props = defineProps<{ claim: Claim }>()
-const statusColor = computed(() => {
-  const m: Record<Claim['status'], string> = { pending: 'warning', approved: 'success', rejected: 'error' }
-  return m[props.claim.status] ?? 'neutral'
+const statusColor = computed((): 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral' => {
+  const m: Record<Claim['status'], 'warning' | 'success' | 'error'> = { pending: 'warning', approved: 'success', rejected: 'error' }
+  return (m[props.claim.status] ?? 'neutral') as 'error' | 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'neutral'
 })
 function formatDate(s: string) {
   return new Date(s).toLocaleDateString()

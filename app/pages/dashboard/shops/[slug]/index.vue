@@ -4,7 +4,7 @@
     <template v-else-if="shop">
       <div class="flex items-start justify-between">
         <div class="flex items-center gap-4">
-          <UAvatar :src="shop.logo" :alt="shop.name" size="xl" />
+          <UAvatar :src="shop.logo ?? undefined" :alt="shop.name" size="xl" />
           <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ shop.name }}</h1>
             <p class="text-gray-600 dark:text-gray-400">{{ shop.city }}, {{ shop.state }}</p>

@@ -1,5 +1,4 @@
-import type { Profile, SocialLink } from '~/shared/types'
-import type { PaginatedResponse } from '~/shared/types'
+import type { Profile, SocialLink, PaginatedResponse } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
 export const useProfileStore = defineStore('profile', () => {
