@@ -27,12 +27,8 @@ export function useAuth() {
   async function signup(data: SignupCredentials) {
     const result = await authStore.signup(data)
     if (result.success) {
-      try {
-        await profileStore.fetchProfile()
-      } catch {
-        // Profile fetch may fail - still allow navigation
-      }
-      await router.push('/dashboard')
+      // Backend requires email confirmation before login; redirect to login
+      await router.push('/auth/login')
     }
     return result
   }

@@ -49,13 +49,19 @@ const schema = object({
 
 async function handleSubmit(values: Record<string, unknown>) {
   const newPassword = values.new_password as string
+  const newPasswordConfirm = values.new_password_confirm as string
   if (!uid.value || !token.value) {
     notification.error('Invalid or missing reset link. Request a new one.')
     return
   }
   loading.value = true
   try {
-    const result = await authStore.resetPassword(uid.value, token.value, newPassword)
+    const result = await authStore.resetPassword(
+      uid.value,
+      token.value,
+      newPassword,
+      newPasswordConfirm
+    )
     if (result.success) {
       notification.success('Password updated. You can sign in now.')
       await navigateTo('/auth/login')

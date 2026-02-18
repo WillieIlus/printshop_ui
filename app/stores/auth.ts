@@ -58,14 +58,21 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { $api } = useNuxtApp()
-      await $api(API.users(), {
+      await $api(API.auth.register, {
         method: 'POST',
-        body: credentials,
+        body: {
+          email: credentials.email,
+          password: credentials.password,
+          password_confirmation: credentials.password_confirm,
+          first_name: credentials.first_name,
+          last_name: credentials.last_name,
+        },
       })
-      return await login({
-        email: credentials.email,
-        password: credentials.password,
-      })
+      // Backend creates inactive user; email confirmation required before login
+      return {
+        success: true,
+        message: 'Registration successful. Please check your email to confirm your account.',
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Signup failed'
       error.value = message
@@ -132,13 +139,23 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /** Confirm password reset with token from email (when backend endpoint exists) */
-  async function resetPassword(uid: string, token: string, newPassword: string) {
+  async function resetPassword(
+    uid: string,
+    token: string,
+    newPassword: string,
+    newPasswordConfirmation?: string
+  ) {
     error.value = null
     try {
       const { $api } = useNuxtApp()
       await $api(API.auth.resetConfirm, {
         method: 'POST',
-        body: { uid, token, new_password: newPassword },
+        body: {
+          uid,
+          token,
+          new_password: newPassword,
+          new_password_confirmation: newPasswordConfirmation ?? newPassword,
+        },
       })
       return { success: true }
     } catch (err: unknown) {

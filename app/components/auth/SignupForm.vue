@@ -69,7 +69,9 @@ async function onSubmit(values: {
   if (!result.success) {
     notification.error(result.error || 'Signup failed')
   } else {
-    notification.success('Account created successfully!')
+    notification.success(
+      (result as { message?: string }).message ?? 'Account created. Please check your email to confirm.'
+    )
   }
 }
 </script>

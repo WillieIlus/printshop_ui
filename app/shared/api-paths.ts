@@ -7,6 +7,7 @@ export const API = {
   auth: {
     login: 'auth/api-auth/login/',
     refresh: 'auth/api-auth/token/refresh/',
+    register: 'auth/register/',
     forgotPassword: 'auth/api-auth/password/reset/',
     resetConfirm: 'auth/api-auth/password/reset/confirm/',
   },
