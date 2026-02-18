@@ -26,9 +26,12 @@ export interface PrintingPrice {
   sheet_size: SheetSize
   color_mode: ColorMode
   selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string
   buying_price_per_side: string | null
   profit_per_side: string
   is_active: boolean
+  is_default_seeded?: boolean
+  needs_review?: boolean
 }
 
 /**
@@ -44,6 +47,23 @@ export interface PaperPrice {
   profit: string
   margin_percent: string
   is_active: boolean
+  is_default_seeded?: boolean
+  needs_review?: boolean
+}
+
+/**
+ * Material price - cost per material unit (e.g. per m² for large format)
+ */
+export interface MaterialPrice {
+  id: number
+  material_name: string
+  unit: string
+  buying_price: string
+  selling_price: string
+  profit: string
+  is_active: boolean
+  is_default_seeded?: boolean
+  needs_review?: boolean
 }
 
 /**
@@ -59,6 +79,41 @@ export interface FinishingService {
   profit: string
   is_default: boolean
   is_active: boolean
+  is_default_seeded?: boolean
+  needs_review?: boolean
+}
+
+// Default templates (read-only reference data)
+export interface DefaultPrintingPriceTemplate {
+  machine: number
+  sheet_size: SheetSize
+  color_mode: ColorMode
+  selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string
+  buying_price_per_side?: string
+}
+
+export interface DefaultPaperPriceTemplate {
+  sheet_size: SheetSize
+  gsm: number
+  paper_type: PaperType
+  buying_price: string
+  selling_price: string
+}
+
+export interface DefaultMaterialPriceTemplate {
+  material_name: string
+  unit: string
+  buying_price: string
+  selling_price: string
+}
+
+export interface DefaultFinishingServiceTemplate {
+  name: string
+  category: FinishingCategory
+  charge_by: ChargeBy
+  buying_price?: string
+  selling_price: string
 }
 
 /**
