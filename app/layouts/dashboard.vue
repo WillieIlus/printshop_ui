@@ -1,16 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden">
     <!-- Top bar -->
     <header class="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-4 border-b border-gray-200/70 dark:border-gray-800 bg-white/85 dark:bg-gray-900/85 backdrop-blur-md px-4 sm:px-6">
-      <UButton
-        icon="i-lucide-menu"
-        color="neutral"
-        variant="ghost"
-        size="sm"
-        aria-label="Toggle sidebar"
-        class="lg:hidden"
-        @click="sidebarOpen = !sidebarOpen"
-      />
       <NuxtLink to="/dashboard" class="flex items-center gap-2 shrink-0 group">
         <span class="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 text-white shadow-lg shadow-flamingo-500/25 transition-transform group-hover:scale-105">
           <UIcon name="i-lucide-printer" class="w-4 h-4" />
@@ -31,10 +22,10 @@
       <slot name="topbar-end" />
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 overflow-hidden min-w-0">
+      <!-- Sidebar: hidden on < md, full sidebar on md+ -->
       <aside
-        class="fixed inset-y-0 left-0 z-30 w-64 transform border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 pt-14 transition-transform duration-200 ease-out lg:static lg:translate-x-0 lg:pt-0"
-        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="hidden md:flex md:flex-col md:shrink-0 md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
       >
         <nav class="flex flex-col gap-1 p-4 overflow-y-auto">
           <template v-for="item in navItems" :key="item.to">
@@ -126,14 +117,10 @@
         </div>
       </aside>
 
-      <div
-        v-if="sidebarOpen"
-        class="fixed inset-0 z-20 bg-black/50 lg:hidden"
-        aria-hidden
-        @click="sidebarOpen = false"
-      />
+      <!-- Bottom nav: mobile only (< md) -->
+      <DashboardBottomNav />
 
-      <main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+      <main class="flex-1 min-w-0 overflow-auto p-4 sm:p-6 lg:p-8 pb-20 md:pb-6 lg:pb-8">
         <div v-if="$slots.title || $slots.actions" class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div v-if="$slots.title"><slot name="title" /></div>
           <div v-if="$slots.actions" class="shrink-0"><slot name="actions" /></div>
@@ -150,7 +137,6 @@ import { useShopStore } from '~/stores/shop'
 const colorMode = useColorMode()
 const route = useRoute()
 const shopStore = useShopStore()
-const sidebarOpen = ref(false)
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
