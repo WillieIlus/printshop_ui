@@ -14,19 +14,14 @@
       <div class="col-span-12 grid gap-6 lg:grid-cols-2">
         <DashboardSectionCard title="Details">
           <div class="space-y-2">
-            <p class="text-sm">
-              <span class="font-medium text-gray-500 dark:text-gray-400">Customer:</span>
-              <span class="text-gray-900 dark:text-white">{{ quoteStore.currentQuote.customer_name }}</span>
-            </p>
-            <p class="text-sm">
-              <span class="font-medium text-gray-500 dark:text-gray-400">Email:</span>
-              <span class="text-gray-900 dark:text-white">{{ quoteStore.currentQuote.customer_email }}</span>
-            </p>
-            <p class="text-sm">
-              <span class="font-medium text-gray-500 dark:text-gray-400">Status:</span>
-              <UBadge :color="statusColor" variant="soft" size="sm" class="ml-1">{{ quoteStore.currentQuote.status }}</UBadge>
-            </p>
-            <p class="text-sm font-semibold text-gray-900 dark:text-white">Total: {{ quoteStore.currentQuote.total }}</p>
+            <p><span class="text-gray-500 dark:text-gray-400">Customer:</span> {{ quoteStore.currentQuote.customer_name }}</p>
+            <p><span class="text-gray-500 dark:text-gray-400">Email:</span> {{ quoteStore.currentQuote.customer_email }}</p>
+            <p><span class="text-gray-500 dark:text-gray-400">Status:</span> <UBadge :color="statusColor" variant="soft" size="sm">{{ quoteStore.currentQuote.status }}</UBadge></p>
+            <p class="font-semibold text-gray-900 dark:text-white">Total: {{ quoteStore.currentQuote.total }}</p>
+            <div v-if="quoteStore.currentQuote.notes" class="pt-2 border-t border-gray-200 dark:border-gray-700">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Notes</p>
+              <EditorRichTextDisplay :html="quoteStore.currentQuote.notes" />
+            </div>
           </div>
         </DashboardSectionCard>
         <QuotesQuoteCalculator :totals="totals" />

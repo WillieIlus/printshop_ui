@@ -15,7 +15,7 @@
         </template>
         <div class="space-y-4">
           <FormsFormInput name="name" label="Shop Name" placeholder="Enter shop name" required />
-          <FormsFormTiptap name="description" label="Description" placeholder="Describe your business..." />
+          <FormsFormRichText name="description" label="Description" placeholder="Describe your business..." />
           <div class="grid md:grid-cols-2 gap-4">
             <FormsFormInput name="business_email" label="Email" type="email" placeholder="shop@example.com" required />
             <FormsFormInput name="phone_number" label="Phone" placeholder="+1 (555) 000-0000" />
