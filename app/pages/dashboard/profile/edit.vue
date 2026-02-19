@@ -11,7 +11,8 @@
     <ProfileProfileEditForm
       v-else
       :profile="profileStore.profile"
-      :loading="profileStore.loading"
+      :user="userForForm"
+      :loading="saving"
       @submit="onSubmit"
       @cancel="goBack"
     />
@@ -20,6 +21,9 @@
 
 <script setup lang="ts">
 import { useProfileStore } from '~/stores/profile'
+import { useUserStore } from '~/stores/user'
+import { useAuthStore } from '~/stores/auth'
+import type { UserUpdatePayload } from '~/shared/types'
 
 definePageMeta({
   layout: 'dashboard',
@@ -27,21 +31,38 @@ definePageMeta({
 })
 
 const profileStore = useProfileStore()
+const userStore = useUserStore()
+const authStore = useAuthStore()
 const notification = useNotification()
+const saving = ref(false)
 
-onMounted(() => profileStore.fetchProfile())
+const userForForm = computed(() => authStore.user ?? userStore.currentUser)
+
+onMounted(() => {
+  profileStore.fetchProfile()
+  if (!authStore.user && !userStore.currentUser) {
+    userStore.fetchMe()
+  }
+})
 
 function goBack() {
   navigateTo('/dashboard/profile')
 }
 
-async function onSubmit(data: Parameters<typeof profileStore.updateProfile>[0]) {
-  const result = await profileStore.updateProfile(data)
-  if (result.success) {
-    notification.success('Profile updated')
-    await navigateTo('/dashboard/profile')
-  } else {
-    notification.error(result.error ?? 'Update failed')
+async function onSubmit(data: UserUpdatePayload) {
+  saving.value = true
+  try {
+    const result = await userStore.updateMe(data)
+    if (result.success) {
+      await userStore.fetchMe()
+      await profileStore.fetchProfile()
+      notification.success('Profile updated successfully')
+      await navigateTo('/dashboard/profile')
+    } else {
+      notification.error(result.error ?? 'Update failed')
+    }
+  } finally {
+    saving.value = false
   }
 }
 </script>
