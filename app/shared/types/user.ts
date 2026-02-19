@@ -1,3 +1,5 @@
+import type { SocialLink } from './profile'
+
 export interface User {
   id: number
   email: string
@@ -6,4 +8,18 @@ export interface User {
   is_active: boolean
   date_joined: string
   last_login: string | null
+}
+
+/** Payload for PATCH /api/users/me/ - user + profile + social links */
+export interface UserUpdatePayload {
+  first_name?: string
+  last_name?: string
+  bio?: string
+  phone?: string
+  address?: string
+  city?: string
+  state?: string
+  country?: string
+  postal_code?: string
+  social_links?: Array<{ platform: string; url: string } | Omit<SocialLink, 'id'>>
 }

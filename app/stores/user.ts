@@ -1,4 +1,4 @@
-import type { User, PaginatedResponse } from '~/shared/types'
+import type { User, UserUpdatePayload, PaginatedResponse } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
 export const useUserStore = defineStore('user', () => {
@@ -11,6 +11,25 @@ export const useUserStore = defineStore('user', () => {
     next: null as string | null,
     previous: null as string | null,
   })
+
+  async function updateMe(payload: UserUpdatePayload) {
+    loading.value = true
+    error.value = null
+    try {
+      const { $api } = useNuxtApp()
+      currentUser.value = await $api<User>(API.userMe(), {
+        method: 'PATCH',
+        body: payload,
+      })
+      return { success: true }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to update profile'
+      error.value = message
+      return { success: false, error: message }
+    } finally {
+      loading.value = false
+    }
+  }
 
   async function fetchUsers(params?: Record<string, string | number>) {
     loading.value = true
@@ -66,5 +85,6 @@ export const useUserStore = defineStore('user', () => {
     fetchUsers,
     fetchMe,
     fetchUser,
+    updateMe,
   }
 })
