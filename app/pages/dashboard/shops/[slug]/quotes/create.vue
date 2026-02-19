@@ -8,7 +8,10 @@
       <UButton :to="`/dashboard/shops/${slug}/quotes`" variant="ghost" size="sm">Back</UButton>
     </div>
     <QuotesQuoteForm
+      :slug="slug"
+      :rate-card="rateCard"
       :loading="quoteStore.loading"
+      submit-label="Create Quote"
       @submit="onSubmit"
       @cancel="goBack"
     />
@@ -26,8 +29,18 @@ definePageMeta({
 
 const route = useRoute()
 const quoteStore = useQuoteStore()
+const pricingStore = usePricingStore()
 const notification = useNotification()
 const slug = computed(() => route.params.slug as string)
+const rateCard = computed(() => pricingStore.rateCard)
+
+onMounted(async () => {
+  try {
+    await pricingStore.fetchRateCard(slug.value)
+  } catch {
+    // Rate card might not be available
+  }
+})
 
 function goBack() {
   navigateTo(`/dashboard/shops/${slug.value}/quotes`)

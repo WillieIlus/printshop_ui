@@ -5,7 +5,6 @@ import { useLocalQuotesStore } from '~/stores/localQuotes'
 import { useNotification } from '~/composables/useNotification'
 import { formatKES } from '~/utils/formatters'
 import type { RateCard, PriceCalculationInput, PriceCalculationResult } from '~/shared/types'
-import { usePricingStore } from '~/stores/pricing'
 
 interface Props {
   slug: string

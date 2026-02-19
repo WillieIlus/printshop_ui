@@ -99,10 +99,8 @@ onMounted(async () => {
   await shopStore.fetchShopBySlug(slug.value)
   try {
     await pricingStore.fetchRateCard(slug.value)
-  } catch (err) {
   } catch {
     // Rate card might not be available - that's okay
-    console.log('Rate card not available for this shop')
   }
 })
 onUnmounted(() => {
