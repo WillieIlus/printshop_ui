@@ -224,11 +224,10 @@
     </template>
 
     <!-- Modals with table-style forms -->
-    <CommonSimpleModal
-      :open="printingModalOpen"
+    <DashboardModalForm
+      v-model="printingModalOpen"
       :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'"
       :description="editingPrintingPrice ? 'Edit price per printed side.' : 'Set price per printed side for paper size and color mode.'"
-      @update:open="onPrintingModalOpenChange"
     >
       <PricingPrintingPriceForm
         v-if="printingFormReady"
@@ -239,12 +238,11 @@
         @submit="submitPrintingPrice"
         @cancel="closePrintingModal"
       />
-    </CommonSimpleModal>
-    <CommonSimpleModal
-      :open="paperModalOpen"
+    </DashboardModalForm>
+    <DashboardModalForm
+      v-model="paperModalOpen"
       :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'"
       :description="editingPaperPrice ? 'Edit paper price by GSM.' : 'Set paper price by GSM for your rate card.'"
-      @update:open="onPaperModalOpenChange"
     >
       <PricingPaperPriceForm
         v-if="paperFormReady"
@@ -254,12 +252,11 @@
         @submit="submitPaperPrice"
         @cancel="closePaperModal"
       />
-    </CommonSimpleModal>
-    <CommonSimpleModal
-      :open="finishingModalOpen"
+    </DashboardModalForm>
+    <DashboardModalForm
+      v-model="finishingModalOpen"
       :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'"
       :description="editingFinishingService ? 'Edit finishing service details.' : 'Add finishing services like lamination and binding.'"
-      @update:open="onFinishingModalOpenChange"
     >
       <PricingFinishingServiceForm
         v-if="finishingFormReady"
@@ -269,12 +266,11 @@
         @submit="submitFinishingService"
         @cancel="closeFinishingModal"
       />
-    </CommonSimpleModal>
-    <CommonSimpleModal
-      :open="discountModalOpen"
+    </DashboardModalForm>
+    <DashboardModalForm
+      v-model="discountModalOpen"
       :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'"
       :description="editingDiscount ? 'Edit bulk discount details.' : 'Set up bulk discounts for large orders.'"
-      @update:open="onDiscountModalOpenChange"
     >
       <PricingVolumeDiscountForm
         v-if="discountFormReady"
@@ -284,7 +280,7 @@
         @submit="submitVolumeDiscount"
         @cancel="closeDiscountModal"
       />
-    </CommonSimpleModal>
+    </DashboardModalForm>
   </div>
 </template>
 
@@ -359,10 +355,6 @@ const closePrintingModal = () => {
   printingModalOpen.value = false
   editingPrintingPrice.value = null
 }
-function onPrintingModalOpenChange(open: boolean) {
-  printingModalOpen.value = open
-  if (!open) editingPrintingPrice.value = null
-}
 watch(printingModalOpen, (open) => {
   if (open) {
     printingFormReady.value = false
@@ -404,10 +396,6 @@ const editPaperPrice = (price: PaperPrice) => openPaperModal(price)
 const closePaperModal = () => {
   paperModalOpen.value = false
   editingPaperPrice.value = null
-}
-function onPaperModalOpenChange(open: boolean) {
-  paperModalOpen.value = open
-  if (!open) editingPaperPrice.value = null
 }
 watch(paperModalOpen, (open) => {
   if (open) {
@@ -452,10 +440,6 @@ const closeFinishingModal = () => {
   finishingModalOpen.value = false
   editingFinishingService.value = null
 }
-function onFinishingModalOpenChange(open: boolean) {
-  finishingModalOpen.value = open
-  if (!open) editingFinishingService.value = null
-}
 watch(finishingModalOpen, (open) => {
   if (open) {
     finishingFormReady.value = false
@@ -497,10 +481,6 @@ const editDiscount = (discount: VolumeDiscount) => openDiscountModal(discount)
 const closeDiscountModal = () => {
   discountModalOpen.value = false
   editingDiscount.value = null
-}
-function onDiscountModalOpenChange(open: boolean) {
-  discountModalOpen.value = open
-  if (!open) editingDiscount.value = null
 }
 watch(discountModalOpen, (open) => {
   if (open) {

@@ -98,11 +98,10 @@
       </CommonEmptyState>
     </template>
 
-    <CommonSimpleModal
-      :open="modalOpen"
+    <DashboardModalForm
+      v-model="modalOpen"
       :title="editing ? 'Edit machine' : 'Add machine'"
       :description="editing ? 'Edit printer or equipment details.' : 'Add a printer or equipment. Required before setting printing prices.'"
-      @update:open="onModalOpenChange"
     >
       <MachinesMachineForm
         v-if="formReady"
@@ -114,7 +113,7 @@
         @submit="onSubmit"
         @cancel="closeModal"
       />
-    </CommonSimpleModal>
+    </DashboardModalForm>
 
     <SubscriptionUpgradeModal
       :open="upgradeModalOpen"
@@ -176,11 +175,6 @@ function editMachine(machine: Machine) {
 function closeModal() {
   modalOpen.value = false
   editing.value = null
-}
-
-function onModalOpenChange(open: boolean) {
-  modalOpen.value = open
-  if (!open) editing.value = null
 }
 
 watch(modalOpen, (open) => {

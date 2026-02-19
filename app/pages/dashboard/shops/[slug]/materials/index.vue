@@ -90,11 +90,10 @@
       </CommonEmptyState>
     </template>
 
-    <CommonSimpleModal
-      :open="modalOpen"
+    <DashboardModalForm
+      v-model="modalOpen"
       :title="editing ? 'Edit paper stock' : 'Add paper stock'"
       :description="editing ? 'Edit paper inventory details.' : 'Add paper inventory by size, GSM and type.'"
-      @update:open="onModalOpenChange"
     >
       <MaterialsPaperStockForm
         v-if="formReady"
@@ -104,13 +103,12 @@
         @submit="onSubmit"
         @cancel="closeModal"
       />
-    </CommonSimpleModal>
+    </DashboardModalForm>
 
-    <CommonSimpleModal
-      :open="adjustModalOpen"
+    <DashboardModalForm
+      v-model="adjustModalOpen"
       title="Adjust stock"
       description="Add or remove sheets from inventory."
-      @update:open="onAdjustModalOpenChange"
     >
         <div v-if="adjustingItem" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -140,7 +138,7 @@
             </UButton>
           </div>
         </div>
-    </CommonSimpleModal>
+    </DashboardModalForm>
   </div>
 </template>
 
@@ -181,11 +179,6 @@ function closeModal() {
   editing.value = null
 }
 
-function onModalOpenChange(open: boolean) {
-  modalOpen.value = open
-  if (!open) editing.value = null
-}
-
 watch(modalOpen, (open) => {
   if (open) {
     formReady.value = false
@@ -206,11 +199,6 @@ function closeAdjustModal() {
   adjustModalOpen.value = false
   adjustingItem.value = null
   adjustmentValue.value = ''
-}
-
-function onAdjustModalOpenChange(open: boolean) {
-  adjustModalOpen.value = open
-  if (!open) adjustingItem.value = null
 }
 
 async function onSubmit(data: {
