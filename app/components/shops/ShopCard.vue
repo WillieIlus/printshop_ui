@@ -31,7 +31,9 @@
 
     <!-- Body -->
     <div class="px-6 py-5">
-      <p v-if="shop.description" class="mb-4 line-clamp-2 text-sm text-gray-600">{{ shop.description }}</p>
+      <div v-if="shop.description" class="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+        <EditorRichTextDisplay :html="shop.description" />
+      </div>
       <div v-else class="mb-4" />
 
       <!-- Contact info -->

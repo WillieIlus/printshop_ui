@@ -10,7 +10,7 @@
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ shop.name }}</h1>
             <p class="text-gray-600 dark:text-gray-400 mt-1">{{ shop.city }}, {{ shop.state }}</p>
             <UBadge v-if="shop.is_verified" color="success" variant="soft" class="mt-2">Verified</UBadge>
-            <p v-if="shop.description" class="mt-4 text-gray-600 dark:text-gray-400">{{ shop.description }}</p>
+            <EditorRichTextDisplay v-if="shop.description" :html="shop.description" class="mt-4" />
             <div class="mt-4 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
               <span v-if="shop.phone_number" class="flex items-center gap-1"><UIcon name="i-lucide-phone" class="w-4 h-4" />{{ shop.phone_number }}</span>
               <span v-if="shop.business_email" class="flex items-center gap-1"><UIcon name="i-lucide-mail" class="w-4 h-4" />{{ shop.business_email }}</span>
@@ -99,7 +99,6 @@ onMounted(async () => {
   await shopStore.fetchShopBySlug(slug.value)
   try {
     await pricingStore.fetchRateCard(slug.value)
-  } catch (err) {
   } catch {
     // Rate card might not be available - that's okay
     console.log('Rate card not available for this shop')

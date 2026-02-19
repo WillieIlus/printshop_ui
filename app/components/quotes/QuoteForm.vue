@@ -4,7 +4,7 @@
       <FormsFormInput name="customer_name" label="Customer name" placeholder="Name" required />
       <FormsFormInput name="customer_email" label="Customer email" type="email" placeholder="email@example.com" required />
       <FormsFormInput name="customer_phone" label="Customer phone" placeholder="+1 555 000 0000" />
-      <FormsFormTextarea name="notes" label="Notes" placeholder="Notes..." :rows="3" />
+      <FormsFormRichText name="notes" label="Notes" placeholder="Notes..." />
       <div class="flex justify-end gap-2">
         <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
         <UButton type="submit" color="primary" :loading="loading" :disabled="!meta.valid">Save</UButton>

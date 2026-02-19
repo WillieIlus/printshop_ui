@@ -17,6 +17,10 @@
             <p><span class="text-gray-500 dark:text-gray-400">Email:</span> {{ quoteStore.currentQuote.customer_email }}</p>
             <p><span class="text-gray-500 dark:text-gray-400">Status:</span> <UBadge :color="statusColor" variant="soft" size="sm">{{ quoteStore.currentQuote.status }}</UBadge></p>
             <p class="font-semibold text-gray-900 dark:text-white">Total: {{ quoteStore.currentQuote.total }}</p>
+            <div v-if="quoteStore.currentQuote.notes" class="pt-2 border-t border-gray-200 dark:border-gray-700">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Notes</p>
+              <EditorRichTextDisplay :html="quoteStore.currentQuote.notes" />
+            </div>
           </div>
         </UCard>
         <QuotesQuoteCalculator :totals="totals" />
