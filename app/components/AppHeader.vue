@@ -40,14 +40,6 @@
 
           <!-- User Avatar / Login -->
           <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
-            <UPopover mode="click" :content="{ placement: 'bottom-end' }">
-              <button class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 transition-all hover:border-gray-300 hover:shadow-sm">
-                <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-flamingo-400 to-flamingo-600 text-xs font-bold text-white">
-                  {{ userInitials }}
-                </div>
-                <span class="hidden text-sm font-medium text-gray-700 sm:inline">{{ userName }}</span>
-                <UIcon name="i-lucide-chevron-down" class="h-4 w-4 text-gray-400" />
-              </button>
             <UPopover mode="click" :popper="{ placement: 'bottom-end' }">
               <template #default>
                 <button class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 transition-all hover:border-gray-300 hover:shadow-sm">
