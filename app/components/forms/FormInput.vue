@@ -44,6 +44,7 @@
         <button
           v-if="showPasswordToggle"
           type="button"
+          aria-label="Toggle password visibility"
           class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600"
           @click="passwordVisible = !passwordVisible"
         >
@@ -54,10 +55,12 @@
         </button>
       </div>
 
-      <!-- Error Message -->
-      <div class="mt-1 h-5">
+      <p v-if="helper && !errors.length" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        {{ helper }}
+      </p>
+      <div class="mt-1 min-h-[1.25rem]">
         <p v-if="errors.length" class="flex items-center gap-1 text-xs text-red-500">
-          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 flex-shrink-0" />
+          <UIcon name="i-lucide-alert-circle" class="h-3.5 w-3.5 shrink-0" />
           {{ errors[0] }}
         </p>
       </div>
@@ -77,6 +80,7 @@ const props = withDefaults(defineProps<{
   disabled?: boolean
   required?: boolean
   hideLabel?: boolean
+  helper?: string
 }>(), {
   type: 'text',
   placeholder: '',

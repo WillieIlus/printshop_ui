@@ -7,11 +7,12 @@
         @click="$emit('update:open', false)"
       />
       <DialogContent
-        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 focus:outline-none"
+        class="fixed inset-0 z-[9999] flex items-end justify-center p-0 focus:outline-none sm:items-center sm:p-4"
         :aria-describedby="descriptionId"
+        @open-auto-focus="onOpenAutoFocus"
       >
         <div
-          class="relative rounded-xl shadow-lg border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 max-w-lg w-full max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col"
+          class="relative flex max-h-[85dvh] w-full flex-col overflow-hidden rounded-t-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:max-h-[90dvh] sm:max-w-lg sm:rounded-xl"
           role="document"
         >
           <div class="flex items-center justify-between p-4 sm:px-6 border-b border-gray-200 dark:border-gray-700 shrink-0">
@@ -39,7 +40,7 @@
               />
             </DialogClose>
           </div>
-          <div class="p-4 sm:p-6 overflow-y-auto flex-1">
+          <div ref="slotRef" class="p-4 sm:p-6 overflow-y-auto flex-1">
             <slot />
           </div>
         </div>
@@ -57,6 +58,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
+  useId,
 } from 'reka-ui'
 
 defineProps<{
@@ -67,5 +69,20 @@ defineProps<{
 
 defineEmits<{ 'update:open': [value: boolean] }>()
 
-const descriptionId = 'dialog-desc'
+const descriptionId = useId(undefined, 'dialog-desc')
+const slotRef = ref<HTMLElement | null>(null)
+
+function onOpenAutoFocus(e: Event) {
+  nextTick(() => {
+    const slot = slotRef.value
+    if (!slot) return
+    const first = slot.querySelector<HTMLElement>(
+      'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+    if (first) {
+      ;(e as FocusEvent).preventDefault()
+      first.focus()
+    }
+  })
+}
 </script>

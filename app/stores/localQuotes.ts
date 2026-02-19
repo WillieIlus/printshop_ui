@@ -1,5 +1,6 @@
 import type { QuoteSnapshot } from '~/utils/quoteMessage'
 
+// PERSIST: localStorage (quote drafts only — no tokens). See app/stores/README.md
 const STORAGE_KEY = 'printshop_local_quotes'
 
 export interface LocalQuote {

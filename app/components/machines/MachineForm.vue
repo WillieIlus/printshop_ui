@@ -22,13 +22,16 @@
         :format-create-value="formatCreateValue"
         @create="onCreateType"
       />
-      <div class="flex justify-end gap-2 pt-4">
-        <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
+      <div class="flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end">
+        <UButton color="neutral" variant="outline" class="w-full sm:w-auto" @click="$emit('cancel')">
+          Cancel
+        </UButton>
         <UButton
           type="submit"
-          class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+          color="primary"
           :loading="loading"
           :disabled="loading"
+          class="w-full sm:w-auto"
         >
           {{ machine ? 'Update' : 'Add' }} machine
         </UButton>

@@ -1,86 +1,57 @@
 <template>
   <VeeForm v-slot="{ meta }" :validation-schema="schema" :initial-values="initialValues" @submit="onSubmit">
-    <table class="w-full text-sm">
-      <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-        <tr>
-          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top w-40">Service Name</td>
-          <td class="py-3">
-            <FormsFormInput
-              name="name"
-              label="Service Name"
-              placeholder="e.g. Matt Lamination A3"
-              required
-              hide-label
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Category</td>
-          <td class="py-3">
-            <FormsFormSelect
-              name="category"
-              label="Category"
-              :options="categoryOptions"
-              placeholder="Select category"
-              required
-              hide-label
-              portal="#modal-portal"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Charge By</td>
-          <td class="py-3">
-            <FormsFormSelect
-              name="charge_by"
-              label="Charge By"
-              :options="chargeByOptions"
-              placeholder="Select"
-              required
-              hide-label
-              portal="#modal-portal"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Buying Price (optional)</td>
-          <td class="py-3">
-            <FormsFormInput
-              name="buying_price"
-              label="Buying Price (optional)"
-              type="number"
-              placeholder="0.00"
-              hide-label
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Selling Price</td>
-          <td class="py-3">
-            <FormsFormInput
-              name="selling_price"
-              label="Selling Price"
-              type="number"
-              placeholder="0.00"
-              required
-              hide-label
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Default</td>
-          <td class="py-3">
-            <label class="flex items-center gap-2">
-              <UCheckbox v-model="isDefault" />
-              <span class="text-sm text-gray-700 dark:text-gray-300">Default selection for customers</span>
-            </label>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="flex justify-end gap-2 pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
-      <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
-      <UButton type="submit" color="primary" :loading="loading" :disabled="!meta.valid">
+    <div class="space-y-4">
+      <FormsFormInput
+        name="name"
+        label="Service Name"
+        placeholder="e.g. Matt Lamination A3"
+        required
+      />
+      <FormsFormSelect
+        name="category"
+        label="Category"
+        :options="categoryOptions"
+        placeholder="Select category"
+        required
+        portal="#modal-portal"
+      />
+      <FormsFormSelect
+        name="charge_by"
+        label="Charge By"
+        :options="chargeByOptions"
+        placeholder="Select"
+        required
+        portal="#modal-portal"
+      />
+      <FormsFormInput
+        name="buying_price"
+        label="Buying Price (optional)"
+        type="number"
+        placeholder="0.00"
+      />
+      <FormsFormInput
+        name="selling_price"
+        label="Selling Price"
+        type="number"
+        placeholder="0.00"
+        required
+      />
+      <div class="flex items-center gap-2">
+        <UCheckbox v-model="isDefault" />
+        <span class="text-sm text-gray-700 dark:text-gray-300">Default selection for customers</span>
+      </div>
+    </div>
+    <div class="mt-6 flex flex-col-reverse gap-2 border-t border-gray-200 pt-4 dark:border-gray-700 sm:flex-row sm:justify-end">
+      <UButton color="neutral" variant="outline" class="w-full sm:w-auto" @click="$emit('cancel')">
+        Cancel
+      </UButton>
+      <UButton
+        type="submit"
+        color="primary"
+        :loading="loading"
+        :disabled="loading || !meta.valid"
+        class="w-full sm:w-auto"
+      >
         {{ editing ? 'Update' : 'Add' }}
       </UButton>
     </div>

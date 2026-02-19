@@ -2,6 +2,8 @@
   <div class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
     <button
       type="button"
+      :aria-expanded="open"
+      :aria-label="`${open ? 'Collapse' : 'Expand'} ${title} section`"
       class="w-full flex items-center justify-between px-4 py-3 text-left bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       @click="open = !open"
     >

@@ -3,14 +3,26 @@
     v-if="isOpen"
     :open="isOpen"
     :title="title"
+    :description="message"
     @update:open="emit('update:open', $event)"
   >
-    <div class="space-y-6">
-      <p class="text-sm text-gray-600 dark:text-gray-400">{{ message }}</p>
-      <div class="flex justify-end gap-2">
-        <UButton color="neutral" variant="ghost" @click="close">{{ cancelLabel }}</UButton>
-        <UButton :color="confirmColor" @click="confirm">{{ confirmLabel }}</UButton>
-      </div>
+    <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          class="w-full sm:w-auto"
+          @click="close"
+        >
+          {{ cancelLabel }}
+        </UButton>
+        <UButton
+          :color="confirmColor"
+          :variant="confirmColor === 'error' ? 'solid' : 'solid'"
+          class="w-full sm:w-auto"
+          @click="confirm"
+        >
+          {{ confirmLabel }}
+        </UButton>
     </div>
   </CommonSimpleModal>
 </template>

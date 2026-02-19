@@ -15,6 +15,27 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
   ],
 
+  // Button hierarchy: primary (solid), secondary (outline/ghost), destructive (error)
+  ui: {
+    button: {
+      default: {
+        rounded: 'rounded-xl',
+      },
+      primary: {
+        color: 'primary',
+        variant: 'solid',
+      },
+      secondary: {
+        color: 'neutral',
+        variant: 'outline',
+      },
+      destructive: {
+        color: 'error',
+        variant: 'solid',
+      },
+    },
+  },
+
   css: ['~/assets/css/main.css'], // Fixed path
 
   runtimeConfig: {
@@ -28,9 +49,10 @@ export default defineNuxtConfig({
     storesDirs: ['./app/stores/**'],
   },
 
-  piniaPersistedstate: {
-    storage: 'localStorage',
-    // Auth store uses custom cookie storage (see stores/auth.ts)
+  // Pinia persistence: opt-in per store. Sensitive data (tokens) MUST use cookies.
+  piniaPluginPersistedstate: {
+    auto: false, // Only stores with explicit persist: true | {} are persisted
+    storage: 'localStorage', // Default for opt-in stores; auth overrides with cookies (stores/auth.ts)
   },
 
   veeValidate: {
@@ -59,10 +81,10 @@ export default defineNuxtConfig({
     storageKey: 'printshop-color-mode',
   },
 
+  // CSR only for private app; public pages (shops, index) use SSR for SEO + share previews
   routeRules: {
     '/auth/**': { ssr: false },
     '/dashboard/**': { ssr: false },
-    '/shops/**': { ssr: false },
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },

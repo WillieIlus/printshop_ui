@@ -187,7 +187,7 @@ export const useAuthStore = defineStore('auth', () => {
 }, {
   persist: {
     key: AUTH_STORAGE_KEY,
-    storage: authCookieStorage,
+    storage: authCookieStorage, // Cookies only — see utils/auth-cookie-storage.ts
     pick: ['tokens', 'rememberMe'],
   },
 })
