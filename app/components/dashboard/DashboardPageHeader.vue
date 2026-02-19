@@ -1,26 +1,17 @@
 <template>
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-    <div class="min-w-0">
-      <nav v-if="breadcrumbs?.length" class="mb-2 flex flex-wrap items-center gap-1.5 text-sm text-muted">
-        <template v-for="(crumb, i) in breadcrumbs" :key="i">
-          <NuxtLink
-            :to="crumb.to"
-            class="hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            {{ crumb.label }}
-          </NuxtLink>
-          <span v-if="i < breadcrumbs.length - 1" class="text-muted">/</span>
-        </template>
-      </nav>
+  <div class="col-span-12 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+    <div class="min-w-0 flex-1 space-y-1">
       <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
         {{ title }}
       </h1>
-      <p v-if="subtitle" class="mt-1 text-sm text-muted">
+      <p v-if="subtitle" class="text-sm text-gray-500 dark:text-gray-400">
         {{ subtitle }}
       </p>
+      <div v-if="$slots.default" class="pt-1">
+        <slot />
+      </div>
     </div>
-    <div v-if="$slots.actions || $slots.filters" class="flex flex-wrap items-center gap-2 shrink-0">
-      <slot name="filters" />
+    <div v-if="$slots.actions" class="shrink-0 flex flex-wrap items-center gap-2">
       <slot name="actions" />
     </div>
   </div>
@@ -30,6 +21,5 @@
 defineProps<{
   title: string
   subtitle?: string
-  breadcrumbs?: Array<{ label: string; to: string }>
 }>()
 </script>

@@ -1,24 +1,19 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="Business hours"
-        :subtitle="slug"
-        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
-      >
-        <template #actions>
-          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Business hours"
+      :subtitle="slug"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
 
-    <DashboardSkeletonState v-if="loading" variant="card" :show-header="false" />
+    <DashboardSkeletonState v-if="loading" variant="block" />
     <div v-else class="col-span-12">
-      <DashboardSectionCard>
-        <ShopsShopHours :hours="shopStore.shopHours" />
-      </DashboardSectionCard>
+      <ShopsShopHours :hours="shopStore.shopHours" />
     </div>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -1,41 +1,38 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="Machines"
-        subtitle="Add your printers and equipment. Required before setting printing prices."
-        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
-      >
-        <template #actions>
-          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
-          <UButton color="primary" @click="openModal()">
-            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
-            Add machine
-          </UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Machines"
+      subtitle="Add your printers and equipment. Required before setting printing prices."
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+        <UButton color="primary" @click="openModal()">
+          <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
+          Add machine
+        </UButton>
+      </template>
+    </DashboardPageHeader>
 
-    <DashboardSkeletonState v-if="machineStore.loading && !machineStore.machines.length" variant="table" :show-header="false" />
-    <template v-else>
-      <div v-if="machineStore.machines.length" class="col-span-12">
-        <DashboardDataTableCard title="Machines">
+    <div class="col-span-12">
+      <DashboardSkeletonState v-if="machineStore.loading && !machineStore.machines.length" variant="table" :rows="5" />
+      <template v-else>
+        <DashboardDataTableCard v-if="machineStore.machines.length" title="Machines">
           <template #thead>
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Name</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">Type</th>
-              <th class="px-4 py-3 text-center text-xs font-medium text-muted uppercase tracking-wider">Status</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">Actions</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Name</th>
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Type</th>
+              <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Status</th>
+              <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">Actions</th>
             </tr>
           </template>
           <template #tbody>
             <tr
               v-for="machine in machineStore.machines"
               :key="machine.id"
-              class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              class="hover:bg-gray-50 dark:hover:bg-gray-800/50"
             >
               <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ machine.name }}</td>
-              <td class="px-4 py-3 text-sm text-muted">
+              <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
                 {{ machine.type_display ?? machine.machine_type ?? 'Digital Printer' }}
               </td>
               <td class="px-4 py-3 text-center">
@@ -52,9 +49,8 @@
             </tr>
           </template>
         </DashboardDataTableCard>
-      </div>
-      <div v-else class="col-span-12">
-        <CommonEmptyState
+        <DashboardEmptyState
+          v-else
           title="No machines yet"
           description="Add your first printer or equipment. You'll need at least one machine before setting printing prices."
           icon="i-lucide-printer"
@@ -62,9 +58,9 @@
           <UButton color="primary" @click="openModal()">
             Add first machine
           </UButton>
-        </CommonEmptyState>
-      </div>
-    </template>
+        </DashboardEmptyState>
+      </template>
+    </div>
 
     <DashboardModalForm
       v-model="modalOpen"

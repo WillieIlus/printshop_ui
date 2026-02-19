@@ -1,16 +1,13 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="Add product template"
-        subtitle="Create a preset for quick quoting"
-        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }, { label: 'Products', to: `/dashboard/shops/${slug}/products` }]"
-      >
-        <template #actions>
-          <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Add product template"
+      subtitle="Create a preset for quick quoting"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
 
     <div class="col-span-12">
       <DashboardSectionCard>
@@ -21,7 +18,7 @@
         />
       </DashboardSectionCard>
     </div>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

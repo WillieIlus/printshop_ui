@@ -7,14 +7,12 @@
         </template>
       </QuotesQuoteCard>
     </div>
-    <CommonEmptyState
+    <DashboardEmptyState
       v-else
       title="No quotes yet"
-      description="Create your first quote to get started."
+      description="Quotes you request will appear here."
       icon="i-lucide-file-text"
-    >
-      <slot name="empty-actions" />
-    </CommonEmptyState>
+    />
   </div>
 </template>
 

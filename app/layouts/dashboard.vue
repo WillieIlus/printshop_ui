@@ -134,8 +134,9 @@
       />
 
       <main class="flex-1 overflow-auto">
-        <!-- All dashboard pages must use DashboardLayout for consistent max-width, padding, surface -->
-        <slot />
+        <DashboardLayout>
+          <slot />
+        </DashboardLayout>
       </main>
     </div>
   </div>

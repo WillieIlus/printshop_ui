@@ -1,22 +1,19 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="Quotes"
-        :subtitle="slug"
-        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
-      >
-        <template #actions>
-          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
-          <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
-            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
-            New quote
-          </UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Quotes"
+      :subtitle="slug"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+        <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
+          <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
+          New quote
+        </UButton>
+      </template>
+    </DashboardPageHeader>
 
-    <DashboardSkeletonState v-if="quoteStore.loading" variant="list" :show-header="false" />
+    <DashboardSkeletonState v-if="quoteStore.loading" variant="cards" :card-count="6" />
     <div v-else class="col-span-12">
       <QuotesQuoteList :quotes="quoteStore.quotes">
         <template #card-actions="{ quote }">
@@ -24,7 +21,7 @@
         </template>
       </QuotesQuoteList>
     </div>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

@@ -1,19 +1,16 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="Stock & prices"
-        subtitle="Paper prices, printing rates, finishing services"
-        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
-      >
-        <template #actions>
-          <UButton :to="`/shops/${slug}`" target="_blank" variant="outline">
-            <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
-            Preview Public Page
-          </UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Stock & prices"
+      subtitle="Paper prices, printing rates, finishing services"
+    >
+      <template #actions>
+        <UButton :to="`/shops/${slug}`" target="_blank" variant="outline">
+          <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
+          Preview Public Page
+        </UButton>
+      </template>
+    </DashboardPageHeader>
 
     <!-- Tab Navigation -->
     <div class="col-span-12 flex gap-1 overflow-x-auto rounded-xl border border-gray-200/60 bg-white p-1.5 dark:border-gray-800/60 dark:bg-gray-900/50">
@@ -95,7 +92,7 @@
             </tbody>
           </table>
         </div>
-        <CommonEmptyState v-else title="No printing prices" description="Add machines first, then add printing prices per machine and paper size.">
+        <DashboardEmptyState v-else title="No printing prices" description="Add machines first, then add printing prices per machine and paper size.">
           <NuxtLink v-if="!machineStore.machines.length" :to="`/dashboard/shops/${slug}/machines`">
             <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600">Add machines first</UButton>
           </NuxtLink>
@@ -106,7 +103,7 @@
           >
             Add first printing price
           </UButton>
-        </CommonEmptyState>
+        </DashboardEmptyState>
       </div>
 
       <!-- Paper Prices -->
@@ -150,9 +147,9 @@
             </tbody>
           </table>
         </div>
-        <CommonEmptyState v-else title="No paper prices" description="Add paper prices by GSM to create your rate card.">
+        <DashboardEmptyState v-else title="No paper prices" description="Add paper prices by GSM to create your rate card.">
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">Add First Paper Price</UButton>
-        </CommonEmptyState>
+        </DashboardEmptyState>
       </div>
 
       <!-- Finishing Services -->
@@ -188,9 +185,9 @@
             </div>
           </div>
         </div>
-        <CommonEmptyState v-else title="No finishing services" description="Add services like lamination and binding.">
+        <DashboardEmptyState v-else title="No finishing services" description="Add services like lamination and binding.">
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">Add First Finishing Service</UButton>
-        </CommonEmptyState>
+        </DashboardEmptyState>
       </div>
 
       <!-- Volume Discounts -->
@@ -218,9 +215,9 @@
             </div>
           </div>
         </div>
-        <CommonEmptyState v-else title="No volume discounts" description="Encourage bulk orders with volume discounts.">
+        <DashboardEmptyState v-else title="No volume discounts" description="Encourage bulk orders with volume discounts.">
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">Add First Discount</UButton>
-        </CommonEmptyState>
+        </DashboardEmptyState>
       </div>
     </template>
 

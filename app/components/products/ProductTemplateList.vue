@@ -6,13 +6,14 @@
       </template>
     </ProductsProductTemplateCard>
   </div>
-  <CommonEmptyState
+  <DashboardEmptyState
     v-else
     title="No product templates yet"
     description="Add product templates to speed up quoting."
+    icon="i-lucide-package"
   >
     <slot name="empty" />
-  </CommonEmptyState>
+  </DashboardEmptyState>
 </template>
 
 <script setup lang="ts">

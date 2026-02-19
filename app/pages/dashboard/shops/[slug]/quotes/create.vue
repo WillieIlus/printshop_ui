@@ -1,27 +1,22 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="New quote"
-        :subtitle="slug"
-        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }, { label: 'Quotes', to: `/dashboard/shops/${slug}/quotes` }]"
-      >
-        <template #actions>
-          <UButton :to="`/dashboard/shops/${slug}/quotes`" variant="ghost" size="sm">Back</UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="New quote"
+      :subtitle="slug"
+    >
+      <template #actions>
+        <UButton :to="`/dashboard/shops/${slug}/quotes`" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
 
     <div class="col-span-12">
-      <DashboardSectionCard>
-        <QuotesQuoteForm
-          :loading="quoteStore.loading"
-          @submit="onSubmit"
-          @cancel="goBack"
-        />
-      </DashboardSectionCard>
+      <QuotesQuoteForm
+        :loading="quoteStore.loading"
+        @submit="onSubmit"
+        @cancel="goBack"
+      />
     </div>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

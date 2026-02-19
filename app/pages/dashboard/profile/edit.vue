@@ -1,28 +1,24 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        title="Edit profile"
-        subtitle="Update your profile information"
-        :breadcrumbs="[{ label: 'Profile', to: '/dashboard/profile' }]"
-      >
-        <template #actions>
-          <UButton to="/dashboard/profile" variant="ghost" size="sm">Back</UButton>
-        </template>
-      </DashboardDashboardPageHeader>
-    </template>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader
+      title="Edit profile"
+      subtitle="Update your profile information"
+    >
+      <template #actions>
+        <UButton to="/dashboard/profile" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
 
-    <div class="col-span-12">
-      <DashboardSectionCard>
-        <ProfileProfileEditForm
-          :profile="profileStore.profile"
-          :loading="profileStore.loading"
-          @submit="onSubmit"
-          @cancel="goBack"
-        />
-      </DashboardSectionCard>
+    <DashboardSkeletonState v-if="profileStore.loading && !profileStore.profile" variant="block" />
+    <div v-else class="col-span-12">
+      <ProfileProfileEditForm
+        :profile="profileStore.profile"
+        :loading="profileStore.loading"
+        @submit="onSubmit"
+        @cancel="goBack"
+      />
     </div>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

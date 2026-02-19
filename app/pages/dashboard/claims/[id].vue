@@ -1,14 +1,31 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        :title="`Claim #${id}`"
-        :breadcrumbs="[{ label: 'Claims', to: '/dashboard/claims' }]"
-      >
-        <template #actions>
-          <UButton to="/dashboard/claims" variant="ghost" size="sm">Back</UButton>
-        </template>
-      </DashboardDashboardPageHeader>
+  <div class="col-span-12 space-y-6">
+    <DashboardPageHeader :title="`Claim #${id}`">
+      <template #actions>
+        <UButton to="/dashboard/claims" variant="ghost" size="sm">Back</UButton>
+      </template>
+    </DashboardPageHeader>
+
+    <DashboardSkeletonState v-if="claimStore.loading" variant="block" />
+    <template v-else-if="claimStore.currentClaim">
+      <div class="col-span-12">
+        <DashboardSectionCard title="Claim details">
+          <div class="space-y-2">
+            <p class="text-sm">
+              <span class="font-medium text-gray-500 dark:text-gray-400">Status:</span>
+              <UBadge :color="statusColor" variant="soft" class="ml-1">{{ claimStore.currentClaim.status }}</UBadge>
+            </p>
+            <p v-if="claimStore.currentClaim.shop_details" class="text-sm">
+              <span class="font-medium text-gray-500 dark:text-gray-400">Shop:</span>
+              <span class="text-gray-900 dark:text-white">{{ claimStore.currentClaim.shop_details.name }}</span>
+            </p>
+            <p class="text-sm">
+              <span class="font-medium text-gray-500 dark:text-gray-400">Created:</span>
+              <span class="text-gray-900 dark:text-white">{{ formatDate(claimStore.currentClaim.created_at) }}</span>
+            </p>
+          </div>
+        </DashboardSectionCard>
+      </div>
     </template>
 
     <DashboardSkeletonState v-if="claimStore.loading" variant="card" :show-header="false" />

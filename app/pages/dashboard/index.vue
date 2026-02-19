@@ -1,33 +1,35 @@
 <template>
-  <DashboardDashboardLayout>
-    <template #header>
-      <DashboardDashboardPageHeader
-        :title="`Welcome back, ${user?.first_name || 'there'}!`"
-        subtitle="Here's what's happening with your business today."
-      />
-    </template>
-
-    <!-- Row 1: 4 KPI cards (col-span-3 each) -->
-    <div
-      v-for="(stat, i) in stats"
-      :key="stat.label"
-      class="col-span-6 sm:col-span-6 lg:col-span-3"
+  <div class="col-span-12 space-y-6">
+    <!-- Hero / Welcome -->
+    <DashboardPageHeader
+      :title="`Welcome back, ${user?.first_name ?? 'User'}!`"
+      subtitle="Here's what's happening with your business today."
     >
+      <template #actions>
+        <slot name="actions" />
+      </template>
+    </DashboardPageHeader>
+
+    <!-- Stats: 4 KPI cards (col-span-3 each) -->
+    <div class="col-span-12 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
       <DashboardStatCard
+        v-for="stat in stats"
+        :key="stat.label"
         :label="stat.label"
         :value="stat.value"
         :icon="stat.icon"
-        :icon-bg="stat.bgColor"
-        :icon-color="stat.iconColor"
+        :variant="stat.variant"
       />
     </div>
 
     <!-- Row 2: Big chart / activity (col-span-8) + side panel (col-span-4) -->
-    <div class="col-span-12 lg:col-span-8">
-      <DashboardQuickActions />
-    </div>
-    <div class="col-span-12 lg:col-span-4">
-      <DashboardRecentActivity :activities="activities" />
+    <div class="col-span-12 grid grid-cols-12 gap-4 lg:gap-6">
+      <div class="col-span-12 lg:col-span-8">
+        <DashboardQuickActions />
+      </div>
+      <div class="col-span-12 lg:col-span-4">
+        <DashboardRecentActivity :activities="activities" />
+      </div>
     </div>
   </DashboardDashboardLayout>
 </template>
@@ -53,29 +55,25 @@ const stats = computed(() => [
     label: 'Total Shops',
     value: shopStore.myShops.length,
     icon: 'i-lucide-store',
-    bgColor: 'bg-flamingo-50 dark:bg-flamingo-900/20',
-    iconColor: 'text-flamingo-600 dark:text-flamingo-400',
+    variant: 'flamingo' as const,
   },
   {
     label: 'Active Quotes',
     value: quoteStore.quotes.filter((q: Quote) => q.status === 'pending').length,
     icon: 'i-lucide-file-text',
-    bgColor: 'bg-green-50 dark:bg-green-900/20',
-    iconColor: 'text-green-600 dark:text-green-400',
+    variant: 'green' as const,
   },
   {
     label: 'Total Revenue',
     value: 'KES 0',
     icon: 'i-lucide-dollar-sign',
-    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-    iconColor: 'text-purple-600 dark:text-purple-400',
+    variant: 'purple' as const,
   },
   {
     label: 'Pending Claims',
     value: claimStore.claims.filter((c: Claim) => c.status === 'pending').length,
     icon: 'i-lucide-shield',
-    bgColor: 'bg-orange-50 dark:bg-orange-900/20',
-    iconColor: 'text-orange-600 dark:text-orange-400',
+    variant: 'orange' as const,
   },
 ])
 

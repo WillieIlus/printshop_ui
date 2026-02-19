@@ -1,8 +1,8 @@
 <template>
-  <div class="overflow-hidden rounded-xl border border-gray-200/60 bg-white shadow-sm dark:border-gray-800/60 dark:bg-gray-900/50">
+  <div class="overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-700/60 dark:bg-gray-800/50">
     <!-- Header -->
-    <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-800">
-      <h3 class="text-sm font-medium text-muted">Quick Actions</h3>
+    <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-700/60">
+      <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Quick Actions</h3>
     </div>
 
     <!-- Actions grid -->
