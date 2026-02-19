@@ -50,8 +50,11 @@ export const API = {
     `shops/${slug}/quotes/${quoteId}/items/${pk}/`,
   requestQuote: (slug: string) => `shops/${slug}/request-quote/`,
   myQuotes: () => 'my-quotes/',
-  // Templates (catalog)
+  // Templates (catalog) — public
   templates: () => 'templates/',
+  templateCategories: () => 'templates/categories/',
+  templateDetail: (slug: string) => `templates/${slug}/`,
+  templateCalculatePrice: (slug: string) => `templates/${slug}/calculate-price/`,
   // Claims
   claims: () => 'claims/',
   claimDetail: (pk: number) => `claims/${pk}/`,
