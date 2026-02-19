@@ -22,7 +22,7 @@
           <ul class="space-y-3 text-sm">
             <li><NuxtLink to="/dashboard" class="transition-colors hover:text-white">Dashboard</NuxtLink></li>
             <li><NuxtLink to="/shops" class="transition-colors hover:text-white">Shops</NuxtLink></li>
-            <li><NuxtLink to="/#demo-gallery" class="transition-colors hover:text-white">Templates</NuxtLink></li>
+            <li><NuxtLink to="/gallery" class="transition-colors hover:text-white">Templates</NuxtLink></li>
             <li><NuxtLink to="/dashboard/quotes" class="transition-colors hover:text-white">Quotes</NuxtLink></li>
           </ul>
         </div>
