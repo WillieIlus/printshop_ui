@@ -52,6 +52,8 @@ export const API = {
   myQuotes: () => 'my-quotes/',
   // Templates (catalog)
   templates: () => 'templates/',
+  templatesFeatured: () => 'templates/featured/',
+  templatesPopular: () => 'templates/popular/',
   // Claims
   claims: () => 'claims/',
   claimDetail: (pk: number) => `claims/${pk}/`,

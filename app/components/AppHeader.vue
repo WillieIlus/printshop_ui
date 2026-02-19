@@ -19,8 +19,9 @@
             v-for="link in navLinks"
             :key="link.label"
             :to="link.to"
-            class="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-flamingo-50 hover:text-flamingo-600"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-flamingo-50 hover:text-flamingo-600"
           >
+            <UIcon v-if="link.icon" :name="link.icon" class="h-4 w-4" />
             {{ link.label }}
           </NuxtLink>
         </div>
@@ -111,9 +112,10 @@
               v-for="link in navLinks"
               :key="link.label"
               :to="link.to"
-              class="rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600"
+              class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600"
               @click="mobileOpen = false"
             >
+              <UIcon v-if="link.icon" :name="link.icon" class="h-4 w-4 shrink-0" />
               {{ link.label }}
             </NuxtLink>
           </div>
@@ -139,6 +141,7 @@ const colorMode = useColorMode()
 const mobileOpen = ref(false)
 
 const navLinks = [
+  { label: 'Gallery', to: '/gallery', icon: 'i-lucide-layout-grid' },
   { label: 'Problem', to: '/#problem' },
   { label: 'Templates Gallery', to: '/#demo-gallery' },
   { label: 'Pricing Models', to: '/#models' },
