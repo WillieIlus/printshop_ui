@@ -15,7 +15,10 @@ import type {
   MaterialPriceForm,
   FinishingServiceForm,
   VolumeDiscountForm,
-  MaterialPriceDTO,
+  DefaultPrintingPriceTemplate,
+  DefaultPaperPriceTemplate,
+  DefaultMaterialPriceTemplate,
+  DefaultFinishingServiceTemplate,
 } from '~/shared/types'
 
 interface PricingState {
@@ -29,6 +32,10 @@ interface PricingState {
   calculationResult: PriceCalculationResult | null
   loading: boolean
   error: string | null
+  defaultPrinting: DefaultPrintingPriceTemplate[]
+  defaultPapers: DefaultPaperPriceTemplate[]
+  defaultMaterials: DefaultMaterialPriceTemplate[]
+  defaultFinishing: DefaultFinishingServiceTemplate[]
 }
 
 export const usePricingStore = defineStore('pricing', {
@@ -43,6 +50,10 @@ export const usePricingStore = defineStore('pricing', {
     calculationResult: null,
     loading: false,
     error: null,
+    defaultPrinting: [],
+    defaultPapers: [],
+    defaultMaterials: [],
+    defaultFinishing: [],
   }),
 
   getters: {
@@ -78,6 +89,17 @@ export const usePricingStore = defineStore('pricing', {
         state.materialPrices.length > 0 ||
         state.finishingServices.length > 0
       )
+    },
+
+    /**
+     * Check if any pricing row needs review
+     */
+    hasNeedsReview: (state) => {
+      const printing = state.printingPrices.some((p) => p.needs_review)
+      const paper = state.paperPrices.some((p) => p.needs_review)
+      const material = state.materialPrices.some((p) => p.needs_review)
+      const finishing = state.finishingServices.some((s) => s.needs_review)
+      return printing || paper || material || finishing
     },
   },
 
@@ -456,6 +478,67 @@ export const usePricingStore = defineStore('pricing', {
       this.materialPrices = []
       this.calculationResult = null
       this.error = null
+    },
+
+    /**
+     * Fetch default pricing templates (read-only)
+     */
+    async fetchPricingDefaults() {
+      const { $api } = useNuxtApp()
+      try {
+        const [printing, papers, materials, finishing] = await Promise.all([
+          $api<DefaultPrintingPriceTemplate[]>(API.pricingDefaultsPrinting()),
+          $api<DefaultPaperPriceTemplate[]>(API.pricingDefaultsPapers()),
+          $api<DefaultMaterialPriceTemplate[]>(API.pricingDefaultsMaterials()),
+          $api<DefaultFinishingServiceTemplate[]>(API.pricingDefaultsFinishing()),
+        ])
+        this.defaultPrinting = printing ?? []
+        this.defaultPapers = papers ?? []
+        this.defaultMaterials = materials ?? []
+        this.defaultFinishing = finishing ?? []
+      } catch (err: unknown) {
+        this.error = err instanceof Error ? err.message : 'Failed to fetch defaults'
+        throw err
+      }
+    },
+
+    /**
+     * Seed shop with default pricing (POST)
+     */
+    async seedShopDefaults(slug: string) {
+      const { $api } = useNuxtApp()
+      await $api(API.shopPricingSeedDefaults(slug), { method: 'POST' })
+      await Promise.all([
+        this.fetchPrintingPrices(slug),
+        this.fetchPaperPrices(slug),
+        this.fetchMaterialPrices(slug),
+        this.fetchFinishingServices(slug),
+        this.fetchVolumeDiscounts(slug),
+      ])
+    },
+
+    /**
+     * Fetch shop pricing status (if backend provides)
+     */
+    async fetchPricingStatus(slug: string) {
+      try {
+        const { $api } = useNuxtApp()
+        return await $api<{ has_pricing: boolean; needs_review: boolean }>(API.shopPricingStatus(slug))
+      } catch {
+        return null
+      }
+    },
+
+    /**
+     * Fetch all material prices for a shop (optional - backend may not have materials pricing yet)
+     */
+    async fetchMaterialPrices(slug: string) {
+      try {
+        const { $api } = useNuxtApp()
+        this.materialPrices = await $api<MaterialPrice[]>(API.shopMaterialPrices(slug))
+      } catch {
+        this.materialPrices = []
+      }
     },
   },
 })

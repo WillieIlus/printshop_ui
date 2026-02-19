@@ -65,6 +65,15 @@ export const API = {
   shopRateCard: (slug: string) => `shops/${slug}/rate-card/`,
   shopCalculatePrice: (slug: string) => `shops/${slug}/calculate-price/`,
   
+  // Pricing defaults (read-only templates)
+  pricingDefaultsPrinting: () => 'pricing/defaults/printing/',
+  pricingDefaultsPapers: () => 'pricing/defaults/papers/',
+  pricingDefaultsMaterials: () => 'pricing/defaults/materials/',
+  pricingDefaultsFinishing: () => 'pricing/defaults/finishing/',
+  // Shop pricing seed & status
+  shopPricingSeedDefaults: (slug: string) => `shops/${slug}/pricing/seed-defaults/`,
+  shopPricingStatus: (slug: string) => `shops/${slug}/pricing/status/`,
+  
   // Pricing - Management (shop owner)
   shopPrintingPrices: (slug: string) => `shops/${slug}/pricing/printing/`,
   shopPrintingPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/printing/${pk}/`,
@@ -72,6 +81,8 @@ export const API = {
   shopPaperPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/paper/${pk}/`,
   shopFinishingServices: (slug: string) => `shops/${slug}/pricing/finishing/`,
   shopFinishingServiceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/finishing/${pk}/`,
+  shopMaterialPrices: (slug: string) => `shops/${slug}/pricing/materials/`,
+  shopMaterialPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/materials/${pk}/`,
   shopVolumeDiscounts: (slug: string) => `shops/${slug}/pricing/discounts/`,
   shopVolumeDiscountDetail: (slug: string, pk: number) => `shops/${slug}/pricing/discounts/${pk}/`,
   shopMaterialPrices: (slug: string) => `shops/${slug}/pricing/material-prices/`,

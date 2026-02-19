@@ -6,12 +6,72 @@
         <p class="text-gray-600 dark:text-gray-400 mt-1">Machine printing prices and large format material rates</p>
       </div>
       <div class="flex gap-2">
+        <UButton
+          variant="outline"
+          size="sm"
+          :loading="defaultsLoading"
+          @click="openViewDefaults"
+        >
+          <UIcon name="i-lucide-file-text" class="w-4 h-4 mr-2" />
+          View defaults
+        </UButton>
         <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
         <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
           <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
           Preview Public Page
         </UButton>
       </div>
+    </div>
+
+    <!-- Empty pricing: Load starter defaults -->
+    <div
+      v-if="!loading && !pricingStore.hasPricing"
+      class="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p class="text-sm font-medium text-amber-800 dark:text-amber-200">
+            <UIcon name="i-lucide-sparkles" class="inline w-4 h-4 mr-1" />
+            No pricing configured yet
+          </p>
+          <p class="mt-1 text-sm text-amber-700 dark:text-amber-300">
+            Load starter defaults to get started quickly, then adjust prices to match your shop.
+          </p>
+        </div>
+        <UButton
+          class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600 shrink-0"
+          :loading="seedLoading"
+          @click="loadStarterDefaults"
+        >
+          <UIcon name="i-lucide-download" class="w-4 h-4 mr-2" />
+          Load starter defaults
+        </UButton>
+      </div>
+    </div>
+
+    <!-- Needs review warning -->
+    <div
+      v-if="!loading && pricingStore.hasPricing && pricingStore.hasNeedsReview"
+      class="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4"
+    >
+      <p class="text-sm text-amber-800 dark:text-amber-200">
+        <UIcon name="i-lucide-alert-triangle" class="inline w-4 h-4 mr-1" />
+        Starter prices loaded—adjust before using
+      </p>
+      <p class="mt-1 text-sm text-amber-700 dark:text-amber-300">
+        Edit any price row to confirm and remove the review flag.
+      </p>
+    </div>
+
+    <!-- Error state -->
+    <div
+      v-if="pricingStore.error"
+      class="rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-4"
+    >
+      <p class="text-sm text-red-800 dark:text-red-200">
+        <UIcon name="i-lucide-alert-circle" class="inline w-4 h-4 mr-1" />
+        {{ pricingStore.error }}
+      </p>
     </div>
 
     <!-- Tab Navigation -->
@@ -42,29 +102,356 @@
             Add machines first in <NuxtLink :to="`/dashboard/shops/${slug}/machines`" class="font-semibold text-amber-700 dark:text-amber-300 hover:underline">Machines</NuxtLink> before setting printing prices.
           </p>
         </div>
-        <PricingPrintingRateGrid
-          v-else
-          :slug="slug"
-          :machines="machineStore.machines"
-          :printing-prices="pricingStore.printingPrices"
-          :loading="pricingStore.loading"
-          @save="onPrintingSave"
-          @refresh="refreshPrinting"
-        />
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-600">Set the price per printed side for each paper size and color mode.</p>
+          <UButton
+            class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+            :disabled="!machineStore.machines.length"
+            @click="openPrintingModal()"
+          >
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
+            Add Printing Price
+          </UButton>
+        </div>
+
+        <div v-if="pricingStore.printingPrices.length" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Size</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Color</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Buy Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Profit</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Active</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="price in pricingStore.printingPrices" :key="price.id" class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.sheet_size }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ price.color_mode }}</td>
+                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">KES {{ price.selling_price_per_side }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500">{{ price.buying_price_per_side ? `KES ${price.buying_price_per_side}` : '-' }}</td>
+                <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit_per_side }}</td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <UBadge :color="price.is_active ? 'success' : 'neutral'" variant="soft">
+                      {{ price.is_active ? 'Yes' : 'No' }}
+                    </UBadge>
+                    <UBadge v-if="price.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <UButton variant="ghost" size="xs" @click="editPrintingPrice(price)">Edit</UButton>
+                  <UButton variant="ghost" size="xs" color="error" @click="deletePrintingPrice(price.id)">Delete</UButton>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <CommonEmptyState v-else title="No printing prices" description="Add machines first, then add printing prices per machine and paper size.">
+          <NuxtLink v-if="!machineStore.machines.length" :to="`/dashboard/shops/${slug}/machines`">
+            <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600">Add machines first</UButton>
+          </NuxtLink>
+          <UButton
+            v-else
+            class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
+            @click="openPrintingModal()"
+          >
+            Add first printing price
+          </UButton>
+        </CommonEmptyState>
       </div>
 
-      <!-- Materials (Large format) Tab -->
-      <div v-if="activeTab === 'materials'" class="space-y-4">
-        <PricingMaterialRateGrid
-          :slug="slug"
-          :material-prices="pricingStore.materialPrices"
-          :loading="pricingStore.loading"
-          :saving="materialSaving"
-          :supports-active="true"
-          @save="onMaterialSave"
-        />
+      <!-- Paper Prices -->
+      <div v-if="activeTab === 'paper'" class="space-y-4">
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-600">Set paper prices by GSM (weight). Customers see this as their rate card.</p>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
+            Add Paper Price
+          </UButton>
+        </div>
+
+        <div v-if="pricingStore.paperPrices.length" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">GSM</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Size</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Buy Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Profit</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Margin</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="price in pricingStore.paperPrices" :key="price.id" class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.gsm }} gsm</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ price.sheet_size }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ price.paper_type }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500">KES {{ price.buying_price }}</td>
+                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">KES {{ price.selling_price }}</td>
+                <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500">{{ parseFloat(price.margin_percent).toFixed(1) }}%</td>
+                <td class="px-4 py-3 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <UBadge v-if="price.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
+                    <UButton variant="ghost" size="xs" @click="editPaperPrice(price)">Edit</UButton>
+                    <UButton variant="ghost" size="xs" color="error" @click="deletePaperPrice(price.id)">Delete</UButton>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <CommonEmptyState v-else title="No paper prices" description="Add paper prices by GSM to create your rate card.">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">Add First Paper Price</UButton>
+        </CommonEmptyState>
+      </div>
+
+      <!-- Finishing Services -->
+      <div v-if="activeTab === 'finishing'" class="space-y-4">
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-600">Add finishing services like lamination, binding, and cutting.</p>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
+            Add Finishing Service
+          </UButton>
+        </div>
+
+        <div v-if="pricingStore.finishingServices.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            v-for="service in pricingStore.finishingServices" 
+            :key="service.id" 
+            class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow"
+          >
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="font-medium text-gray-900">{{ service.name }}</h3>
+                <p class="text-sm text-gray-500">{{ service.category }}</p>
+              </div>
+              <div class="flex gap-1">
+                <UBadge v-if="service.is_default" color="info" variant="soft" size="xs">Default</UBadge>
+                <UBadge v-if="service.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
+              </div>
+            </div>
+            <div class="mt-3 flex justify-between items-center">
+              <span class="text-lg font-semibold text-gray-900">KES {{ service.selling_price }}</span>
+              <span class="text-sm text-gray-500">{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <UButton variant="ghost" size="xs" @click="editFinishingService(service)">Edit</UButton>
+              <UButton variant="ghost" size="xs" color="error" @click="deleteFinishingService(service.id)">Delete</UButton>
+            </div>
+          </div>
+        </div>
+        <CommonEmptyState v-else title="No finishing services" description="Add services like lamination and binding.">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">Add First Finishing Service</UButton>
+        </CommonEmptyState>
+      </div>
+
+      <!-- Volume Discounts -->
+      <div v-if="activeTab === 'discounts'" class="space-y-4">
+        <div class="flex justify-between items-center">
+          <p class="text-sm text-gray-600">Set up bulk discounts for large orders.</p>
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
+            Add Volume Discount
+          </UButton>
+        </div>
+
+        <div v-if="pricingStore.volumeDiscounts.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div 
+            v-for="discount in pricingStore.volumeDiscounts" 
+            :key="discount.id" 
+            class="bg-white rounded-lg border border-gray-200 p-4"
+          >
+            <h3 class="font-medium text-gray-900">{{ discount.name }}</h3>
+            <p class="text-2xl font-bold text-green-600 mt-2">{{ discount.discount_percent }}% OFF</p>
+            <p class="text-sm text-gray-500 mt-1">Min. {{ discount.min_quantity }} items</p>
+            <div class="mt-3 flex gap-2">
+              <UButton variant="ghost" size="xs" @click="editDiscount(discount)">Edit</UButton>
+              <UButton variant="ghost" size="xs" color="error" @click="deleteDiscount(discount.id)">Delete</UButton>
+            </div>
+          </div>
+        </div>
+        <CommonEmptyState v-else title="No volume discounts" description="Encourage bulk orders with volume discounts.">
+          <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">Add First Discount</UButton>
+        </CommonEmptyState>
       </div>
     </template>
+
+    <!-- Modals with table-style forms -->
+    <CommonSimpleModal
+      :open="printingModalOpen"
+      :title="editingPrintingPrice ? 'Edit Printing Price' : 'Add Printing Price'"
+      :description="editingPrintingPrice ? 'Edit price per printed side.' : 'Set price per printed side for paper size and color mode.'"
+      @update:open="onPrintingModalOpenChange"
+    >
+      <PricingPrintingPriceForm
+        v-if="printingFormReady"
+        :key="editingPrintingPrice?.id ?? 'new'"
+        :price="editingPrintingPrice"
+        :machine-options="machineOptions"
+        :loading="formLoading"
+        @submit="submitPrintingPrice"
+        @cancel="closePrintingModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      :open="paperModalOpen"
+      :title="editingPaperPrice ? 'Edit Paper Price' : 'Add Paper Price'"
+      :description="editingPaperPrice ? 'Edit paper price by GSM.' : 'Set paper price by GSM for your rate card.'"
+      @update:open="onPaperModalOpenChange"
+    >
+      <PricingPaperPriceForm
+        v-if="paperFormReady"
+        :key="editingPaperPrice?.id ?? 'new'"
+        :price="editingPaperPrice"
+        :loading="formLoading"
+        @submit="submitPaperPrice"
+        @cancel="closePaperModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      :open="finishingModalOpen"
+      :title="editingFinishingService ? 'Edit Finishing Service' : 'Add Finishing Service'"
+      :description="editingFinishingService ? 'Edit finishing service details.' : 'Add finishing services like lamination and binding.'"
+      @update:open="onFinishingModalOpenChange"
+    >
+      <PricingFinishingServiceForm
+        v-if="finishingFormReady"
+        :key="editingFinishingService?.id ?? 'new'"
+        :service="editingFinishingService"
+        :loading="formLoading"
+        @submit="submitFinishingService"
+        @cancel="closeFinishingModal"
+      />
+    </CommonSimpleModal>
+    <CommonSimpleModal
+      :open="discountModalOpen"
+      :title="editingDiscount ? 'Edit Volume Discount' : 'Add Volume Discount'"
+      :description="editingDiscount ? 'Edit bulk discount details.' : 'Set up bulk discounts for large orders.'"
+      @update:open="onDiscountModalOpenChange"
+    >
+      <PricingVolumeDiscountForm
+        v-if="discountFormReady"
+        :key="editingDiscount?.id ?? 'new'"
+        :discount="editingDiscount"
+        :loading="formLoading"
+        @submit="submitVolumeDiscount"
+        @cancel="closeDiscountModal"
+      />
+    </CommonSimpleModal>
+
+    <!-- View defaults modal (read-only) -->
+    <CommonSimpleModal
+      :open="viewDefaultsOpen"
+      title="Starter pricing defaults"
+      description="Reference templates you can load into your shop. These are read-only."
+      @update:open="viewDefaultsOpen = $event"
+    >
+      <div class="space-y-6 max-h-[60vh] overflow-y-auto">
+        <div v-if="defaultsLoading" class="py-8 text-center">
+          <CommonLoadingSpinner />
+        </div>
+        <template v-else>
+          <div v-if="pricingStore.defaultPrinting.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Printing</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Size</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Color</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell/side</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultPrinting" :key="`p-${i}`">
+                    <td class="px-3 py-2">{{ t.sheet_size }}</td>
+                    <td class="px-3 py-2">{{ t.color_mode }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price_per_side }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="pricingStore.defaultPapers.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Paper</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Size</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">GSM</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Type</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultPapers" :key="`pa-${i}`">
+                    <td class="px-3 py-2">{{ t.sheet_size }}</td>
+                    <td class="px-3 py-2">{{ t.gsm }} gsm</td>
+                    <td class="px-3 py-2">{{ t.paper_type }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="pricingStore.defaultMaterials.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Materials</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Material</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Unit</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultMaterials" :key="`m-${i}`">
+                    <td class="px-3 py-2">{{ t.material_name }}</td>
+                    <td class="px-3 py-2">{{ t.unit }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="pricingStore.defaultFinishing.length" class="space-y-2">
+            <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Finishing</h4>
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
+              <table class="min-w-full">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Name</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Category</th>
+                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="(t, i) in pricingStore.defaultFinishing" :key="`f-${i}`">
+                    <td class="px-3 py-2">{{ t.name }}</td>
+                    <td class="px-3 py-2">{{ t.category }}</td>
+                    <td class="px-3 py-2 text-right">KES {{ t.selling_price }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if="!hasAnyDefaults" class="py-6 text-center text-sm text-gray-500">
+            No default templates available.
+          </div>
+        </template>
+      </div>
+    </CommonSimpleModal>
   </div>
 </template>
 
@@ -90,24 +477,84 @@ const activeTab = ref<TabId>('printing')
 const loading = ref(true)
 const materialSaving = ref(false)
 
-const tabs: { id: TabId; name: string }[] = [
-  { id: 'printing', name: 'Printing (Machines)' },
-  { id: 'materials', name: 'Materials (Large format)' },
-]
+// Modals
+const printingModalOpen = ref(false)
+const paperModalOpen = ref(false)
+const finishingModalOpen = ref(false)
+const discountModalOpen = ref(false)
+const printingFormReady = ref(false)
+const paperFormReady = ref(false)
+const finishingFormReady = ref(false)
+const discountFormReady = ref(false)
+const editingPrintingPrice = ref<PrintingPrice | null>(null)
+const editingPaperPrice = ref<PaperPrice | null>(null)
+const editingFinishingService = ref<FinishingService | null>(null)
+const editingDiscount = ref<VolumeDiscount | null>(null)
+const formLoading = ref(false)
+const machineStore = useMachineStore()
+const viewDefaultsOpen = ref(false)
+const defaultsLoading = ref(false)
+const seedLoading = ref(false)
 
-async function onPrintingSave(payload: {
-  machine: number
-  sheet_size: SheetSize
-  color_mode: ColorMode
-  selling_price_per_side: string
-  selling_price_duplex_per_sheet: string | null
-}) {
-  const existing = pricingStore.printingPrices.find(
-    (p) =>
-      p.machine === payload.machine &&
-      p.sheet_size === payload.sheet_size &&
-      p.color_mode === payload.color_mode
-  )
+const machineOptions = computed(() => machineStore.machineOptions)
+
+const hasAnyDefaults = computed(
+  () =>
+    pricingStore.defaultPrinting.length > 0 ||
+    pricingStore.defaultPapers.length > 0 ||
+    pricingStore.defaultMaterials.length > 0 ||
+    pricingStore.defaultFinishing.length > 0
+)
+
+async function openViewDefaults() {
+  viewDefaultsOpen.value = true
+  defaultsLoading.value = true
+  try {
+    await pricingStore.fetchPricingDefaults()
+  } catch (err) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to load defaults', color: 'error' })
+  } finally {
+    defaultsLoading.value = false
+  }
+}
+
+async function loadStarterDefaults() {
+  seedLoading.value = true
+  pricingStore.error = null
+  try {
+    await pricingStore.seedShopDefaults(slug.value)
+    toast.add({ title: 'Loaded', description: 'Starter defaults have been added to your shop.' })
+  } catch (err) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to seed defaults', color: 'error' })
+  } finally {
+    seedLoading.value = false
+  }
+}
+
+const openPrintingModal = (price?: PrintingPrice) => {
+  editingPrintingPrice.value = price ?? null
+  printingModalOpen.value = true
+}
+const editPrintingPrice = (price: PrintingPrice) => openPrintingModal(price)
+const closePrintingModal = () => {
+  printingModalOpen.value = false
+  editingPrintingPrice.value = null
+}
+function onPrintingModalOpenChange(open: boolean) {
+  printingModalOpen.value = open
+  if (!open) editingPrintingPrice.value = null
+}
+watch(printingModalOpen, (open) => {
+  if (open) {
+    printingFormReady.value = false
+    nextTick(() => { printingFormReady.value = true })
+  } else {
+    printingFormReady.value = false
+    editingPrintingPrice.value = null
+  }
+})
+async function submitPrintingPrice(data: PrintingPriceForm) {
+  formLoading.value = true
   try {
     if (existing) {
       await pricingStore.updatePrintingPrice(slug.value, existing.id, {
@@ -176,10 +623,14 @@ async function onMaterialSave(payload: {
 }
 
 onMounted(async () => {
+  pricingStore.error = null
   try {
     await Promise.all([
       pricingStore.fetchPrintingPrices(slug.value),
+      pricingStore.fetchPaperPrices(slug.value),
       pricingStore.fetchMaterialPrices(slug.value),
+      pricingStore.fetchFinishingServices(slug.value),
+      pricingStore.fetchVolumeDiscounts(slug.value),
       machineStore.fetchMachines(slug.value),
     ])
   } catch (err) {
