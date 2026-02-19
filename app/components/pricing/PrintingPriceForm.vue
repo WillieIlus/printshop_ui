@@ -58,6 +58,18 @@
           </td>
         </tr>
         <tr>
+          <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Selling Price (duplex per sheet)</td>
+          <td class="py-3">
+            <FormsFormInput
+              name="selling_price_duplex_per_sheet"
+              label="Selling Price (duplex per sheet)"
+              type="number"
+              placeholder="0.00 (optional override)"
+              hide-label
+            />
+          </td>
+        </tr>
+        <tr>
           <td class="py-3 pr-4 font-medium text-gray-700 dark:text-gray-300 align-top">Buying Price (per side)</td>
           <td class="py-3">
             <FormsFormInput
@@ -109,6 +121,7 @@ const initialValues = computed(() => ({
   sheet_size: props.price?.sheet_size ?? 'A4',
   color_mode: props.price?.color_mode ?? 'COLOR',
   selling_price_per_side: props.price?.selling_price_per_side ?? '',
+  selling_price_duplex_per_sheet: props.price?.selling_price_duplex_per_sheet ?? '',
   buying_price_per_side: props.price?.buying_price_per_side ?? '',
 }))
 
@@ -117,6 +130,7 @@ const schema = object({
   sheet_size: string().oneOf(['A5', 'A4', 'A3', 'SRA3']).required('Size is required'),
   color_mode: string().oneOf(['BW', 'COLOR']).required('Color mode is required'),
   selling_price_per_side: string().required('Selling price is required'),
+  selling_price_duplex_per_sheet: string().optional().nullable(),
   buying_price_per_side: string().optional(),
 })
 </script>

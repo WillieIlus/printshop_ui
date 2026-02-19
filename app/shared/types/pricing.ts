@@ -5,6 +5,12 @@
 // Sheet sizes
 export type SheetSize = 'A5' | 'A4' | 'A3' | 'SRA3'
 
+// Pricing units (sheet-based vs area-based)
+export type PricingUnit = 'A4' | 'A3' | 'SRA3' | 'SQM'
+
+// Material types for large format (banner, vinyl, reflective)
+export type MaterialType = 'BANNER' | 'VINYL' | 'REFLECTIVE' | 'CANVAS' | 'MESH'
+
 // Color modes
 export type ColorMode = 'BW' | 'COLOR'
 
@@ -26,8 +32,21 @@ export interface PrintingPrice {
   sheet_size: SheetSize
   color_mode: ColorMode
   selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string | null
   buying_price_per_side: string | null
   profit_per_side: string
+  is_active: boolean
+}
+
+/**
+ * Material price - cost per SQM for banner/vinyl/reflective
+ */
+export interface MaterialPrice {
+  id: number
+  material_type: MaterialType
+  unit: PricingUnit
+  selling_price: string
+  buying_price?: string | null
   is_active: boolean
 }
 
@@ -104,14 +123,29 @@ export interface PublicFinishingRate {
 }
 
 /**
- * Price calculation input
+ * Price calculation input - supports sheet mode and large format (SQM) mode
  */
-export interface PriceCalculationInput {
+export type PriceCalculationInput =
+  | PriceCalculationInputSheet
+  | PriceCalculationInputLargeFormat
+
+/** Sheet-based print job */
+export interface PriceCalculationInputSheet {
+  unit?: 'A4' | 'A3' | 'SRA3'
   sheet_size: SheetSize
   gsm: number
   quantity: number
   sides?: 1 | 2
   paper_type?: PaperType
+  finishing_ids?: number[]
+}
+
+/** Large format job (banner/vinyl/reflective per SQM) */
+export interface PriceCalculationInputLargeFormat {
+  unit: 'SQM'
+  material_type: MaterialType
+  area_sqm: number
+  quantity?: number
   finishing_ids?: number[]
 }
 
@@ -146,6 +180,7 @@ export interface PrintingPriceForm {
   sheet_size: SheetSize
   color_mode: ColorMode
   selling_price_per_side: string
+  selling_price_duplex_per_sheet?: string | null
   buying_price_per_side?: string
 }
 
@@ -170,4 +205,11 @@ export interface VolumeDiscountForm {
   name: string
   min_quantity: number
   discount_percent: string
+}
+
+export interface MaterialPriceForm {
+  material_type: MaterialType
+  unit: PricingUnit
+  selling_price: string
+  buying_price?: string | null
 }

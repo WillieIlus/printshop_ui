@@ -73,6 +73,8 @@ export const API = {
   shopFinishingServiceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/finishing/${pk}/`,
   shopVolumeDiscounts: (slug: string) => `shops/${slug}/pricing/discounts/`,
   shopVolumeDiscountDetail: (slug: string, pk: number) => `shops/${slug}/pricing/discounts/${pk}/`,
+  shopMaterialPrices: (slug: string) => `shops/${slug}/pricing/materials/`,
+  shopMaterialPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/materials/${pk}/`,
   // Inventory (machines, materials, paper stock)
   shopMachines: (slug: string) => `shops/${slug}/machines/`,
   shopMachineDetail: (slug: string, id: number) => `shops/${slug}/machines/${id}/`,

@@ -127,6 +127,7 @@ const hasPricing = computed(
   () =>
     pricingStore.paperPrices.length > 0 ||
     pricingStore.printingPrices.length > 0 ||
+    pricingStore.materialPrices.length > 0 ||
     pricingStore.finishingServices.length > 0
 )
 const setupProgress = computed(() => {
@@ -195,6 +196,7 @@ onMounted(async () => {
       machineStore.fetchMachines(slug.value),
       pricingStore.fetchPrintingPrices(slug.value),
       pricingStore.fetchPaperPrices(slug.value),
+      pricingStore.fetchMaterialPrices(slug.value),
       pricingStore.fetchFinishingServices(slug.value),
     ])
   }
