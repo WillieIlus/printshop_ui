@@ -9,11 +9,13 @@ import type {
   MaterialPrice,
   FinishingService,
   VolumeDiscount,
+  MaterialPrice,
   PrintingPriceForm,
   PaperPriceForm,
   MaterialPriceForm,
   FinishingServiceForm,
   VolumeDiscountForm,
+  MaterialPriceDTO,
 } from '~/shared/types'
 
 interface PricingState {
@@ -23,6 +25,7 @@ interface PricingState {
   materialPrices: MaterialPrice[]
   finishingServices: FinishingService[]
   volumeDiscounts: VolumeDiscount[]
+  materialPrices: MaterialPrice[]
   calculationResult: PriceCalculationResult | null
   loading: boolean
   error: string | null
@@ -36,6 +39,7 @@ export const usePricingStore = defineStore('pricing', {
     materialPrices: [],
     finishingServices: [],
     volumeDiscounts: [],
+    materialPrices: [],
     calculationResult: null,
     loading: false,
     error: null,
@@ -391,6 +395,54 @@ export const usePricingStore = defineStore('pricing', {
       this.volumeDiscounts = this.volumeDiscounts.filter((d) => d.id !== pk)
     },
 
+    // =========== Material Prices (Large format SQM) ===========
+
+    /**
+     * Fetch all material prices for a shop
+     */
+    async fetchMaterialPrices(slug: string) {
+      this.loading = true
+      try {
+        const { $api } = useNuxtApp()
+        this.materialPrices = await $api<MaterialPrice[]>(API.shopMaterialPrices(slug))
+      } catch (err: unknown) {
+        this.error = err instanceof Error ? err.message : 'Failed'
+        this.materialPrices = []
+        throw err
+      } finally {
+        this.loading = false
+      }
+    },
+
+    /**
+     * Create a material price
+     */
+    async createMaterialPrice(slug: string, data: MaterialPriceDTO) {
+      const { $api } = useNuxtApp()
+      const created = await $api<MaterialPrice>(API.shopMaterialPrices(slug), {
+        method: 'POST',
+        body: data,
+      })
+      this.materialPrices.push(created)
+      return created
+    },
+
+    /**
+     * Update a material price
+     */
+    async updateMaterialPrice(slug: string, pk: number, data: Partial<MaterialPriceDTO>) {
+      const { $api } = useNuxtApp()
+      const updated = await $api<MaterialPrice>(API.shopMaterialPriceDetail(slug, pk), {
+        method: 'PATCH',
+        body: data,
+      })
+      const index = this.materialPrices.findIndex((p) => p.id === pk)
+      if (index !== -1) {
+        this.materialPrices[index] = updated
+      }
+      return updated
+    },
+
     /**
      * Clear all pricing data
      */
@@ -401,6 +453,7 @@ export const usePricingStore = defineStore('pricing', {
       this.materialPrices = []
       this.finishingServices = []
       this.volumeDiscounts = []
+      this.materialPrices = []
       this.calculationResult = null
       this.error = null
     },
