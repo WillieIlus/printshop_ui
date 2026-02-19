@@ -23,7 +23,7 @@
             <div class="mt-8 flex flex-col sm:flex-row gap-4">
               <NuxtLink to="/gallery" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors">
                 View Gallery Demo
-                <UIcon name="i-lucide-chevron-down" class="ml-2 w-4 h-4" />
+                <UIcon name="i-lucide-chevron-right" class="ml-2 w-4 h-4" />
               </NuxtLink>
               <NuxtLink to="/#models" class="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10 transition-colors backdrop-blur-sm">
                 How Pricing Works
