@@ -31,7 +31,7 @@
             </div>
           </div>
           <div class="mt-16 lg:mt-0 relative">
-            <LandingQuoteSimulator ref="simRef" />
+            <LandingLandingQuoteSimulator ref="simulatorRef" v-model="demoForm" />
           </div>
         </div>
       </div>
@@ -77,18 +77,15 @@
 
     <!-- Gallery CTA (sample: gray-50, border-gray-200) -->
     <section id="demo-gallery" class="py-16 sm:py-24 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-        <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">The Customer Experience</span>
-        <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Browse Templates</h2>
-        <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Pre-configured templates that use your pricing logic in the background.
-        </p>
-        <div class="mt-10">
-          <LandingTemplatePreview @select="handleSelect" />
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+          <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">The Customer Experience</span>
+          <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Browse Templates</h2>
+          <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Pre-configured templates that use your pricing logic in the background. Click a card to pre-fill the simulator above.
+          </p>
         </div>
-        <NuxtLink to="/auth/login" class="mt-8 inline-flex items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-primary-700 shadow-md shadow-primary-200 dark:shadow-primary-900/50 transition-all">
-          Sign in to access gallery
-        </NuxtLink>
+        <LandingLandingTemplateGallery @select="applyPreset" />
       </div>
     </section>
 
@@ -151,16 +148,28 @@
 </template>
 
 <script setup lang="ts">
-import type { SimulatorPreset } from '~/shared/demo/demo-rate-card'
+import type { DemoFormState, DemoPreset } from '~/shared/demoRateCard'
 
 definePageMeta({
   layout: 'default',
 })
 
-const simRef = ref<{ applyPreset: (preset: SimulatorPreset) => void } | null>(null)
+const demoForm = ref<Partial<DemoFormState>>({})
+const simulatorRef = ref<InstanceType<typeof import('~/components/landing/LandingQuoteSimulator.vue').default> | null>(null)
 
-function handleSelect(preset: SimulatorPreset) {
-  simRef.value?.applyPreset(preset)
+function applyPreset(preset: DemoPreset) {
+  const formUpdate: Partial<DemoFormState> = {
+    unit: preset.unit,
+    sides: preset.sides,
+    quantity: preset.quantity,
+    material: preset.material,
+    finishing: [...preset.finishing],
+    widthM: preset.widthM ?? 1,
+    heightM: preset.heightM ?? 1,
+  }
+  demoForm.value = formUpdate
+  simulatorRef.value?.applyPreset(formUpdate)
+  // Scroll to hero simulator so user sees the update
   document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' })
 }
 </script>
