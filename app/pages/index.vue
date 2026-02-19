@@ -31,44 +31,7 @@
             </div>
           </div>
           <div class="mt-16 lg:mt-0 relative">
-            <div class="relative rounded-2xl bg-gray-800/50 border border-white/10 p-6 backdrop-blur-md shadow-2xl">
-              <div class="flex justify-between items-center mb-6">
-                <div class="flex gap-2">
-                  <span class="w-3 h-3 rounded-full bg-red-400" />
-                  <span class="w-3 h-3 rounded-full bg-yellow-400" />
-                  <span class="w-3 h-3 rounded-full bg-green-400" />
-                </div>
-                <div class="h-2 w-20 rounded-full bg-gray-700" />
-              </div>
-              <div class="space-y-4">
-                <div class="flex justify-between items-center p-3 rounded-lg bg-white/5 border border-white/5">
-                  <div>
-                    <div class="text-sm font-medium text-white">A5 Flyers</div>
-                    <div class="text-xs text-gray-400">Digital • SRA3 • Double-sided</div>
-                  </div>
-                  <div class="text-right">
-                    <div class="text-xs text-gray-400">Qty 1,000</div>
-                    <div class="text-sm font-bold text-emerald-400">KES 5,600</div>
-                  </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="p-3 rounded-lg bg-white/5 border border-white/5">
-                    <div class="text-xs text-gray-400 mb-1">Material Cost</div>
-                    <div class="text-sm font-medium text-white">KES 800</div>
-                  </div>
-                  <div class="p-3 rounded-lg bg-white/5 border border-white/5">
-                    <div class="text-xs text-gray-400 mb-1">Printing Cost</div>
-                    <div class="text-sm font-medium text-white">KES 4,500</div>
-                  </div>
-                </div>
-                <div class="p-3 rounded-lg bg-primary-600/20 border border-primary-500/30">
-                  <div class="flex justify-between items-center">
-                    <span class="text-sm text-primary-200">Profit Margin</span>
-                    <span class="text-sm font-bold text-primary-100">32%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <LandingQuoteSimulator ref="simRef" />
           </div>
         </div>
       </div>
@@ -120,6 +83,9 @@
         <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Pre-configured templates that use your pricing logic in the background.
         </p>
+        <div class="mt-10">
+          <LandingTemplatePreview @select="handleSelect" />
+        </div>
         <NuxtLink to="/auth/login" class="mt-8 inline-flex items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-primary-700 shadow-md shadow-primary-200 dark:shadow-primary-900/50 transition-all">
           Sign in to access gallery
         </NuxtLink>
@@ -185,7 +151,16 @@
 </template>
 
 <script setup lang="ts">
+import type { SimulatorPreset } from '~/shared/demo/demo-rate-card'
+
 definePageMeta({
   layout: 'default',
 })
+
+const simRef = ref<{ applyPreset: (preset: SimulatorPreset) => void } | null>(null)
+
+function handleSelect(preset: SimulatorPreset) {
+  simRef.value?.applyPreset(preset)
+  document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' })
+}
 </script>
