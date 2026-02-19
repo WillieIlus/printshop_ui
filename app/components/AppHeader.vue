@@ -143,7 +143,7 @@ const mobileOpen = ref(false)
 const navLinks = [
   { label: 'Gallery', to: '/gallery', icon: 'i-lucide-layout-grid' },
   { label: 'Problem', to: '/#problem' },
-  { label: 'Templates Gallery', to: '/#demo-gallery' },
+  { label: 'Templates Gallery', to: '/gallery' },
   { label: 'Pricing Models', to: '/#models' },
   { label: 'Shops', to: '/shops' },
   { label: 'My Quotes', to: '/quotes' },

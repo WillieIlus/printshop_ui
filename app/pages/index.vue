@@ -21,7 +21,7 @@
               PrintShop mirrors how real print shops calculate pricing—using your machines, your materials, and your operational costs to generate fast, accurate quotes for <span class="text-white font-semibold">digital</span> and <span class="text-white font-semibold">large format</span> work.
             </p>
             <div class="mt-8 flex flex-col sm:flex-row gap-4">
-              <NuxtLink to="/#demo-gallery" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors">
+              <NuxtLink to="/gallery" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors">
                 View Gallery Demo
                 <UIcon name="i-lucide-chevron-down" class="ml-2 w-4 h-4" />
               </NuxtLink>
@@ -77,15 +77,15 @@
 
     <!-- Gallery CTA (sample: gray-50, border-gray-200) -->
     <section id="demo-gallery" class="py-16 sm:py-24 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-10">
-          <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">The Customer Experience</span>
-          <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Browse Templates</h2>
-          <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Pre-configured templates that use your pricing logic in the background. Click a card to pre-fill the simulator above.
-          </p>
-        </div>
-        <LandingLandingTemplateGallery @select="applyPreset" />
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <span class="text-primary-600 font-semibold text-sm uppercase tracking-wider">The Customer Experience</span>
+        <h2 class="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Browse Templates</h2>
+        <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          Pre-configured templates that use your pricing logic in the background.
+        </p>
+        <NuxtLink to="/gallery" class="mt-8 inline-flex items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-primary-700 shadow-md shadow-primary-200 dark:shadow-primary-900/50 transition-all">
+          Browse Template Gallery
+        </NuxtLink>
       </div>
     </section>
 
@@ -137,7 +137,7 @@
           <NuxtLink to="/auth/signup" class="inline-flex items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-primary-500 transition-colors shadow-lg shadow-primary-900/50">
             Create your first shop
           </NuxtLink>
-          <NuxtLink to="/#demo-gallery" class="inline-flex items-center justify-center rounded-xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/20 transition-colors backdrop-blur-sm">
+          <NuxtLink to="/gallery" class="inline-flex items-center justify-center rounded-xl bg-white/10 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/20 transition-colors backdrop-blur-sm">
             Back to Gallery
           </NuxtLink>
         </div>
