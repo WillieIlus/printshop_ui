@@ -1,21 +1,28 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit profile</h1>
-        <p class="text-gray-600 dark:text-gray-400">Update your profile information</p>
-      </div>
-      <UButton to="/dashboard/profile" variant="ghost" size="sm">Back</UButton>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Edit profile"
+        subtitle="Update your profile information"
+        :breadcrumbs="[{ label: 'Profile', to: '/dashboard/profile' }]"
+      >
+        <template #actions>
+          <UButton to="/dashboard/profile" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <div class="col-span-12">
+      <DashboardSectionCard>
+        <ProfileProfileEditForm
+          :profile="profileStore.profile"
+          :loading="profileStore.loading"
+          @submit="onSubmit"
+          @cancel="goBack"
+        />
+      </DashboardSectionCard>
     </div>
-    <CommonLoadingSpinner v-if="profileStore.loading && !profileStore.profile" />
-    <ProfileProfileEditForm
-      v-else
-      :profile="profileStore.profile"
-      :loading="profileStore.loading"
-      @submit="onSubmit"
-      @cancel="goBack"
-    />
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

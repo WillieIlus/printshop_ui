@@ -1,29 +1,37 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Quote #{{ id }}</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}/quotes`" variant="ghost" size="sm">Back</UButton>
-    </div>
-    <CommonLoadingSpinner v-if="quoteStore.loading" />
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        :title="`Quote #${id}`"
+        :subtitle="slug"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }, { label: 'Quotes', to: `/dashboard/shops/${slug}/quotes` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}/quotes`" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <DashboardSkeletonState v-if="quoteStore.loading" variant="card" :show-header="false" />
     <template v-else-if="quoteStore.currentQuote">
-      <div class="grid lg:grid-cols-2 gap-6">
-        <UCard>
-          <template #header>Details</template>
-          <div class="space-y-2">
-            <p><span class="text-gray-500 dark:text-gray-400">Customer:</span> {{ quoteStore.currentQuote.customer_name }}</p>
-            <p><span class="text-gray-500 dark:text-gray-400">Email:</span> {{ quoteStore.currentQuote.customer_email }}</p>
-            <p><span class="text-gray-500 dark:text-gray-400">Status:</span> <UBadge :color="statusColor" variant="soft" size="sm">{{ quoteStore.currentQuote.status }}</UBadge></p>
+      <div class="col-span-12 lg:col-span-8">
+        <DashboardSectionCard title="Details">
+          <div class="space-y-2 text-sm">
+            <p><span class="text-muted">Customer:</span> {{ quoteStore.currentQuote.customer_name }}</p>
+            <p><span class="text-muted">Email:</span> {{ quoteStore.currentQuote.customer_email }}</p>
+            <p><span class="text-muted">Status:</span> <UBadge :color="statusColor" variant="soft" size="sm">{{ quoteStore.currentQuote.status }}</UBadge></p>
             <p class="font-semibold text-gray-900 dark:text-white">Total: {{ quoteStore.currentQuote.total }}</p>
           </div>
-        </UCard>
+        </DashboardSectionCard>
+      </div>
+      <div class="col-span-12 lg:col-span-4">
         <QuotesQuoteCalculator :totals="totals" />
       </div>
-      <QuotesQuoteItemList :items="quoteItems" />
+      <div class="col-span-12">
+        <QuotesQuoteItemList :items="quoteItems" />
+      </div>
     </template>
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,14 +1,23 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Product template</h1>
-        <p class="text-gray-600 dark:text-gray-400">{{ slug }}</p>
-      </div>
-      <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Product template"
+        :subtitle="slug"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }, { label: 'Products', to: `/dashboard/shops/${slug}/products` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}/products`" variant="ghost" size="sm">Back</UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
+
+    <div class="col-span-12">
+      <DashboardSectionCard>
+        <p class="text-sm text-muted">Product detail / edit (wire to API by id).</p>
+      </DashboardSectionCard>
     </div>
-    <p class="text-sm text-gray-500 dark:text-gray-400">Product detail / edit (wire to API by id).</p>
-  </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,46 +1,30 @@
 <template>
-  <div class="space-y-6">
-    <CommonPageHeader
-      title="Quotes"
-      :description="`Manage quotes for ${shopStore.currentShop?.name ?? slug}`"
-    >
-      <template #actions>
-        <UButton :to="`/dashboard/shops/${slug}`" color="neutral" variant="ghost" size="sm">
-          Back
-        </UButton>
-        <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
-          <UIcon name="i-lucide-plus" class="mr-2 h-4 w-4" />
-          New quote
-        </UButton>
-      </template>
-    </CommonPageHeader>
+  <DashboardDashboardLayout>
+    <template #header>
+      <DashboardDashboardPageHeader
+        title="Quotes"
+        :subtitle="slug"
+        :breadcrumbs="[{ label: 'My Shops', to: '/dashboard/shops' }, { label: slug, to: `/dashboard/shops/${slug}` }]"
+      >
+        <template #actions>
+          <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
+          <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
+            <UIcon name="i-lucide-plus" class="w-4 h-4 mr-2" />
+            New quote
+          </UButton>
+        </template>
+      </DashboardDashboardPageHeader>
+    </template>
 
-    <!-- Skeleton → Error → Content -->
-    <CommonDataListSkeleton v-if="quoteStore.loading && !quoteStore.quotes.length" variant="cards" />
-    <CommonErrorState
-      v-else-if="quoteStore.error && !quoteStore.quotes.length"
-      title="Could not load quotes"
-      :message="quoteStore.error"
-    >
-      <UButton color="primary" @click="retryFetch">
-        <UIcon name="i-lucide-refresh-cw" class="mr-2 h-4 w-4" />
-        Try again
-      </UButton>
-    </CommonErrorState>
-    <QuotesQuoteList v-else :quotes="quoteStore.quotes">
-      <template #card-actions="{ quote }">
-        <UButton :to="`/dashboard/shops/${slug}/quotes/${quote.id}`" color="neutral" variant="ghost" size="sm">
-          View
-        </UButton>
-      </template>
-      <template #empty-actions>
-        <UButton :to="`/dashboard/shops/${slug}/quotes/create`" color="primary">
-          <UIcon name="i-lucide-plus" class="mr-2 h-4 w-4" />
-          Create first quote
-        </UButton>
-      </template>
-    </QuotesQuoteList>
-  </div>
+    <DashboardSkeletonState v-if="quoteStore.loading" variant="list" :show-header="false" />
+    <div v-else class="col-span-12">
+      <QuotesQuoteList :quotes="quoteStore.quotes">
+        <template #card-actions="{ quote }">
+          <UButton :to="`/dashboard/shops/${slug}/quotes/${quote.id}`" variant="ghost" size="sm">View</UButton>
+        </template>
+      </QuotesQuoteList>
+    </div>
+  </DashboardDashboardLayout>
 </template>
 
 <script setup lang="ts">
@@ -57,13 +41,8 @@ const shopStore = useShopStore()
 const quoteStore = useQuoteStore()
 const slug = computed(() => route.params.slug as string)
 
-async function retryFetch() {
-  quoteStore.error = null
+onMounted(async () => {
   await shopStore.fetchShopBySlug(slug.value)
   await quoteStore.fetchShopQuotes(slug.value)
-}
-
-onMounted(() => {
-  retryFetch()
 })
 </script>
