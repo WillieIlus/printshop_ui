@@ -55,8 +55,8 @@
           </ProfileSocialLinksManager>
         </DashboardSectionCard>
       </div>
-    </template>
-  </DashboardDashboardLayout>
+  </template>
+</div>
 </template>
 
 <script setup lang="ts">

@@ -30,7 +30,7 @@
         <QuotesQuoteItemList :items="quoteItems" />
       </div>
     </template>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

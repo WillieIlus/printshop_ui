@@ -31,7 +31,7 @@
         <DashboardRecentActivity :activities="activities" />
       </div>
     </div>
-  </DashboardDashboardLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
