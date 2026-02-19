@@ -66,18 +66,31 @@
       </div>
     </template>
 
-    <UModal v-model:open="modalOpen" :title="editing ? 'Edit machine' : 'Add machine'">
-      <template #body>
-        <MachinesMachineForm
-          :key="editing?.id ?? 'new'"
-          :machine="editing"
-          :loading="formLoading"
-          @submit="onSubmit"
-          @cancel="closeModal"
-        />
-      </template>
-    </UModal>
-  </DashboardDashboardLayout>
+    <DashboardModalForm
+      v-model="modalOpen"
+      :title="editing ? 'Edit machine' : 'Add machine'"
+      :description="editing ? 'Edit printer or equipment details.' : 'Add a printer or equipment. Required before setting printing prices.'"
+    >
+      <MachinesMachineForm
+        v-if="formReady"
+        :key="editing?.id ?? 'new'"
+        :machine="editing"
+        :loading="formLoading"
+        :can-add-printing="subscription?.can_add_printing_machine ?? true"
+        :can-add-finishing="subscription?.can_add_finishing_machine ?? true"
+        @submit="onSubmit"
+        @cancel="closeModal"
+      />
+    </DashboardModalForm>
+
+    <SubscriptionUpgradeModal
+      :open="upgradeModalOpen"
+      :shop-slug="slug"
+      :reason="subscription ? `Your plan allows ${subscription.usage.printing_machines}/${subscription.limits.max_printing_machines || '∞'} printing and ${subscription.usage.finishing_machines}/${subscription.limits.max_finishing_machines || '∞'} finishing machines.` : 'Upgrade to add more machines.'"
+      :plans="subscriptionStore.plans"
+      @update:open="upgradeModalOpen = $event"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -112,7 +125,17 @@ function closeModal() {
   editing.value = null
 }
 
-async function onSubmit(data: { name: string; machine_type?: string }) {
+watch(modalOpen, (open) => {
+  if (open) {
+    formReady.value = false
+    nextTick(() => { formReady.value = true })
+  } else {
+    formReady.value = false
+    editing.value = null
+  }
+})
+
+async function onSubmit(data: { name: string; machine_type?: string | { value: string } }) {
   formLoading.value = true
   try {
     if (editing.value) {
