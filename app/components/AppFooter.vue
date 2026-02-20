@@ -9,7 +9,7 @@
             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700">
               <UIcon name="i-lucide-printer" class="h-6 w-6 text-white" />
             </div>
-            <span class="text-xl font-bold text-white">PrintShop</span>
+            <span class="text-xl font-bold text-white">Printy</span>
           </div>
           <p class="text-sm leading-relaxed">
             The intelligent quoting and pricing engine for modern print shops. Not a marketplace — a pricing brain.
@@ -51,7 +51,7 @@
       </div>
 
       <div class="flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
-        <p class="text-sm">© <ClientOnly>{{ new Date().getFullYear() }}<template #fallback>2025</template></ClientOnly> <span class="font-semibold text-white">PrintShop</span>. All rights reserved.</p>
+        <p class="text-sm">© <ClientOnly>{{ new Date().getFullYear() }}<template #fallback>2025</template></ClientOnly> <span class="font-semibold text-white">Printy</span>. All rights reserved.</p>
         <div class="flex items-center gap-6 text-sm">
           <a href="#" class="transition-colors hover:text-white">Privacy Policy</a>
           <a href="#" class="transition-colors hover:text-white">Terms of Service</a>

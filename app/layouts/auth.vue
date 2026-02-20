@@ -32,7 +32,7 @@
               <span class="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 text-white shadow-lg shadow-flamingo-500/25 transition-transform group-hover:scale-105">
                 <UIcon name="i-lucide-printer" class="w-7 h-7" />
               </span>
-              <span class="text-lg font-bold text-gray-900 dark:text-white">PrintShop</span>
+              <span class="text-lg font-bold text-gray-900 dark:text-white">Printy</span>
             </NuxtLink>
           </slot>
         </div>
@@ -77,7 +77,7 @@ withDefaults(
     title?: string
     /** Subtitle (used when no subtitle slot) */
     subtitle?: string
-    /** Show default PrintShop branding when no branding slot */
+    /** Show default Printy branding when no branding slot */
     showBranding?: boolean
   }>(),
   {

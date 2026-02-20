@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrintShop - Pricing Engine & Gallery Demo</title>
+    <title>Printy - Pricing Engine & Gallery Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -53,7 +53,7 @@
                         </svg>
                     </span>
                     <div class="leading-tight">
-                        <div class="text-sm font-bold tracking-tight sm:text-base">PrintShop</div>
+                        <div class="text-sm font-bold tracking-tight sm:text-base">Printy</div>
                         <div class="hidden text-xs text-slate-500 sm:block">Quoting & Pricing Engine</div>
                     </div>
                 </a>
@@ -115,7 +115,7 @@
                         Quote print jobs <br class="hidden lg:block"> <span class="text-primary-400">in seconds.</span>
                     </h1>
                     <p class="mt-6 text-lg text-slate-300 leading-relaxed">
-                        PrintShop mirrors how real print shops calculate pricing—using your machines, your materials, and your operational costs to generate fast, accurate quotes for <span class="text-white font-semibold">digital</span> and <span class="text-white font-semibold">large format</span> work.
+                        Printy mirrors how real print shops calculate pricing—using your machines, your materials, and your operational costs to generate fast, accurate quotes for <span class="text-white font-semibold">digital</span> and <span class="text-white font-semibold">large format</span> work.
                     </p>
                     
                     <div class="mt-8 flex flex-col sm:flex-row gap-4">
@@ -569,7 +569,7 @@
                         </span>
                     </summary>
                     <p class="group-open:animate-fadeIn mt-3 text-slate-600">
-                        No. PrintShop is an internal quoting engine for your shop staff. However, the "Templates Gallery" view can be exposed to customers if you choose to use it as a catalog.
+                        No. Printy is an internal quoting engine for your shop staff. However, the "Templates Gallery" view can be exposed to customers if you choose to use it as a catalog.
                     </p>
                 </details>
 
@@ -628,7 +628,7 @@
                 <span class="grid h-8 w-8 place-items-center rounded-lg bg-white/10 text-white">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8V3h10v5" /><path d="M6 17h12v4H6z" /><path d="M6 12h12" /></svg>
                 </span>
-                <span class="text-slate-400 text-sm">© 2024 PrintShop. All rights reserved.</span>
+                <span class="text-slate-400 text-sm">© 2024 Printy. All rights reserved.</span>
             </div>
             <div class="flex gap-6 text-sm text-slate-400">
                 <a href="#" class="hover:text-white transition-colors">Privacy</a>

@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between h-full px-4">
       <NuxtLink to="/dashboard" class="flex items-center gap-2 shrink-0">
         <CommonAppLogo icon-class="h-8 w-8" />
-        <span class="font-bold text-xl hidden sm:block text-gray-900 dark:text-white">PrintShop</span>
+        <span class="font-bold text-xl hidden sm:block text-gray-900 dark:text-white">Printy</span>
       </NuxtLink>
       <div class="flex items-center gap-4">
         <UButton variant="ghost" size="sm" color="neutral" aria-label="Notifications">

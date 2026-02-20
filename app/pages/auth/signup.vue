@@ -1,5 +1,5 @@
 <template>
-  <NuxtLayout name="auth" title="Create your account" subtitle="Start your journey with PrintShop today.">
+  <NuxtLayout name="auth" title="Create your account" subtitle="Start your journey with Printy today.">
     <AuthSignupForm />
     <template #footer>
       <p class="text-sm text-gray-600 dark:text-gray-400">
