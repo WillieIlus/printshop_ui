@@ -1,10 +1,21 @@
 import type { SignupCredentials } from '~/shared/types'
 import { useAuthStore } from '~/stores/auth'
 import { useProfileStore } from '~/stores/profile'
+import { useShopStore } from '~/stores/shop'
+
+/** Redirect path based on user role and shop ownership */
+export function getPostLoginRedirectPath(user: { role?: string } | null, hasShops: boolean): string {
+  if (!user) return '/gallery'
+  if (user.role === 'PRINTER') {
+    return hasShops ? '/dashboard' : '/onboarding/printer'
+  }
+  return '/gallery'
+}
 
 export function useAuth() {
   const authStore = useAuthStore()
   const profileStore = useProfileStore()
+  const shopStore = useShopStore()
   const router = useRouter()
 
   const isAuthenticated = computed(() => authStore.isAuthenticated)
@@ -19,7 +30,12 @@ export function useAuth() {
       } catch {
         // Profile fetch may fail (e.g. 500) - still allow navigation
       }
-      await router.push('/dashboard')
+      const u = authStore.user
+      if (u?.role === 'PRINTER') {
+        await shopStore.fetchMyShops()
+      }
+      const path = getPostLoginRedirectPath(u, (shopStore.myShops?.length ?? 0) > 0)
+      await router.push(path)
     }
     return result
   }
@@ -27,8 +43,8 @@ export function useAuth() {
   async function signup(data: SignupCredentials) {
     const result = await authStore.signup(data)
     if (result.success) {
-      // Backend requires email confirmation before login; redirect to login
-      await router.push('/auth/login')
+      // Backend requires email verification; redirect to verify-email page
+      await router.push({ path: '/auth/verify-email', query: { email: data.email } })
     }
     return result
   }

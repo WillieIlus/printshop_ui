@@ -17,6 +17,8 @@ export interface AuthTokens {
   refresh: string
 }
 
+import type { UserRole } from './user'
+
 export interface AuthUser {
   id: number
   email: string
@@ -24,4 +26,5 @@ export interface AuthUser {
   last_name: string
   is_active: boolean
   date_joined: string
+  role?: UserRole
 }
