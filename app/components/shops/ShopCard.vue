@@ -1,6 +1,6 @@
 <!-- ShopCard.vue — Shop card with flamingo design -->
 <template>
-  <div class="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:border-flamingo-200 hover:shadow-lg">
+  <div class="group overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm transition-all hover:border-flamingo-200 dark:hover:border-flamingo-800/50 hover:shadow-lg">
     <!-- Header with gradient -->
     <div class="relative bg-gradient-to-r from-flamingo-500 to-flamingo-700 px-6 py-5">
       <div class="flex items-start justify-between">
@@ -37,7 +37,7 @@
       <div v-else class="mb-4" />
 
       <!-- Contact info -->
-      <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+      <div class="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
         <div v-if="shop.phone_number" class="flex items-center gap-1">
           <UIcon name="i-lucide-phone" class="h-4 w-4 shrink-0" />
           {{ shop.phone_number }}
@@ -49,18 +49,18 @@
       </div>
 
       <!-- Actions -->
-      <div v-if="showActions" class="mt-4 flex gap-2 border-t border-gray-100 pt-4">
-        <UButton variant="outline" size="sm" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600" @click="$emit('view')">
+      <div v-if="showActions" class="mt-4 flex gap-2 border-t border-gray-100 dark:border-gray-800 pt-4">
+        <UButton variant="outline" size="sm" class="rounded-xl border-gray-200 dark:border-gray-700 hover:border-flamingo-300 dark:hover:border-flamingo-600 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400" @click="$emit('view')">
           View
         </UButton>
-        <UButton variant="outline" size="sm" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600" @click="$emit('edit')">
+        <UButton variant="outline" size="sm" class="rounded-xl border-gray-200 dark:border-gray-700 hover:border-flamingo-300 dark:hover:border-flamingo-600 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400" @click="$emit('edit')">
           Edit
         </UButton>
       </div>
     </div>
 
     <!-- Footer Actions (public view) -->
-    <div v-if="!showActions" class="flex border-t border-gray-100">
+    <div v-if="!showActions" class="flex border-t border-gray-100 dark:border-gray-800">
       <NuxtLink
         :to="`/shops/${shop.slug}`"
         class="flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-semibold text-flamingo-600 transition-colors hover:bg-flamingo-50"
@@ -68,10 +68,10 @@
         View Details
         <UIcon name="i-lucide-chevron-right" class="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       </NuxtLink>
-      <div class="w-px bg-gray-100" />
+      <div class="w-px bg-gray-100 dark:bg-gray-800" />
       <NuxtLink
         :to="`/shops/${shop.slug}/request-quote`"
-        class="flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-50"
+        class="flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-semibold text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
       >
         <UIcon name="i-lucide-plus" class="h-4 w-4" />
         Request Quote

@@ -16,7 +16,7 @@
           View defaults
         </UButton>
         <UButton :to="`/dashboard/shops/${slug}`" variant="ghost" size="sm">Back</UButton>
-        <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 hover:border-flamingo-300 hover:bg-flamingo-50 hover:text-flamingo-600">
+        <UButton :to="`/shops/${slug}`" target="_blank" variant="outline" class="rounded-xl border-gray-200 dark:border-gray-700 hover:border-flamingo-300 dark:hover:border-flamingo-600 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400">
           <UIcon name="i-lucide-eye" class="w-4 h-4 mr-2" />
           Preview Public Page
         </UButton>
@@ -103,7 +103,7 @@
           </p>
         </div>
         <div class="flex justify-between items-center">
-          <p class="text-sm text-gray-600">Set the price per printed side for each paper size and color mode.</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Set the price per printed side for each paper size and color mode.</p>
           <UButton
             class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600"
             :disabled="!machineStore.machines.length"
@@ -114,25 +114,25 @@
           </UButton>
         </div>
 
-        <div v-if="pricingStore.printingPrices.length" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <div v-if="pricingStore.printingPrices.length" class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Size</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Color</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell Price</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Buy Price</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Profit</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Active</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Size</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Color</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Sell Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Buy Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Profit</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Active</th>
                 <th class="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="price in pricingStore.printingPrices" :key="price.id" class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.sheet_size }}</td>
-                <td class="px-4 py-3 text-sm text-gray-600">{{ price.color_mode }}</td>
-                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">KES {{ price.selling_price_per_side }}</td>
-                <td class="px-4 py-3 text-sm text-right text-gray-500">{{ price.buying_price_per_side ? `KES ${price.buying_price_per_side}` : '-' }}</td>
+            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              <tr v-for="price in pricingStore.printingPrices" :key="price.id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ price.sheet_size }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ price.color_mode }}</td>
+                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900 dark:text-white">KES {{ price.selling_price_per_side }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500 dark:text-gray-400">{{ price.buying_price_per_side ? `KES ${price.buying_price_per_side}` : '-' }}</td>
                 <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit_per_side }}</td>
                 <td class="px-4 py-3 text-center">
                   <div class="flex items-center justify-center gap-1">
@@ -167,36 +167,36 @@
       <!-- Paper Prices -->
       <div v-if="activeTab === 'paper'" class="space-y-4">
         <div class="flex justify-between items-center">
-          <p class="text-sm text-gray-600">Set paper prices by GSM (weight). Customers see this as their rate card.</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Set paper prices by GSM (weight). Customers see this as their rate card.</p>
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openPaperModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Paper Price
           </UButton>
         </div>
 
-        <div v-if="pricingStore.paperPrices.length" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+        <div v-if="pricingStore.paperPrices.length" class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">GSM</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Size</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Buy Price</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Sell Price</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Profit</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Margin</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">GSM</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Size</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Type</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Buy Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Sell Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Profit</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Margin</th>
                 <th class="px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="price in pricingStore.paperPrices" :key="price.id" class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ price.gsm }} gsm</td>
-                <td class="px-4 py-3 text-sm text-gray-600">{{ price.sheet_size }}</td>
-                <td class="px-4 py-3 text-sm text-gray-600">{{ price.paper_type }}</td>
-                <td class="px-4 py-3 text-sm text-right text-gray-500">KES {{ price.buying_price }}</td>
-                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">KES {{ price.selling_price }}</td>
+            <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              <tr v-for="price in pricingStore.paperPrices" :key="price.id" class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ price.gsm }} gsm</td>
+                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ price.sheet_size }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ price.paper_type }}</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500 dark:text-gray-400">KES {{ price.buying_price }}</td>
+                <td class="px-4 py-3 text-sm text-right font-medium text-gray-900 dark:text-white">KES {{ price.selling_price }}</td>
                 <td class="px-4 py-3 text-sm text-right text-green-600">KES {{ price.profit }}</td>
-                <td class="px-4 py-3 text-sm text-right text-gray-500">{{ parseFloat(price.margin_percent).toFixed(1) }}%</td>
+                <td class="px-4 py-3 text-sm text-right text-gray-500 dark:text-gray-400">{{ parseFloat(price.margin_percent).toFixed(1) }}%</td>
                 <td class="px-4 py-3 text-right">
                   <div class="flex items-center justify-end gap-1">
                     <UBadge v-if="price.needs_review" color="warning" variant="soft" size="xs">Review</UBadge>
@@ -216,7 +216,7 @@
       <!-- Finishing Services -->
       <div v-if="activeTab === 'finishing'" class="space-y-4">
         <div class="flex justify-between items-center">
-          <p class="text-sm text-gray-600">Add finishing services like lamination, binding, and cutting.</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Add finishing services like lamination, binding, and cutting.</p>
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openFinishingModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Finishing Service
@@ -227,12 +227,12 @@
           <div 
             v-for="service in pricingStore.finishingServices" 
             :key="service.id" 
-            class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow"
+            class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-sm transition-shadow"
           >
             <div class="flex justify-between items-start">
               <div>
-                <h3 class="font-medium text-gray-900">{{ service.name }}</h3>
-                <p class="text-sm text-gray-500">{{ service.category }}</p>
+                <h3 class="font-medium text-gray-900 dark:text-white">{{ service.name }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ service.category }}</p>
               </div>
               <div class="flex gap-1">
                 <UBadge v-if="service.is_default" color="info" variant="soft" size="xs">Default</UBadge>
@@ -240,8 +240,8 @@
               </div>
             </div>
             <div class="mt-3 flex justify-between items-center">
-              <span class="text-lg font-semibold text-gray-900">KES {{ service.selling_price }}</span>
-              <span class="text-sm text-gray-500">{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
+              <span class="text-lg font-semibold text-gray-900 dark:text-white">KES {{ service.selling_price }}</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
             </div>
             <div class="mt-3 flex gap-2">
               <UButton variant="ghost" size="xs" @click="editFinishingService(service)">Edit</UButton>
@@ -257,7 +257,7 @@
       <!-- Volume Discounts -->
       <div v-if="activeTab === 'discounts'" class="space-y-4">
         <div class="flex justify-between items-center">
-          <p class="text-sm text-gray-600">Set up bulk discounts for large orders.</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Set up bulk discounts for large orders.</p>
           <UButton class="rounded-xl bg-flamingo-500 hover:bg-flamingo-600" @click="openDiscountModal()">
             <UIcon name="i-lucide-plus" class="w-4 h-4 mr-1" />
             Add Volume Discount
@@ -268,11 +268,11 @@
           <div 
             v-for="discount in pricingStore.volumeDiscounts" 
             :key="discount.id" 
-            class="bg-white rounded-lg border border-gray-200 p-4"
+            class="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
           >
-            <h3 class="font-medium text-gray-900">{{ discount.name }}</h3>
-            <p class="text-2xl font-bold text-green-600 mt-2">{{ discount.discount_percent }}% OFF</p>
-            <p class="text-sm text-gray-500 mt-1">Min. {{ discount.min_quantity }} items</p>
+            <h3 class="font-medium text-gray-900 dark:text-white">{{ discount.name }}</h3>
+            <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">{{ discount.discount_percent }}% OFF</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Min. {{ discount.min_quantity }} items</p>
             <div class="mt-3 flex gap-2">
               <UButton variant="ghost" size="xs" @click="editDiscount(discount)">Edit</UButton>
               <UButton variant="ghost" size="xs" color="error" @click="deleteDiscount(discount.id)">Delete</UButton>
@@ -371,7 +371,7 @@
                     <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell/side</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-gray-900 dark:text-white">
                   <tr v-for="(t, i) in pricingStore.defaultPrinting" :key="`p-${i}`">
                     <td class="px-3 py-2">{{ t.sheet_size }}</td>
                     <td class="px-3 py-2">{{ t.color_mode }}</td>
@@ -393,7 +393,7 @@
                     <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-gray-900 dark:text-white">
                   <tr v-for="(t, i) in pricingStore.defaultPapers" :key="`pa-${i}`">
                     <td class="px-3 py-2">{{ t.sheet_size }}</td>
                     <td class="px-3 py-2">{{ t.gsm }} gsm</td>
@@ -415,7 +415,7 @@
                     <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-gray-900 dark:text-white">
                   <tr v-for="(t, i) in pricingStore.defaultMaterials" :key="`m-${i}`">
                     <td class="px-3 py-2">{{ t.material_name }}</td>
                     <td class="px-3 py-2">{{ t.unit }}</td>
@@ -436,7 +436,7 @@
                     <th class="px-3 py-2 text-right text-xs font-medium text-gray-500">Sell</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-gray-900 dark:text-white">
                   <tr v-for="(t, i) in pricingStore.defaultFinishing" :key="`f-${i}`">
                     <td class="px-3 py-2">{{ t.name }}</td>
                     <td class="px-3 py-2">{{ t.category }}</td>
@@ -446,7 +446,7 @@
               </table>
             </div>
           </div>
-          <div v-if="!hasAnyDefaults" class="py-6 text-center text-sm text-gray-500">
+          <div v-if="!hasAnyDefaults" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
             No default templates available.
           </div>
         </template>

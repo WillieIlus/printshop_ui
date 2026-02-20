@@ -298,7 +298,7 @@ async function handleSaveQuote() {
                 class="text-emerald-600 focus:ring-emerald-500 rounded"
               />
               <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ service.name }}</span>
-              <span class="ml-auto text-sm text-gray-500">{{ formatKES(service.price) }}/{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
+              <span class="ml-auto text-sm text-gray-500 dark:text-gray-400">{{ formatKES(service.price) }}/{{ service.charge_by.replace('PER_', '').toLowerCase() }}</span>
             </label>
           </div>
         </QuotesQuoteInputsSection>
