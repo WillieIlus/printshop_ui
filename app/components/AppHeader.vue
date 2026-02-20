@@ -57,6 +57,15 @@
                   <NuxtLink to="/dashboard/profile" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">Profile</NuxtLink>
                   <NuxtLink to="/dashboard/shops" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">My Shops</NuxtLink>
                   <NuxtLink to="/dashboard/quotes" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">My Quotes</NuxtLink>
+                  <button
+                    v-if="isCustomer"
+                    class="rounded-lg px-3 py-2 text-left text-sm font-medium text-flamingo-600 hover:bg-flamingo-50 w-full flex items-center gap-2"
+                    :disabled="becomingPrinter"
+                    @click="onBecomePrinter"
+                  >
+                    <UIcon name="i-lucide-store" class="h-4 w-4" />
+                    {{ becomingPrinter ? 'Updating...' : 'Become a printer' }}
+                  </button>
                   <div class="my-1 border-t border-gray-100" />
                   <button class="rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 w-full" @click="authStore.logout">
                     Log Out
@@ -119,6 +128,16 @@
               {{ link.label }}
             </NuxtLink>
           </div>
+          <div v-if="authStore.isAuthenticated && isCustomer" class="mt-3 grid gap-2 px-3">
+            <button
+              class="rounded-xl bg-flamingo-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-flamingo-600 flex items-center justify-center gap-2"
+              :disabled="becomingPrinter"
+              @click="onBecomePrinter(); mobileOpen = false"
+            >
+              <UIcon name="i-lucide-store" class="h-4 w-4" />
+              {{ becomingPrinter ? 'Updating...' : 'Become a printer' }}
+            </button>
+          </div>
           <div v-if="!authStore.isAuthenticated" class="mt-3 grid gap-2 px-3">
             <NuxtLink to="/auth/login" class="rounded-xl bg-gray-100 px-4 py-2.5 text-center text-sm font-semibold text-gray-800 hover:bg-gray-200" @click="mobileOpen = false">
               Log In
@@ -135,10 +154,35 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useUserStore } from '~/stores/user'
 
 const authStore = useAuthStore()
+const userStore = useUserStore()
 const colorMode = useColorMode()
 const mobileOpen = ref(false)
+const becomingPrinter = ref(false)
+const notification = useNotification()
+
+const isCustomer = computed(() => {
+  const u = authStore.user
+  return !u?.role || u.role === 'CUSTOMER'
+})
+
+async function onBecomePrinter() {
+  if (becomingPrinter.value) return
+  becomingPrinter.value = true
+  try {
+    const result = await userStore.updateMe({ role: 'PRINTER' })
+    if (result.success) {
+      await authStore.fetchUser()
+      await navigateTo('/onboarding/printer')
+    } else {
+      notification.error(userStore.error ?? 'Failed to update role')
+    }
+  } finally {
+    becomingPrinter.value = false
+  }
+}
 
 const navLinks = [
   { label: 'Gallery', to: '/gallery', icon: 'i-lucide-layout-grid' },

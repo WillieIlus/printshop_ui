@@ -10,6 +10,23 @@
         close
         @update:open="(open) => { if (!open) authStore.error = null }"
       />
+      <UAlert
+        v-if="emailNotVerified"
+        color="warning"
+        icon="i-lucide-mail-question"
+        title="Please verify your email before signing in."
+        description="We sent a verification code to your email. Enter it to activate your account."
+        class="rounded-lg"
+      />
+      <div v-if="emailNotVerified" class="flex justify-center">
+        <UButton
+          size="sm"
+          color="primary"
+          :to="verifyEmailLink"
+        >
+          Verify email
+        </UButton>
+      </div>
       <FormsFormInput
         name="email"
         label="Email"
@@ -74,11 +91,27 @@ const loginSchema = object({
   password: string().min(8, 'Password must be at least 8 characters').required('Password is required'),
 })
 
+const emailNotVerified = ref(false)
+const unverifiedEmail = ref('')
+
+const verifyEmailLink = computed(() => {
+  if (!unverifiedEmail.value) return '/auth/verify-email'
+  return { path: '/auth/verify-email', query: { email: unverifiedEmail.value } }
+})
+
 async function onSubmit(values: Record<string, unknown>) {
   const { email, password } = values as { email: string; password: string }
+  emailNotVerified.value = false
+  unverifiedEmail.value = ''
   const result = await login(email, password, rememberMe.value)
   if (!result.success) {
-    notification.error(result.error || 'Login failed')
+    const r = result as { code?: string; email?: string }
+    if (r.code === 'email_not_verified') {
+      emailNotVerified.value = true
+      unverifiedEmail.value = r.email ?? email
+    } else {
+      notification.error(result.error || 'Login failed')
+    }
   }
 }
 </script>

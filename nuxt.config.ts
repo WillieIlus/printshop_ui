@@ -85,6 +85,7 @@ export default defineNuxtConfig({
   routeRules: {
     '/auth/**': { ssr: false },
     '/dashboard/**': { ssr: false },
+    '/onboarding/**': { ssr: false },
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },

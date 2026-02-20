@@ -16,6 +16,19 @@ function extractErrorMessage(err: unknown, rateLimitStatus: number, rateLimitMes
   return err instanceof Error ? err.message : 'Login failed'
 }
 
+function extractErrorCode(err: unknown): string | undefined {
+  if (err && typeof err === 'object') {
+    const e = err as { data?: { code?: string; detail?: string }; response?: { _data?: { code?: string; detail?: string } } }
+    const data = e.data ?? e.response?._data
+    if (data && typeof data === 'object') {
+      const d = data as Record<string, unknown>
+      if (typeof d.code === 'string') return d.code
+      if (typeof d.detail === 'string' && d.detail.includes('email_not_verified')) return 'email_not_verified'
+    }
+  }
+  return undefined
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const tokens = ref<AuthTokens | null>(null)
   const user = ref<AuthUser | null>(null)
@@ -47,7 +60,14 @@ export const useAuthStore = defineStore('auth', () => {
       if (is429) rateLimitUntil.value = Date.now() + 60_000
       const message = extractErrorMessage(err, 429, 'Too many requests. Please wait a minute before trying again.')
       error.value = message
-      return { success: false, error: message }
+      const code = extractErrorCode(err)
+      const is403 = e?.statusCode === 403 || e?.status === 403
+      return {
+        success: false,
+        error: message,
+        code: is403 && code === 'email_not_verified' ? 'email_not_verified' : undefined,
+        email: credentials.email,
+      }
     } finally {
       loading.value = false
     }
@@ -58,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     try {
       const { $api } = useNuxtApp()
-      await $api(API.auth.register, {
+      await $api(API.auth.signup, {
         method: 'POST',
         body: {
           email: credentials.email,

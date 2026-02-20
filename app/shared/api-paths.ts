@@ -8,6 +8,9 @@ export const API = {
     login: 'auth/api-auth/login/',
     refresh: 'auth/api-auth/token/refresh/',
     register: 'auth/register/',
+    signup: 'auth/signup/', // Use 'auth/register/' if backend only has register
+    verifyEmail: 'auth/email/verify/',
+    resendVerification: 'auth/email/resend/',
     forgotPassword: 'auth/api-auth/password/reset/',
     resetConfirm: 'auth/api-auth/password/reset/confirm/',
   },
