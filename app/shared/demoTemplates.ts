@@ -9,6 +9,11 @@ export interface DemoCategory {
   icon: string
 }
 
+export interface DemoTemplateProviderShop {
+  name: string
+  slug: string
+}
+
 export interface DemoTemplate {
   id: string
   category: string
@@ -29,6 +34,8 @@ export interface DemoTemplate {
   defaultHeightM?: number
   demoImage?: string
   badge?: string
+  /** Shop that provides this template (for demo display) */
+  created_by_shop?: DemoTemplateProviderShop
 }
 
 export const categories: DemoCategory[] = [
@@ -54,6 +61,7 @@ export const templates: DemoTemplate[] = [
     defaultMaterial: 'Paper 300gsm',
     defaultFinishings: ['LAMINATION', 'ROUND_EDGES'],
     badge: 'Popular',
+    created_by_shop: { name: 'PrintPro Nairobi', slug: 'printpro-nairobi' },
   },
   {
     id: 'bc-2',

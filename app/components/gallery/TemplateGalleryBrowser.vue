@@ -130,6 +130,12 @@ function onTweak(template: DemoTemplate) {
             <p class="mt-2 text-xs font-medium text-gray-400 dark:text-gray-500">
               {{ getCategoryByKey(template.category)?.label ?? template.category }}
             </p>
+            <p
+              v-if="template.created_by_shop"
+              class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+            >
+              Provided by {{ template.created_by_shop.name }}
+            </p>
           </div>
         </div>
 

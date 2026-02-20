@@ -59,6 +59,12 @@
           <h3 class="font-bold text-gray-900 dark:text-white mb-2 group-hover:text-flamingo-600 dark:group-hover:text-flamingo-400 transition-colors">
             {{ t.title }}
           </h3>
+          <p
+            v-if="t.created_by_shop"
+            class="text-xs text-gray-500 dark:text-gray-400 mb-2"
+          >
+            Provided by {{ t.created_by_shop.name }}
+          </p>
           <div class="flex flex-wrap gap-2 mb-4">
             <UBadge
               v-for="b in (t.badges ?? []).slice(2)"
