@@ -123,6 +123,18 @@ function goToView(slug: string) {
   navigateTo(`/dashboard/shops/${slug}`)
 }
 
+function goToEdit(slug: string) {
+  const shop = shopStore.myShops.find((s) => s.slug === slug) ?? (shopStore.currentShop?.slug === slug ? shopStore.currentShop : null)
+  if (shop) {
+    openEditModal(shop)
+  } else {
+    shopStore.fetchShopBySlug(slug).then(() => {
+      const s = shopStore.currentShop
+      if (s) openEditModal(s)
+    })
+  }
+}
+
 async function onSubmit(data: ShopCreateInput) {
   formLoading.value = true
   try {

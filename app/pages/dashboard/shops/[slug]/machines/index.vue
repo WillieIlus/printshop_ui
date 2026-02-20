@@ -92,6 +92,7 @@
 <script setup lang="ts">
 import type { Machine } from '~/stores/machine'
 import { useMachineStore } from '~/stores/machine'
+import { useSubscriptionStore } from '~/stores/subscription'
 
 definePageMeta({
   layout: 'dashboard',

@@ -32,7 +32,7 @@
       </ProfileSocialLinksManager>
     </template>
 
-    <DashboardSkeletonState v-if="profileStore.loading" variant="card" :show-header="false" />
+    <DashboardSkeletonState v-if="profileStore.loading" variant="cards" :show-header="false" />
     <template v-else>
       <div class="col-span-12">
         <DashboardSectionCard>

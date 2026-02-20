@@ -111,7 +111,7 @@ async function onSubmit(data: UserUpdatePayload) {
         state: data.state ?? null,
         country: data.country ?? null,
         postal_code: data.postal_code ?? null,
-        social_links: (data.social_links ?? []).filter((l) => l.url?.trim()).map((l) => ({ platform: l.platform, url: l.url })),
+        social_links: (data.social_links ?? []).filter((l) => l.url?.trim()).map((l) => ({ platform: l.platform, url: l.url })) as Array<{ id?: number; platform: string; url: string }>,
       })
       if (!profileResult.success) {
         notification.error(profileResult.error ?? 'Failed to update profile')

@@ -457,8 +457,6 @@
 
 <script setup lang="ts">
 import type {
-  SheetSize,
-  ColorMode,
   MaterialType,
   PrintingPrice,
   PaperPrice,
@@ -773,7 +771,7 @@ function refreshPrinting() {
   pricingStore.fetchPrintingPrices(slug.value)
 }
 
-async function onMaterialSave(payload: {
+async function _onMaterialSave(payload: {
   material_type: MaterialType
   selling_price: string
   buying_price: string | null

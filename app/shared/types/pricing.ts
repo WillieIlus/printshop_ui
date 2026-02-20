@@ -51,21 +51,6 @@ export interface PrintingPriceDTO {
   selling_price_duplex_per_sheet?: string | null
 }
 
-/** Large format material types (SQM pricing) */
-export type MaterialType = 'BANNER' | 'VINYL' | 'REFLECTIVE'
-
-/**
- * Material price - selling price per SQM for large format
- */
-export interface MaterialPrice {
-  id: number
-  material_type: MaterialType
-  unit: 'SQM'
-  selling_price: string
-  buying_price: string | null
-  is_active: boolean
-}
-
 /** DTO for material price create/update */
 export interface MaterialPriceDTO {
   id?: number
@@ -74,18 +59,6 @@ export interface MaterialPriceDTO {
   selling_price: string
   buying_price?: string | null
   is_active?: boolean
-}
-
-/**
- * Material price - cost per SQM for banner/vinyl/reflective
- */
-export interface MaterialPrice {
-  id: number
-  material_type: MaterialType
-  unit: PricingUnit
-  selling_price: string
-  buying_price?: string | null
-  is_active: boolean
 }
 
 /**
@@ -106,16 +79,17 @@ export interface PaperPrice {
 }
 
 /**
- * Material price - cost per material unit (e.g. per m² for large format)
+ * Material price - cost per SQM for large format (banner, vinyl, etc.)
  */
 export interface MaterialPrice {
   id: number
-  material_name: string
-  unit: string
-  buying_price: string
+  material_type: MaterialType
+  unit: 'SQM' | PricingUnit
   selling_price: string
-  profit: string
+  buying_price?: string | null
   is_active: boolean
+  material_name?: string
+  profit?: string
   is_default_seeded?: boolean
   needs_review?: boolean
 }
@@ -302,4 +276,5 @@ export interface MaterialPriceForm {
   unit: PricingUnit
   selling_price: string
   buying_price?: string | null
+  is_active?: boolean
 }
