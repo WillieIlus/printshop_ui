@@ -60,7 +60,7 @@ export interface PrintTemplateDetailDTO extends Omit<PrintTemplateListDTO, 'cate
   optional_finishing: TemplateFinishingDTO[]
   min_quantity?: number
   /** Ups per sheet (imposition) — from backend when available */
-  ups_per_sheet?: number
+  ups_per_sheet?: number | null
   imposition_count?: number
 }
 
@@ -73,6 +73,14 @@ export interface TemplatePriceResponseDTO {
   total: string | number
   breakdown?: TemplatePriceBreakdownItemDTO[]
   currency?: string
+  /** Imposition: units per sheet (from template or computed) */
+  ups_per_sheet?: number | null
+  /** Imposition: sheets needed = ceil(quantity / ups_per_sheet) */
+  sheets_needed?: number | null
+  /** Human-readable calculation steps e.g. ["500 ÷ 25 = 20 sheets"] */
+  calculation_steps?: string[]
+  /** Notes e.g. ["Rounded up to whole sheets"] */
+  notes?: string[]
 }
 
 export interface TemplateCalculatePricePayload {
@@ -81,6 +89,8 @@ export interface TemplateCalculatePricePayload {
   print_sides: 'SIMPLEX' | 'DUPLEX'
   selected_option_ids?: number[]
   selected_finishing_ids?: number[]
+  /** Shop slug to use shop-specific pricing (optional) */
+  shop_slug?: string
 }
 
 /** Format GSM constraint for display, e.g. "250–350gsm" or "Max 200gsm" */
