@@ -7,6 +7,13 @@ export interface TemplateCategoryDTO {
   template_count?: number
 }
 
+export interface TemplateGsmConstraints {
+  /** Minimum GSM allowed (e.g. 250) */
+  gsm_min?: number | null
+  /** Maximum GSM allowed (e.g. 350) */
+  gsm_max?: number | null
+}
+
 export interface PrintTemplateListDTO {
   id: number
   slug: string
@@ -21,6 +28,9 @@ export interface PrintTemplateListDTO {
   is_new?: boolean
   badges?: string[]
   category?: { id: number; name: string; slug: string }
+  /** GSM constraints for price calculation */
+  gsm_min?: number | null
+  gsm_max?: number | null
 }
 
 export interface TemplateOptionDTO {
@@ -68,4 +78,14 @@ export interface TemplateCalculatePricePayload {
   print_sides: 'SIMPLEX' | 'DUPLEX'
   selected_option_ids?: number[]
   selected_finishing_ids?: number[]
+}
+
+/** Format GSM constraint for display, e.g. "250–350gsm" or "Max 200gsm" */
+export function formatGsmConstraint(t: { gsm_min?: number | null; gsm_max?: number | null }): string | null {
+  const min = t.gsm_min ?? null
+  const max = t.gsm_max ?? null
+  if (min != null && max != null) return `${min}–${max}gsm`
+  if (min != null) return `Min ${min}gsm`
+  if (max != null) return `Max ${max}gsm`
+  return null
 }

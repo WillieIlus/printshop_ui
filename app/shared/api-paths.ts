@@ -58,6 +58,12 @@ export const API = {
   templateCategories: () => 'templates/categories/',
   templateDetail: (slug: string) => `templates/${slug}/`,
   templateCalculatePrice: (slug: string) => `templates/${slug}/calculate-price/`,
+  // Shop-scoped templates (gallery)
+  shopTemplateCategories: (slug: string) => `shops/${slug}/template-categories/`,
+  shopTemplates: (slug: string) => `shops/${slug}/templates/`,
+  shopTemplateDetail: (slug: string, templateSlug: string) => `shops/${slug}/templates/${templateSlug}/`,
+  shopTemplateCalculatePrice: (slug: string, templateSlug: string) =>
+    `shops/${slug}/templates/${templateSlug}/calculate-price/`,
   // Claims
   claims: () => 'claims/',
   claimDetail: (pk: number) => `claims/${pk}/`,
