@@ -59,6 +59,9 @@ export interface PrintTemplateDetailDTO extends Omit<PrintTemplateListDTO, 'cate
   mandatory_finishing: TemplateFinishingDTO[]
   optional_finishing: TemplateFinishingDTO[]
   min_quantity?: number
+  /** Ups per sheet (imposition) — from backend when available */
+  ups_per_sheet?: number
+  imposition_count?: number
 }
 
 export interface TemplatePriceBreakdownItemDTO {

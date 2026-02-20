@@ -357,6 +357,13 @@ const isShopScoped = computed(() => Boolean(props.shopSlug && props.template))
                   </div>
                 </div>
 
+                <!-- Imposition (digital only) -->
+                <ImpositionPanel
+                  :quantity="quantity"
+                  :ups-per-sheet-from-template="templateDetail?.ups_per_sheet ?? templateDetail?.imposition_count ?? null"
+                  :default-ups-per-sheet="25"
+                />
+
                 <!-- Price result -->
                 <div
                   class="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4 border border-gray-200 dark:border-gray-700"
