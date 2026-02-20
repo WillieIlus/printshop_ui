@@ -7,6 +7,12 @@ export interface TemplateCategoryDTO {
   template_count?: number
 }
 
+/** Provider shop info when template is created by a shop */
+export interface TemplateProviderShop {
+  name: string
+  slug: string
+}
+
 export interface PrintTemplateListDTO {
   id: number
   slug: string
@@ -21,6 +27,12 @@ export interface PrintTemplateListDTO {
   is_new?: boolean
   badges?: string[]
   category?: { id: number; name: string; slug: string }
+  /** Shop that created/provides this template */
+  created_by_shop?: TemplateProviderShop
+  /** GSM constraints — use allowed_gsm_values if set, else min/max range */
+  min_gsm?: number
+  max_gsm?: number
+  allowed_gsm_values?: number[]
 }
 
 export interface TemplateOptionDTO {
@@ -43,12 +55,19 @@ export interface GroupedOptionDTO {
   options: TemplateOptionDTO[]
 }
 
+/** Shop capability caps returned when template has provider shop (e.g. max gsm) */
+export interface TemplateShopCapability {
+  max_gsm?: number
+}
+
 export interface PrintTemplateDetailDTO extends Omit<PrintTemplateListDTO, 'category'> {
   description?: string
   grouped_options: GroupedOptionDTO[]
   mandatory_finishing: TemplateFinishingDTO[]
   optional_finishing: TemplateFinishingDTO[]
   min_quantity?: number
+  /** Provider shop capability caps (e.g. max_gsm) — intersect with template constraints */
+  shop_capability?: TemplateShopCapability
 }
 
 export interface TemplatePriceBreakdownItemDTO {
