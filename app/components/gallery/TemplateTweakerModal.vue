@@ -267,6 +267,14 @@ const descriptionId = 'template-tweaker-desc'
                 </div>
               </div>
 
+              <!-- Imposition (digital only) -->
+              <QuotesImpositionPanel
+                v-if="formState.unit !== 'SQM'"
+                :quantity="formState.quantity"
+                :ups-per-sheet-from-template="formState.piecesPerSheet"
+                :default-ups-per-sheet="25"
+              />
+
               <!-- Price breakdown -->
               <div
                 class="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4 border border-gray-200 dark:border-gray-700"
