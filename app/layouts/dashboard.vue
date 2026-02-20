@@ -6,7 +6,7 @@
         <span class="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 text-white shadow-lg shadow-flamingo-500/25 transition-transform group-hover:scale-105">
           <UIcon name="i-lucide-printer" class="w-4 h-4" />
         </span>
-        <span class="font-semibold text-gray-900 dark:text-white hidden sm:inline">PrintShop</span>
+        <span class="font-semibold text-gray-900 dark:text-white hidden sm:inline">Printy</span>
       </NuxtLink>
       <div class="flex-1 min-w-0" />
       <ClientOnly>

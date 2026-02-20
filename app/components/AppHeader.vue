@@ -8,7 +8,7 @@
             <UIcon name="i-lucide-printer" class="h-6 w-6 text-white" />
           </div>
           <div class="leading-tight">
-            <div class="text-lg font-bold tracking-tight text-gray-900">PrintShop</div>
+            <div class="text-lg font-bold tracking-tight text-gray-900">Printy</div>
             <div class="hidden text-[11px] text-gray-500 sm:block">Quoting & Pricing Engine</div>
           </div>
         </NuxtLink>

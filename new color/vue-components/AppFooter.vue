@@ -11,7 +11,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
               </svg>
             </div>
-            <span class="text-xl font-bold text-white">PrintShop</span>
+            <span class="text-xl font-bold text-white">Printy</span>
           </div>
           <p class="text-sm leading-relaxed">
             The intelligent quoting and pricing engine for modern print shops. Not a marketplace — a pricing brain.
@@ -53,7 +53,7 @@
       </div>
 
       <div class="flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
-        <p class="text-sm">© 2024 <span class="font-semibold text-white">PrintShop</span>. All rights reserved.</p>
+        <p class="text-sm">© 2024 <span class="font-semibold text-white">Printy</span>. All rights reserved.</p>
         <div class="flex items-center gap-6 text-sm">
           <a href="#" class="transition-colors hover:text-white">Privacy Policy</a>
           <a href="#" class="transition-colors hover:text-white">Terms of Service</a>

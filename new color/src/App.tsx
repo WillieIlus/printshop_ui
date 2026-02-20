@@ -18,7 +18,7 @@ export function App() {
                 </svg>
               </div>
               <div className="text-left">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">PrintShop</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Printy</h1>
                 <p className="text-sm text-gray-500">Quoting & Pricing Engine</p>
               </div>
             </div>

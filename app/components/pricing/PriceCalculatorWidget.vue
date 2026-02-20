@@ -113,7 +113,7 @@ const quoteSnapshot = computed(() => {
     ?.filter((f) => selectedFinishing.value.includes(f.id))
     .map((f) => f.name) ?? []
   const base = {
-    shopName: props.shopName || 'Print Shop',
+    shopName: props.shopName || 'Printy',
     shopPhone: props.shopPhone,
     finishingNames: finishingNames.length ? finishingNames : undefined,
     suggestedPrice: price,
@@ -151,7 +151,7 @@ async function handleSaveQuote() {
     ]
     const quote = localQuotesStore.addQuote({
       shopSlug: props.slug,
-      shopName: props.shopName || 'Print Shop',
+      shopName: props.shopName || 'Printy',
       snapshot: quoteSnapshot.value,
       costBreakdown: costRows,
       suggestedPrice: overridePrice.value || result.value.grand_total,
