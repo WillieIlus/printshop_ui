@@ -5,7 +5,7 @@
       <label
         v-if="!hideLabel"
         :for="name"
-        class="mb-1.5 block text-sm font-medium text-gray-700"
+        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
       >
         {{ label }}
         <span v-if="required" class="text-flamingo-500">*</span>
@@ -30,13 +30,13 @@
           :type="computedType"
           :placeholder="placeholder"
           :disabled="disabled"
-          class="w-full rounded-xl border bg-gray-50 py-3 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-flamingo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          class="w-full rounded-xl border bg-gray-50 dark:bg-gray-800/50 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 transition-all focus:border-flamingo-500 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-flamingo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
           :class="[
             icon ? 'pl-10' : 'pl-4',
             showPasswordToggle ? 'pr-12' : 'pr-4',
             errors.length
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
-              : 'border-gray-200',
+              : 'border-gray-200 dark:border-gray-700',
           ]"
         />
 
@@ -45,7 +45,7 @@
           v-if="showPasswordToggle"
           type="button"
           aria-label="Toggle password visibility"
-          class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition-colors hover:text-gray-600"
+          class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 dark:text-gray-500 transition-colors hover:text-gray-600 dark:hover:text-gray-300"
           @click="passwordVisible = !passwordVisible"
         >
           <UIcon

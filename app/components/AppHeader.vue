@@ -1,5 +1,5 @@
 <template>
-  <nav class="sticky top-0 z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur-md">
+  <nav class="sticky top-0 z-50 border-b border-gray-200/70 dark:border-gray-800/70 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between">
         <!-- Logo -->
@@ -8,8 +8,8 @@
             <UIcon name="i-lucide-printer" class="h-6 w-6 text-white" />
           </div>
           <div class="leading-tight">
-            <div class="text-lg font-bold tracking-tight text-gray-900">PrintShop</div>
-            <div class="hidden text-[11px] text-gray-500 sm:block">Quoting & Pricing Engine</div>
+            <div class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">PrintShop</div>
+            <div class="hidden text-[11px] text-gray-500 dark:text-gray-400 sm:block">Quoting & Pricing Engine</div>
           </div>
         </NuxtLink>
 
@@ -19,7 +19,7 @@
             v-for="link in navLinks"
             :key="link.label"
             :to="link.to"
-            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-flamingo-50 hover:text-flamingo-600"
+            class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400"
           >
             <UIcon v-if="link.icon" :name="link.icon" class="h-4 w-4" />
             {{ link.label }}
@@ -31,7 +31,7 @@
           <ClientOnly>
             <button
               v-if="authStore.isAuthenticated"
-              class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              class="rounded-lg p-2 text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
               aria-label="Toggle theme"
               @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'"
             >
@@ -43,21 +43,21 @@
           <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
             <UPopover mode="click" :popper="{ placement: 'bottom-end' }">
               <template #default>
-                <button class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-1.5 transition-all hover:border-gray-300 hover:shadow-sm">
+                <button class="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 transition-all hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm">
                   <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-flamingo-400 to-flamingo-600 text-xs font-bold text-white">
                     {{ userInitials }}
                   </div>
-                  <span class="hidden text-sm font-medium text-gray-700 sm:inline">{{ userName }}</span>
-                  <UIcon name="i-lucide-chevron-down" class="h-4 w-4 text-gray-400" />
+                  <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-200 sm:inline">{{ userName }}</span>
+                  <UIcon name="i-lucide-chevron-down" class="h-4 w-4 text-gray-400 dark:text-gray-500" />
                 </button>
               </template>
               <template #content>
-                <div class="w-48 border border-gray-200 bg-white rounded-xl shadow-xl p-2 flex flex-col gap-1">
-                  <NuxtLink to="/dashboard" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">Dashboard</NuxtLink>
-                  <NuxtLink to="/dashboard/profile" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">Profile</NuxtLink>
-                  <NuxtLink to="/dashboard/shops" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">My Shops</NuxtLink>
-                  <NuxtLink to="/dashboard/quotes" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600">My Quotes</NuxtLink>
-                  <div class="my-1 border-t border-gray-100" />
+                <div class="w-48 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 rounded-xl shadow-xl p-2 flex flex-col gap-1">
+                  <NuxtLink to="/dashboard" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400">Dashboard</NuxtLink>
+                  <NuxtLink to="/dashboard/profile" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400">Profile</NuxtLink>
+                  <NuxtLink to="/dashboard/shops" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400">My Shops</NuxtLink>
+                  <NuxtLink to="/dashboard/quotes" class="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400">My Quotes</NuxtLink>
+                  <div class="my-1 border-t border-gray-100 dark:border-gray-800" />
                   <button class="rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 w-full" @click="authStore.logout">
                     Log Out
                   </button>
@@ -68,14 +68,14 @@
           <div v-else class="flex items-center gap-2">
             <ClientOnly>
               <button
-                class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                class="rounded-lg p-2 text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
                 aria-label="Toggle theme"
                 @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'"
               >
                 <UIcon :name="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" class="h-5 w-5" />
               </button>
             </ClientOnly>
-            <NuxtLink to="/auth/login" class="hidden text-sm font-semibold text-gray-600 transition-colors hover:text-flamingo-600 sm:inline-flex">
+            <NuxtLink to="/auth/login" class="hidden text-sm font-semibold text-gray-600 dark:text-gray-400 transition-colors hover:text-flamingo-600 dark:hover:text-flamingo-400 sm:inline-flex">
               Log In
             </NuxtLink>
             <NuxtLink
@@ -88,7 +88,7 @@
 
           <!-- Mobile Menu Toggle -->
           <button
-            class="rounded-lg p-2 text-gray-500 hover:bg-gray-100 md:hidden"
+            class="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden"
             aria-label="Menu"
             @click="mobileOpen = !mobileOpen"
           >
@@ -106,13 +106,13 @@
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 -translate-y-2"
       >
-        <div v-if="mobileOpen" class="border-t border-gray-200 pb-4 pt-3 md:hidden">
+        <div v-if="mobileOpen" class="border-t border-gray-200 dark:border-gray-800 pb-4 pt-3 md:hidden">
           <div class="grid gap-1">
             <NuxtLink
               v-for="link in navLinks"
               :key="link.label"
               :to="link.to"
-              class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-flamingo-50 hover:text-flamingo-600"
+              class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-flamingo-50 dark:hover:bg-flamingo-900/30 hover:text-flamingo-600 dark:hover:text-flamingo-400"
               @click="mobileOpen = false"
             >
               <UIcon v-if="link.icon" :name="link.icon" class="h-4 w-4 shrink-0" />
@@ -120,7 +120,7 @@
             </NuxtLink>
           </div>
           <div v-if="!authStore.isAuthenticated" class="mt-3 grid gap-2 px-3">
-            <NuxtLink to="/auth/login" class="rounded-xl bg-gray-100 px-4 py-2.5 text-center text-sm font-semibold text-gray-800 hover:bg-gray-200" @click="mobileOpen = false">
+            <NuxtLink to="/auth/login" class="rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-2.5 text-center text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" @click="mobileOpen = false">
               Log In
             </NuxtLink>
             <NuxtLink to="/auth/signup" class="rounded-xl bg-flamingo-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-flamingo-600" @click="mobileOpen = false">

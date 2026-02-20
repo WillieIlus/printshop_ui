@@ -21,7 +21,7 @@
               PrintShop mirrors how real print shops calculate pricing—using your machines, your materials, and your operational costs to generate fast, accurate quotes for <span class="text-white font-semibold">digital</span> and <span class="text-white font-semibold">large format</span> work.
             </p>
             <div class="mt-8 flex flex-col sm:flex-row gap-4">
-              <NuxtLink to="/gallery" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-gray-900 hover:bg-gray-100 transition-colors">
+              <NuxtLink to="/gallery" class="inline-flex items-center justify-center rounded-xl bg-white dark:bg-gray-100 px-6 py-3.5 text-sm font-bold text-gray-900 dark:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-200 transition-colors">
                 View Gallery Demo
                 <UIcon name="i-lucide-chevron-right" class="ml-2 w-4 h-4" />
               </NuxtLink>
