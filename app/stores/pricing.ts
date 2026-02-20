@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { API } from '~/shared/api-paths'
+import { parseApiError } from '~/utils/api-error'
 import type {
   RateCard,
   PriceCalculationInput,
@@ -111,7 +112,7 @@ export const usePricingStore = defineStore('pricing', {
         const { $api } = useNuxtApp()
         this.rateCard = await $api<RateCard>(API.shopRateCard(slug))
       } catch (err: unknown) {
-        this.error = (err instanceof Error ? err.message : null) || 'Failed to fetch rate card'
+        this.error = parseApiError(err, 'Failed to fetch rate card')
         throw err
       } finally {
         this.loading = false
@@ -135,7 +136,7 @@ export const usePricingStore = defineStore('pricing', {
         )
         return this.calculationResult
       } catch (err: unknown) {
-        this.error = (err instanceof Error ? err.message : null) || 'Failed to calculate price'
+        this.error = parseApiError(err, 'Failed to calculate price')
         throw err
       } finally {
         this.loading = false
@@ -153,7 +154,7 @@ export const usePricingStore = defineStore('pricing', {
         const { $api } = useNuxtApp()
         this.printingPrices = await $api<PrintingPrice[]>(API.shopPrintingPrices(slug))
       } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Failed'
+        this.error = parseApiError(err, 'Failed')
         throw err
       } finally {
         this.loading = false
@@ -207,7 +208,7 @@ export const usePricingStore = defineStore('pricing', {
         const { $api } = useNuxtApp()
         this.paperPrices = await $api<PaperPrice[]>(API.shopPaperPrices(slug))
       } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Failed'
+        this.error = parseApiError(err, 'Failed')
         throw err
       } finally {
         this.loading = false
@@ -261,7 +262,7 @@ export const usePricingStore = defineStore('pricing', {
         const { $api } = useNuxtApp()
         this.materialPrices = await $api<MaterialPrice[]>(API.shopMaterialPrices(slug))
       } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Failed'
+        this.error = parseApiError(err, 'Failed')
         throw err
       } finally {
         this.loading = false
@@ -315,7 +316,7 @@ export const usePricingStore = defineStore('pricing', {
         const { $api } = useNuxtApp()
         this.finishingServices = await $api<FinishingService[]>(API.shopFinishingServices(slug))
       } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Failed'
+        this.error = parseApiError(err, 'Failed')
         throw err
       } finally {
         this.loading = false
@@ -369,7 +370,7 @@ export const usePricingStore = defineStore('pricing', {
         const { $api } = useNuxtApp()
         this.volumeDiscounts = await $api<VolumeDiscount[]>(API.shopVolumeDiscounts(slug))
       } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Failed'
+        this.error = parseApiError(err, 'Failed')
         throw err
       } finally {
         this.loading = false
@@ -445,7 +446,7 @@ export const usePricingStore = defineStore('pricing', {
         this.defaultMaterials = materials ?? []
         this.defaultFinishing = finishing ?? []
       } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Failed to fetch defaults'
+        this.error = parseApiError(err, 'Failed to fetch defaults')
         throw err
       }
     },

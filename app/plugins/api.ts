@@ -5,8 +5,9 @@ export default defineNuxtPlugin(() => {
 
   const api = $fetch.create({
     baseURL: config.public.apiBase as string,
-    // JWT auth via Authorization header - no credentials/cookies needed for API.
-    // For cross-origin (e.g. printy.ke -> willieilus.pythonanywhere.com), backend must allow origin in CORS.
+    // JWT auth via Authorization header - no credentials/cookies needed for CORS.
+    // Backend must allow origin (e.g. https://printy.ke) in CORS for production.
+    // credentials: 'include' not used - we rely on Bearer token in header.
 
     onRequest({ options }) {
       // Get auth store lazily to avoid initialization issues

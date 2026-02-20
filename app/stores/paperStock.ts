@@ -1,20 +1,6 @@
 import { defineStore } from 'pinia'
 import { API } from '~/shared/api-paths'
-
-function parseApiError(err: unknown, fallback: string): string {
-  if (err && typeof err === 'object' && 'data' in err) {
-    const data = (err as { data: unknown }).data
-    if (typeof data === 'object' && data !== null) {
-      const entries = Object.entries(data as Record<string, string | string[]>)
-      const msg = entries
-        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-        .join('; ')
-      if (msg) return msg
-    }
-    if (typeof data === 'string') return data
-  }
-  return err instanceof Error ? err.message : fallback
-}
+import { parseApiError } from '~/utils/api-error'
 
 export type SheetSize = 'A5' | 'A4' | 'A3' | 'SRA3' | 'SRA4'
 export type PaperType = 'GLOSS' | 'MATTE' | 'BOND' | 'ART'
@@ -71,7 +57,7 @@ export const usePaperStockStore = defineStore('paperStock', {
         this.items = Array.isArray(response) ? response : (response?.results ?? [])
         return this.items
       } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Failed to fetch paper stock'
+        this.error = parseApiError(err, 'Failed to fetch paper stock')
         this.items = []
         throw err
       } finally {
@@ -141,7 +127,7 @@ export const usePaperStockStore = defineStore('paperStock', {
         this.items = this.items.filter((p) => p.id !== id)
         return { success: true }
       } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Failed to delete'
+        this.error = parseApiError(err, 'Failed to delete')
         throw err
       } finally {
         this.loading = false

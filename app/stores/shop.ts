@@ -1,5 +1,6 @@
 import type { Shop, ShopCreateInput, OpeningHours, ShopMember, PaginatedResponse, SocialLink } from '~/shared/types'
 import { API } from '~/shared/api-paths'
+import { parseApiError } from '~/utils/api-error'
 
 export const useShopStore = defineStore('shop', () => {
   const shops = ref<Shop[]>([])
@@ -18,32 +19,6 @@ export const useShopStore = defineStore('shop', () => {
   })
 
   // ---------------------------------------------------------------------------
-  // Helper: parse Django error responses
-  // ---------------------------------------------------------------------------
-  function parseDjangoError(err: unknown, fallback: string): string {
-    if (err && typeof err === 'object' && 'data' in err) {
-      const responseData = (err as { data: unknown }).data
-
-      if (typeof responseData === 'object' && responseData !== null) {
-        const errors = Object.entries(responseData as Record<string, string[]>)
-          .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
-          .join('; ')
-        if (errors) return errors
-      }
-
-      if (typeof responseData === 'string') {
-        return responseData
-      }
-    }
-
-    if (err instanceof Error) {
-      return err.message
-    }
-
-    return fallback
-  }
-
-  // ---------------------------------------------------------------------------
   // Shops – CRUD
   // ---------------------------------------------------------------------------
   async function fetchShops(params?: Record<string, string | number>) {
@@ -59,7 +34,7 @@ export const useShopStore = defineStore('shop', () => {
         previous: response?.previous ?? null,
       }
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch shops')
+      error.value = parseApiError(err, 'Failed to fetch shops')
       console.error('fetchShops error:', err)
       shops.value = []
     } finally {
@@ -75,7 +50,7 @@ export const useShopStore = defineStore('shop', () => {
       const response = await $api<{ owned: Shop[]; member_of: Shop[] }>(API.shopsMyShops())
       myShops.value = [...(response.owned ?? []), ...(response.member_of ?? [])]
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch my shops')
+      error.value = parseApiError(err, 'Failed to fetch my shops')
       console.error('fetchMyShops error:', err)
     } finally {
       loading.value = false
@@ -96,7 +71,7 @@ export const useShopStore = defineStore('shop', () => {
       const data = await $api<Shop>(API.shopDetail(slug))
       currentShop.value = data
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch shop')
+      error.value = parseApiError(err, 'Failed to fetch shop')
       console.error('fetchShopBySlug error:', err)
     } finally {
       loading.value = false
@@ -118,7 +93,7 @@ export const useShopStore = defineStore('shop', () => {
       myShops.value.push(shop)
       return { success: true, shop }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to create shop')
+      const message = parseApiError(err, 'Failed to create shop')
       error.value = message
       console.error('createShop error:', err)
       return { success: false, error: message }
@@ -143,7 +118,7 @@ export const useShopStore = defineStore('shop', () => {
       }
       return { success: true, shop }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to update shop')
+      const message = parseApiError(err, 'Failed to update shop')
       error.value = message
       console.error('updateShop error:', err)
       return { success: false, error: message }
@@ -164,7 +139,7 @@ export const useShopStore = defineStore('shop', () => {
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to transfer ownership')
+      const message = parseApiError(err, 'Failed to transfer ownership')
       console.error('transferOwnership error:', err)
       return { success: false, error: message }
     }
@@ -178,7 +153,7 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       shopMembers.value = await $api<ShopMember[]>(API.shopMembers(slug))
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch members')
+      error.value = parseApiError(err, 'Failed to fetch members')
       console.error('fetchShopMembers error:', err)
       throw err
     }
@@ -191,7 +166,7 @@ export const useShopStore = defineStore('shop', () => {
       shopMembers.value = shopMembers.value.filter((m) => m.id !== pk)
       return { success: true }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to remove member')
+      const message = parseApiError(err, 'Failed to remove member')
       console.error('removeShopMember error:', err)
       return { success: false, error: message }
     }
@@ -205,7 +180,7 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       shopHours.value = await $api<OpeningHours[]>(API.shopHours(slug))
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch hours')
+      error.value = parseApiError(err, 'Failed to fetch hours')
       console.error('fetchShopHoursList error:', err)
       throw err
     }
@@ -220,7 +195,7 @@ export const useShopStore = defineStore('shop', () => {
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to update hours')
+      const message = parseApiError(err, 'Failed to update hours')
       console.error('updateShopHoursBulk error:', err)
       return { success: false, error: message }
     }
@@ -234,7 +209,7 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       shopSocialLinks.value = await $api<SocialLink[]>(API.shopSocialLinks(slug))
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch social links')
+      error.value = parseApiError(err, 'Failed to fetch social links')
       console.error('fetchShopSocialLinksList error:', err)
       throw err
     }
@@ -250,7 +225,7 @@ export const useShopStore = defineStore('shop', () => {
       shopSocialLinks.value.push(newLink)
       return { success: true, link: newLink }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to add link')
+      const message = parseApiError(err, 'Failed to add link')
       console.error('addShopSocialLink error:', err)
       return { success: false, error: message }
     }
@@ -263,7 +238,7 @@ export const useShopStore = defineStore('shop', () => {
       shopSocialLinks.value = shopSocialLinks.value.filter((l) => l.id !== pk)
       return { success: true }
     } catch (err: unknown) {
-      const message = parseDjangoError(err, 'Failed to delete link')
+      const message = parseApiError(err, 'Failed to delete link')
       console.error('deleteShopSocialLink error:', err)
       return { success: false, error: message }
     }
@@ -279,7 +254,7 @@ export const useShopStore = defineStore('shop', () => {
       const { $api } = useNuxtApp()
       nearbyShops.value = await $api<Shop[]>(API.shopsNearby(), { params })
     } catch (err: unknown) {
-      error.value = parseDjangoError(err, 'Failed to fetch nearby shops')
+      error.value = parseApiError(err, 'Failed to fetch nearby shops')
       console.error('fetchNearbyShops error:', err)
     } finally {
       loading.value = false

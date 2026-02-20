@@ -26,6 +26,7 @@ import { useProfileStore } from '~/stores/profile'
 import { useUserStore } from '~/stores/user'
 import { useAuthStore } from '~/stores/auth'
 import type { UserUpdatePayload } from '~/shared/types'
+import { parseApiError } from '~/utils/api-error'
 
 definePageMeta({
   layout: 'dashboard',
@@ -64,8 +65,19 @@ async function onSubmit(data: UserUpdatePayload) {
       return
     }
 
+    // Ensure profile exists (create if 404 on profiles/me/)
+    let profileId = profileStore.profile?.id
+    if (!profileId) {
+      const created = await profileStore.createProfile()
+      if (created && profileStore.profile) {
+        profileId = profileStore.profile.id
+      } else {
+        notification.error(profileStore.error ?? 'Failed to create profile. Please try again.')
+        return
+      }
+    }
+
     // Update profile (PATCH /api/profiles/me/) - bio, phone, address, etc.
-    const profileId = profileStore.profile?.id
     if (profileId) {
       const profileResult = await profileStore.updateProfile({
         bio: data.bio ?? null,
@@ -101,22 +113,6 @@ async function onSubmit(data: UserUpdatePayload) {
           return
         }
       }
-    } else {
-      // No profile yet - try updating profile with social_links in one payload (some backends support this)
-      const profileResult = await profileStore.updateProfile({
-        bio: data.bio ?? null,
-        phone: data.phone ?? null,
-        address: data.address ?? null,
-        city: data.city ?? null,
-        state: data.state ?? null,
-        country: data.country ?? null,
-        postal_code: data.postal_code ?? null,
-        social_links: (data.social_links ?? []).filter((l) => l.url?.trim()).map((l) => ({ platform: l.platform, url: l.url })) as Array<{ id?: number; platform: string; url: string }>,
-      })
-      if (!profileResult.success) {
-        notification.error(profileResult.error ?? 'Failed to update profile')
-        return
-      }
     }
 
     await userStore.fetchMe()
@@ -128,7 +124,7 @@ async function onSubmit(data: UserUpdatePayload) {
     await navigateTo('/dashboard/profile')
   } catch (err) {
     console.error('Profile save error:', err)
-    notification.error(err instanceof Error ? err.message : 'Update failed')
+    notification.error(parseApiError(err, 'Update failed'))
   } finally {
     saving.value = false
   }

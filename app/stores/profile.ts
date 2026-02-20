@@ -26,7 +26,7 @@ export const useProfileStore = defineStore('profile', () => {
         previous: response.previous,
       }
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch profiles'
+      error.value = parseApiError(err, 'Failed to fetch profiles')
     } finally {
       loading.value = false
     }
@@ -39,9 +39,32 @@ export const useProfileStore = defineStore('profile', () => {
       const { $api } = useNuxtApp()
       profile.value = await $api<Profile>(API.profileMe())
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch profile'
+      const e = err as { statusCode?: number; status?: number }
+      const status = e?.statusCode ?? e?.status
+      // 404 = no profile yet; create one so user can edit
+      if (status === 404) {
+        const ok = await createProfile()
+        if (!ok) error.value = parseApiError(err, 'Failed to create profile')
+      } else {
+        error.value = parseApiError(err, 'Failed to fetch profile')
+      }
     } finally {
       loading.value = false
+    }
+  }
+
+  /** Create profile when none exists (POST profiles/). Backend typically auto-assigns user from JWT. */
+  async function createProfile() {
+    try {
+      const { $api } = useNuxtApp()
+      profile.value = await $api<Profile>(API.profiles(), {
+        method: 'POST',
+        body: {},
+      })
+      return true
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Failed to create profile')
+      return false
     }
   }
 
@@ -52,7 +75,7 @@ export const useProfileStore = defineStore('profile', () => {
       const { $api } = useNuxtApp()
       profile.value = await $api<Profile>(API.profileDetail(pk))
     } catch (err: unknown) {
-      error.value = err instanceof Error ? err.message : 'Failed to fetch profile'
+      error.value = parseApiError(err, 'Failed to fetch profile')
     } finally {
       loading.value = false
     }
@@ -118,6 +141,7 @@ export const useProfileStore = defineStore('profile', () => {
     fetchProfiles,
     fetchProfile,
     fetchProfileById,
+    createProfile,
     updateProfile,
     addProfileSocialLink,
     deleteSocialLink,

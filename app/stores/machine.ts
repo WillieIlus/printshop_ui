@@ -1,20 +1,6 @@
 import { defineStore } from 'pinia'
 import { API } from '~/shared/api-paths'
-
-function parseApiError(err: unknown, fallback: string): string {
-  if (err && typeof err === 'object' && 'data' in err) {
-    const data = (err as { data: unknown }).data
-    if (typeof data === 'object' && data !== null) {
-      const entries = Object.entries(data as Record<string, string | string[]>)
-      const msg = entries
-        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
-        .join('; ')
-      if (msg) return msg
-    }
-    if (typeof data === 'string') return data
-  }
-  return err instanceof Error ? err.message : fallback
-}
+import { parseApiError } from '~/utils/api-error'
 
 export interface Machine {
   id: number
@@ -57,7 +43,7 @@ export const useMachineStore = defineStore('machine', {
         this.machines = Array.isArray(response) ? response : (response?.results ?? [])
         return this.machines
       } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Failed to fetch machines'
+        this.error = parseApiError(err, 'Failed to fetch machines')
         this.machines = []
         throw err
       } finally {
@@ -103,7 +89,7 @@ export const useMachineStore = defineStore('machine', {
         if (idx >= 0) this.machines[idx] = machine
         return { success: true, machine }
       } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Failed to update machine'
+        this.error = parseApiError(err, 'Failed to update machine')
         throw err
       } finally {
         this.loading = false
@@ -119,7 +105,7 @@ export const useMachineStore = defineStore('machine', {
         this.machines = this.machines.filter((m) => m.id !== id)
         return { success: true }
       } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Failed to delete machine'
+        this.error = parseApiError(err, 'Failed to delete machine')
         throw err
       } finally {
         this.loading = false
