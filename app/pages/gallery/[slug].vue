@@ -75,6 +75,9 @@
             <p v-if="template.dimensions_label || template.weight_label" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
               {{ template.dimensions_label }}{{ template.dimensions_label && template.weight_label ? ' · ' : '' }}{{ template.weight_label }}
             </p>
+            <p v-if="template.created_by_shop" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Provided by {{ template.created_by_shop.name }}
+            </p>
             <p class="mt-3 font-semibold text-flamingo-600 dark:text-flamingo-400">
               {{ formatKES(template.starting_price) }} starting
             </p>
