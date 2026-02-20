@@ -10,6 +10,7 @@ import {
   DialogClose,
 } from 'reka-ui'
 import type { DemoTemplate } from '~/shared/demoTemplates'
+import type { PrintTemplateDetailDTO } from '~/shared/types/templates'
 import { demoRateCard } from '~/shared/demoRateCard'
 import {
   computeDemoQuote,
@@ -17,10 +18,12 @@ import {
   type DemoQuoteResult,
 } from '~/shared/demoPricing'
 import { formatKES } from '~/utils/formatters'
+import { computeSheetImposition } from '~/utils/imposition'
 
 const props = defineProps<{
   open: boolean
-  template: DemoTemplate | null
+  /** DemoTemplate (gallery index) or PrintTemplateDetailDTO (gallery [slug]) */
+  template: DemoTemplate | PrintTemplateDetailDTO | null
 }>()
 
 const emit = defineEmits<{ 'update:open': [value: boolean] }>()
@@ -41,16 +44,18 @@ watch(
   () => [props.open, props.template] as const,
   ([open, template]) => {
     if (open && template) {
+      const isDemo = 'piecesPerSheet' in template
+      const ups = isDemo ? template.piecesPerSheet : (template.ups_per_sheet ?? 1)
       formState.value = {
-        unit: template.unit,
-        sheetSize: template.sheetSize,
-        piecesPerSheet: template.piecesPerSheet,
-        sides: template.defaultSides,
-        quantity: template.defaultQty,
-        materialKey: template.defaultMaterial,
-        finishingIds: [...template.defaultFinishings],
-        widthM: template.defaultWidthM ?? 1,
-        heightM: template.defaultHeightM ?? 1,
+        unit: isDemo ? template.unit : 'A4',
+        sheetSize: isDemo ? template.sheetSize : 'SRA3',
+        piecesPerSheet: ups,
+        sides: isDemo ? template.defaultSides : 1,
+        quantity: isDemo ? template.defaultQty : (template.min_quantity ?? 100),
+        materialKey: isDemo ? template.defaultMaterial : '',
+        finishingIds: isDemo ? [...template.defaultFinishings] : [],
+        widthM: isDemo ? (template.defaultWidthM ?? 1) : 1,
+        heightM: isDemo ? (template.defaultHeightM ?? 1) : 1,
       }
     }
   },
@@ -82,6 +87,15 @@ function toggleFinishing(id: string) {
   }
 }
 
+// Imposition: for digital templates, piecesPerSheet = ups_per_sheet
+const imposition = computed(() => {
+  if (formState.value.unit === 'SQM') return null
+  return computeSheetImposition(
+    formState.value.quantity,
+    formState.value.piecesPerSheet
+  )
+})
+
 const descriptionId = 'template-tweaker-desc'
 </script>
 
@@ -106,7 +120,7 @@ const descriptionId = 'template-tweaker-desc'
           >
             <div>
               <DialogTitle class="text-lg font-semibold text-gray-900 dark:text-white">
-                {{ template?.name ?? 'Configure Template' }}
+                {{ template ? ('name' in template ? template.name : template.title) : 'Configure Template' }}
               </DialogTitle>
               <DialogDescription
                 :id="descriptionId"
@@ -280,6 +294,31 @@ const descriptionId = 'template-tweaker-desc'
                   </span>
                 </div>
                 <div class="space-y-2 text-sm">
+                  <div
+                    v-if="imposition"
+                    class="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700 space-y-1"
+                  >
+                    <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                      <span>Sheets needed</span>
+                      <span class="font-medium text-gray-900 dark:text-white">
+                        {{ imposition.sheets_needed }}
+                      </span>
+                    </div>
+                    <p
+                      v-for="step in imposition.calculation_steps"
+                      :key="step"
+                      class="text-xs text-gray-500 dark:text-gray-400"
+                    >
+                      {{ step }}
+                    </p>
+                    <p
+                      v-for="note in imposition.notes"
+                      :key="note"
+                      class="text-xs text-amber-600 dark:text-amber-400"
+                    >
+                      {{ note }}
+                    </p>
+                  </div>
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-400">Printing</span>
                     <span class="font-medium text-gray-900 dark:text-white">
