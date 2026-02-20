@@ -5,6 +5,8 @@ export default defineNuxtPlugin(() => {
 
   const api = $fetch.create({
     baseURL: config.public.apiBase as string,
+    // JWT auth via Authorization header - no credentials/cookies needed for API.
+    // For cross-origin (e.g. printy.ke -> willieilus.pythonanywhere.com), backend must allow origin in CORS.
 
     onRequest({ options }) {
       // Get auth store lazily to avoid initialization issues
@@ -18,8 +20,16 @@ export default defineNuxtPlugin(() => {
     },
 
     async onResponseError({ response, request }) {
-      if (response?.status === 401) {
-        const url = typeof request === 'string' ? request : (request as Request)?.url ?? ''
+      const status = response?.status
+      const url = typeof request === 'string' ? request : (request as Request)?.url ?? ''
+
+      // Log API errors for debugging (400/403/500) - callers surface messages via parseApiError
+      if (status && status >= 400) {
+        const body = response._data as Record<string, unknown> | undefined
+        console.error(`[API Error] ${status} ${url}`, body ?? response.statusText)
+      }
+
+      if (status === 401) {
         if (url.includes('api-auth/login') || url.includes('token/refresh')) return
         const authStore = useAuthStore()
         const refreshed = await authStore.refreshTokens()

@@ -1,5 +1,6 @@
 import type { User, UserUpdatePayload, PaginatedResponse } from '~/shared/types'
 import { API } from '~/shared/api-paths'
+import { parseApiError } from '~/utils/api-error'
 
 export const useUserStore = defineStore('user', () => {
   const users = ref<User[]>([])
@@ -23,7 +24,7 @@ export const useUserStore = defineStore('user', () => {
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update profile'
+      const message = parseApiError(err, 'Failed to update profile')
       error.value = message
       return { success: false, error: message }
     } finally {

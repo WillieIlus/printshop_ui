@@ -32,6 +32,23 @@
         <UButton to="/dashboard/shops/create" color="primary">Create Your First Shop</UButton>
       </DashboardEmptyState>
     </div>
+
+    <!-- Shop create/edit modal - required for ?create=1 and ?edit=slug redirects -->
+    <DashboardModalForm
+      v-model="modalOpen"
+      :title="editingShop ? 'Edit shop' : 'Create shop'"
+      :description="editingShop ? 'Update your business listing.' : 'Add a new business listing.'"
+    >
+      <ShopsShopForm
+        v-if="formReady"
+        :key="editingShop?.slug ?? 'new'"
+        :shop="editingShop ?? undefined"
+        :loading="formLoading"
+        :error="shopStore.error"
+        @submit="onSubmit"
+        @cancel="closeModal"
+      />
+    </DashboardModalForm>
   </div>
 </template>
 

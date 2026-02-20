@@ -1,5 +1,6 @@
 import type { Profile, SocialLink, PaginatedResponse } from '~/shared/types'
 import { API } from '~/shared/api-paths'
+import { parseApiError } from '~/utils/api-error'
 
 export const useProfileStore = defineStore('profile', () => {
   const profile = ref<Profile | null>(null)
@@ -68,7 +69,7 @@ export const useProfileStore = defineStore('profile', () => {
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update'
+      const message = parseApiError(err, 'Failed to update profile')
       error.value = message
       return { success: false, error: message }
     } finally {
@@ -89,7 +90,7 @@ export const useProfileStore = defineStore('profile', () => {
       }
       return { success: true, link: newLink }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to add link'
+      const message = parseApiError(err, 'Failed to add link')
       return { success: false, error: message }
     }
   }
@@ -103,7 +104,7 @@ export const useProfileStore = defineStore('profile', () => {
       }
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to delete link'
+      const message = parseApiError(err, 'Failed to delete link')
       return { success: false, error: message }
     }
   }

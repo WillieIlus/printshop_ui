@@ -66,7 +66,7 @@ export default defineNuxtConfig({
   },
 
   image: {
-    domains: ['localhost'],
+    domains: ['localhost', 'printy.ke', 'willieilus.pythonanywhere.com'],
   },
 
   typescript: {

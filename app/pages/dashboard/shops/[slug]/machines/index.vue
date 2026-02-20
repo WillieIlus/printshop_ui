@@ -104,8 +104,12 @@ const toast = useToast()
 
 const slug = computed(() => route.params.slug as string)
 const modalOpen = ref(false)
+const formReady = ref(false)
 const editing = ref<Machine | null>(null)
 const formLoading = ref(false)
+const upgradeModalOpen = ref(false)
+const subscriptionStore = useSubscriptionStore()
+const subscription = computed(() => subscriptionStore.getSubscription(slug.value))
 
 function openModal(machine?: Machine) {
   editing.value = machine ?? null
@@ -132,13 +136,18 @@ watch(modalOpen, (open) => {
 })
 
 async function onSubmit(data: { name: string; machine_type?: string | { value: string } }) {
+  // Normalize machine_type: FormSelect may return { value: string } when using create-item
+  const machineType = typeof data.machine_type === 'object' && data.machine_type?.value
+    ? data.machine_type.value
+    : (data.machine_type ?? 'DIGITAL')
+  const payload = { name: data.name, machine_type: machineType }
   formLoading.value = true
   try {
     if (editing.value) {
-      await machineStore.updateMachine(slug.value, editing.value.id, data)
+      await machineStore.updateMachine(slug.value, editing.value.id, payload)
       toast.add({ title: 'Updated', description: 'Machine updated' })
     } else {
-      await machineStore.createMachine(slug.value, data)
+      await machineStore.createMachine(slug.value, payload)
       toast.add({ title: 'Added', description: 'Machine added' })
     }
     closeModal()

@@ -10,15 +10,6 @@
     </DashboardPageHeader>
 
     <DashboardSkeletonState v-if="profileStore.loading && !profileStore.profile" variant="block" />
-    <div v-else class="col-span-12">
-      <ProfileProfileEditForm
-        :profile="profileStore.profile"
-        :loading="profileStore.loading"
-        @submit="onSubmit"
-        @cancel="goBack"
-      />
-    </div>
-    <CommonLoadingSpinner v-if="profileStore.loading && !profileStore.profile" />
     <ProfileProfileEditForm
       v-else
       :profile="profileStore.profile"
@@ -63,15 +54,81 @@ function goBack() {
 async function onSubmit(data: UserUpdatePayload) {
   saving.value = true
   try {
-    const result = await userStore.updateMe(data)
-    if (result.success) {
-      await userStore.fetchMe()
-      await profileStore.fetchProfile()
-      notification.success('Profile updated successfully')
-      await navigateTo('/dashboard/profile')
-    } else {
-      notification.error(result.error ?? 'Update failed')
+    // Update user (PATCH /api/users/me/) - first_name, last_name
+    const userResult = await userStore.updateMe({
+      first_name: data.first_name,
+      last_name: data.last_name,
+    })
+    if (!userResult.success) {
+      notification.error(userResult.error ?? 'Failed to update name')
+      return
     }
+
+    // Update profile (PATCH /api/profiles/me/) - bio, phone, address, etc.
+    const profileId = profileStore.profile?.id
+    if (profileId) {
+      const profileResult = await profileStore.updateProfile({
+        bio: data.bio ?? null,
+        phone: data.phone ?? null,
+        address: data.address ?? null,
+        city: data.city ?? null,
+        state: data.state ?? null,
+        country: data.country ?? null,
+        postal_code: data.postal_code ?? null,
+      })
+      if (!profileResult.success) {
+        notification.error(profileResult.error ?? 'Failed to update profile')
+        return
+      }
+
+      // Sync social links: delete existing, add new (backend uses profiles/{id}/social-links/ and social-links/{id}/)
+      const existingIds = [...(profileStore.profile?.social_links ?? [])].map((l) => l.id)
+      for (const id of existingIds) {
+        const delResult = await profileStore.deleteSocialLink(id)
+        if (!delResult.success) {
+          notification.error(delResult.error ?? 'Failed to remove link')
+          return
+        }
+      }
+      const newLinks = (data.social_links ?? []).filter((l) => l.url?.trim())
+      for (const link of newLinks) {
+        const addResult = await profileStore.addProfileSocialLink(profileId, {
+          platform: link.platform,
+          url: link.url,
+        })
+        if (!addResult.success) {
+          notification.error(addResult.error ?? 'Failed to add link')
+          return
+        }
+      }
+    } else {
+      // No profile yet - try updating profile with social_links in one payload (some backends support this)
+      const profileResult = await profileStore.updateProfile({
+        bio: data.bio ?? null,
+        phone: data.phone ?? null,
+        address: data.address ?? null,
+        city: data.city ?? null,
+        state: data.state ?? null,
+        country: data.country ?? null,
+        postal_code: data.postal_code ?? null,
+        social_links: (data.social_links ?? []).filter((l) => l.url?.trim()).map((l) => ({ platform: l.platform, url: l.url })),
+      })
+      if (!profileResult.success) {
+        notification.error(profileResult.error ?? 'Failed to update profile')
+        return
+      }
+    }
+
+    await userStore.fetchMe()
+    await profileStore.fetchProfile()
+    if (authStore.user) {
+      await authStore.fetchUser()
+    }
+    notification.success('Profile and social links saved successfully')
+    await navigateTo('/dashboard/profile')
+  } catch (err) {
+    console.error('Profile save error:', err)
+    notification.error(err instanceof Error ? err.message : 'Update failed')
   } finally {
     saving.value = false
   }

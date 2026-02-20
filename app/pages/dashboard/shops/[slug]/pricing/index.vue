@@ -456,11 +456,30 @@
 </template>
 
 <script setup lang="ts">
-import type { SheetSize, ColorMode, MaterialType } from '~/shared/types'
+import type {
+  SheetSize,
+  ColorMode,
+  MaterialType,
+  PrintingPrice,
+  PaperPrice,
+  FinishingService,
+  VolumeDiscount,
+  PrintingPriceForm,
+  PaperPriceForm,
+  FinishingServiceForm,
+  VolumeDiscountForm,
+} from '~/shared/types'
 import { usePricingStore } from '~/stores/pricing'
 import { useMachineStore } from '~/stores/machine'
 
-type TabId = 'printing' | 'materials'
+type TabId = 'printing' | 'paper' | 'finishing' | 'discounts'
+
+const tabs = [
+  { id: 'printing' as TabId, name: 'Printing' },
+  { id: 'paper' as TabId, name: 'Paper' },
+  { id: 'finishing' as TabId, name: 'Finishing' },
+  { id: 'discounts' as TabId, name: 'Discounts' },
+]
 
 definePageMeta({
   layout: 'dashboard',
@@ -553,23 +572,28 @@ watch(printingModalOpen, (open) => {
   }
 })
 async function submitPrintingPrice(data: PrintingPriceForm) {
+  const existing = editingPrintingPrice.value
   formLoading.value = true
   try {
     if (existing) {
       await pricingStore.updatePrintingPrice(slug.value, existing.id, {
-        selling_price_per_side: payload.selling_price_per_side,
-        selling_price_duplex_per_sheet: payload.selling_price_duplex_per_sheet,
+        selling_price_per_side: data.selling_price_per_side,
+        selling_price_duplex_per_sheet: data.selling_price_duplex_per_sheet,
       })
       toast.add({ title: 'Updated', description: 'Printing price updated' })
+      closePrintingModal()
+      refreshPrinting()
     } else {
       await pricingStore.createPrintingPrice(slug.value, {
-        machine: payload.machine,
-        sheet_size: payload.sheet_size,
-        color_mode: payload.color_mode,
-        selling_price_per_side: payload.selling_price_per_side,
-        selling_price_duplex_per_sheet: payload.selling_price_duplex_per_sheet ?? undefined,
+        machine: data.machine,
+        sheet_size: data.sheet_size,
+        color_mode: data.color_mode,
+        selling_price_per_side: data.selling_price_per_side,
+        selling_price_duplex_per_sheet: data.selling_price_duplex_per_sheet ?? undefined,
       })
       toast.add({ title: 'Added', description: 'Printing price added' })
+      closePrintingModal()
+      refreshPrinting()
     }
   } catch (err: unknown) {
     toast.add({
@@ -577,6 +601,171 @@ async function submitPrintingPrice(data: PrintingPriceForm) {
       description: err instanceof Error ? err.message : 'Failed to save',
       color: 'error',
     })
+  } finally {
+    formLoading.value = false
+  }
+}
+
+async function deletePrintingPrice(id: number) {
+  try {
+    await pricingStore.deletePrintingPrice(slug.value, id)
+    toast.add({ title: 'Deleted', description: 'Printing price removed' })
+    refreshPrinting()
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete', color: 'error' })
+  }
+}
+
+// Paper modal
+const openPaperModal = (price?: PaperPrice) => {
+  editingPaperPrice.value = price ?? null
+  paperModalOpen.value = true
+}
+const editPaperPrice = (price: PaperPrice) => openPaperModal(price)
+const closePaperModal = () => {
+  paperModalOpen.value = false
+  editingPaperPrice.value = null
+}
+function onPaperModalOpenChange(open: boolean) {
+  paperModalOpen.value = open
+  if (!open) editingPaperPrice.value = null
+}
+watch(paperModalOpen, (open) => {
+  if (open) {
+    paperFormReady.value = false
+    nextTick(() => { paperFormReady.value = true })
+  } else {
+    paperFormReady.value = false
+    editingPaperPrice.value = null
+  }
+})
+async function submitPaperPrice(data: PaperPriceForm) {
+  formLoading.value = true
+  try {
+    if (editingPaperPrice.value) {
+      await pricingStore.updatePaperPrice(slug.value, editingPaperPrice.value.id, data)
+      toast.add({ title: 'Updated', description: 'Paper price updated' })
+    } else {
+      await pricingStore.createPaperPrice(slug.value, data)
+      toast.add({ title: 'Added', description: 'Paper price added' })
+    }
+    closePaperModal()
+    await pricingStore.fetchPaperPrices(slug.value)
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
+async function deletePaperPrice(id: number) {
+  try {
+    await pricingStore.deletePaperPrice(slug.value, id)
+    toast.add({ title: 'Deleted', description: 'Paper price removed' })
+    await pricingStore.fetchPaperPrices(slug.value)
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete', color: 'error' })
+  }
+}
+
+// Finishing modal
+const openFinishingModal = (service?: FinishingService) => {
+  editingFinishingService.value = service ?? null
+  finishingModalOpen.value = true
+}
+const editFinishingService = (service: FinishingService) => openFinishingModal(service)
+const closeFinishingModal = () => {
+  finishingModalOpen.value = false
+  editingFinishingService.value = null
+}
+function onFinishingModalOpenChange(open: boolean) {
+  finishingModalOpen.value = open
+  if (!open) editingFinishingService.value = null
+}
+watch(finishingModalOpen, (open) => {
+  if (open) {
+    finishingFormReady.value = false
+    nextTick(() => { finishingFormReady.value = true })
+  } else {
+    finishingFormReady.value = false
+    editingFinishingService.value = null
+  }
+})
+async function submitFinishingService(data: FinishingServiceForm) {
+  formLoading.value = true
+  try {
+    if (editingFinishingService.value) {
+      await pricingStore.updateFinishingService(slug.value, editingFinishingService.value.id, data)
+      toast.add({ title: 'Updated', description: 'Finishing service updated' })
+    } else {
+      await pricingStore.createFinishingService(slug.value, data)
+      toast.add({ title: 'Added', description: 'Finishing service added' })
+    }
+    closeFinishingModal()
+    await pricingStore.fetchFinishingServices(slug.value)
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
+async function deleteFinishingService(id: number) {
+  try {
+    await pricingStore.deleteFinishingService(slug.value, id)
+    toast.add({ title: 'Deleted', description: 'Finishing service removed' })
+    await pricingStore.fetchFinishingServices(slug.value)
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete', color: 'error' })
+  }
+}
+
+// Discount modal
+const openDiscountModal = (discount?: VolumeDiscount) => {
+  editingDiscount.value = discount ?? null
+  discountModalOpen.value = true
+}
+const editDiscount = (discount: VolumeDiscount) => openDiscountModal(discount)
+const closeDiscountModal = () => {
+  discountModalOpen.value = false
+  editingDiscount.value = null
+}
+function onDiscountModalOpenChange(open: boolean) {
+  discountModalOpen.value = open
+  if (!open) editingDiscount.value = null
+}
+watch(discountModalOpen, (open) => {
+  if (open) {
+    discountFormReady.value = false
+    nextTick(() => { discountFormReady.value = true })
+  } else {
+    discountFormReady.value = false
+    editingDiscount.value = null
+  }
+})
+async function submitVolumeDiscount(data: VolumeDiscountForm) {
+  formLoading.value = true
+  try {
+    if (editingDiscount.value) {
+      await pricingStore.updateVolumeDiscount(slug.value, editingDiscount.value.id, data)
+      toast.add({ title: 'Updated', description: 'Volume discount updated' })
+    } else {
+      await pricingStore.createVolumeDiscount(slug.value, data)
+      toast.add({ title: 'Added', description: 'Volume discount added' })
+    }
+    closeDiscountModal()
+    await pricingStore.fetchVolumeDiscounts(slug.value)
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to save', color: 'error' })
+  } finally {
+    formLoading.value = false
+  }
+}
+async function deleteDiscount(id: number) {
+  try {
+    await pricingStore.deleteVolumeDiscount(slug.value, id)
+    toast.add({ title: 'Deleted', description: 'Volume discount removed' })
+    await pricingStore.fetchVolumeDiscounts(slug.value)
+  } catch (err: unknown) {
+    toast.add({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to delete', color: 'error' })
   }
 }
 
