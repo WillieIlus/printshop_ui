@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center" :class="containerClass">
-    <UIcon name="i-lucide-loader-2" class="animate-spin" :class="sizeClass" />
+    <UIcon name="i-lucide-loader-2" class="animate-spin text-gray-500 dark:text-gray-400" :class="sizeClass" />
     <span v-if="text" class="ml-2">{{ text }}</span>
   </div>
 </template>
