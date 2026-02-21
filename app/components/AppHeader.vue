@@ -167,6 +167,7 @@ async function onBecomePrinter() {
 
 const navLinks = [
   { label: 'Templates', to: '/gallery', icon: 'i-lucide-layout-grid' },
+  { label: 'About', to: '/about' },
   { label: 'Problem', to: '/#problem' },
   { label: 'Pricing Models', to: '/#models' },
   { label: 'Shops', to: '/shops' },

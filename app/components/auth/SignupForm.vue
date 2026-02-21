@@ -18,13 +18,24 @@
       <FormsFormInput name="password" label="Password" type="password" placeholder="Create a password" icon="i-lucide-lock" />
       <FormsFormInput name="password_confirm" label="Confirm Password" type="password" placeholder="Confirm your password" icon="i-lucide-lock" />
       <label class="flex items-start gap-2">
-        <UCheckbox v-model="agreeTerms" class="mt-1" />
+        <UCheckbox v-model="acceptedTerms" class="mt-1" />
         <span class="text-sm text-gray-600 dark:text-gray-400">
-          I agree to the <a href="#" class="text-primary-600 hover:underline dark:text-primary-400">Terms of Service</a>
-          and <a href="#" class="text-primary-600 hover:underline dark:text-primary-400">Privacy Policy</a>
+          I agree to the
+          <NuxtLink to="/terms" class="text-primary-600 hover:underline dark:text-primary-400">Terms & Conditions</NuxtLink>
+          and
+          <NuxtLink to="/privacy" class="text-primary-600 hover:underline dark:text-primary-400">Privacy Policy</NuxtLink>
         </span>
       </label>
-      <UButton type="submit" color="primary" block :loading="loading" :disabled="!meta.valid || !agreeTerms">
+      <p v-if="meta.valid && !acceptedTerms" class="text-sm text-amber-600 dark:text-amber-400">
+        Accept Terms & Privacy to continue.
+      </p>
+      <UButton
+        type="submit"
+        block
+        :loading="loading"
+        :disabled="!meta.valid || !acceptedTerms"
+        :class="(meta.valid && acceptedTerms) ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed'"
+      >
         Create Account
       </UButton>
       <p class="text-center text-sm text-gray-600 dark:text-gray-400">
@@ -42,7 +53,7 @@ import { useAuthStore } from '~/stores/auth'
 const authStore = useAuthStore()
 const { signup, loading } = useAuth()
 const notification = useNotification()
-const agreeTerms = ref(false)
+const acceptedTerms = ref(false)
 
 const signupSchema = object({
   first_name: string().required('First name is required'),
@@ -59,6 +70,9 @@ const signupSchema = object({
 })
 
 async function onSubmit(values: Record<string, unknown>) {
+  if (!acceptedTerms.value) {
+    return
+  }
   const result = await signup(values as {
     first_name: string
     last_name: string
