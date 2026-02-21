@@ -39,14 +39,19 @@ onMounted(fetchShops)
       </p>
     </div>
 
-    <CommonLoadingSpinner v-if="loading" />
+    <SkeletonsCardGridSkeleton v-if="loading" :count="6" variant="shop" />
 
     <CommonEmptyState
       v-else-if="fetchError || !shops.length"
       :title="fetchError ? 'Could not load shops' : 'No print shops available yet'"
-      :description="fetchError ? 'Something went wrong. Please try again later.' : 'There are no print shops available. Check back later.'"
+      :description="fetchError ? 'Something went wrong. Please try again.' : 'There are no print shops available. Check back later.'"
       icon="i-lucide-store"
-    />
+    >
+      <UButton v-if="fetchError" color="primary" @click="fetchShops">
+        <UIcon name="i-lucide-refresh-cw" class="h-4 w-4 mr-2" />
+        Retry
+      </UButton>
+    </CommonEmptyState>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <article

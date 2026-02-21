@@ -20,7 +20,17 @@
       </div>
     </div>
 
-    <CommonLoadingSpinner v-if="paperStockStore.loading && !paperStockStore.items.length" />
+    <SkeletonsListRowSkeleton v-if="paperStockStore.loading && !paperStockStore.items.length" :rows="5" :show-header="true" />
+    <CommonErrorState
+      v-else-if="paperStockStore.error && !paperStockStore.items.length"
+      title="Could not load paper stock"
+      :message="paperStockStore.error"
+    >
+      <UButton color="primary" @click="paperStockStore.fetchPaperStock(slug)">
+        <UIcon name="i-lucide-refresh-cw" class="h-4 w-4 mr-2" />
+        Retry
+      </UButton>
+    </CommonErrorState>
     <template v-else>
       <div v-if="paperStockStore.items.length" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

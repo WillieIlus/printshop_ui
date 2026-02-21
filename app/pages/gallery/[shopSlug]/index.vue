@@ -133,8 +133,10 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
       </div>
     </div>
 
-    <!-- Category tabs - ALWAYS render (even when templates empty or loading) -->
+    <!-- Category tabs - skeleton when loading -->
     <div class="flex flex-wrap gap-2 mb-6">
+      <SkeletonsCategoryPillsSkeleton v-if="loading" :count="5" />
+      <template v-else>
       <UButton
         :variant="selectedCategory === 'all' ? 'solid' : 'outline'"
         :color="selectedCategory === 'all' ? 'primary' : 'neutral'"
@@ -156,6 +158,7 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
         {{ cat.name }}
         <span v-if="(cat.template_count ?? cat.templates_count) != null" class="ml-1 opacity-75">({{ cat.template_count ?? cat.templates_count }})</span>
       </UButton>
+      </template>
     </div>
 
     <!-- Search -->
@@ -168,7 +171,7 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
     />
 
     <!-- Loading: skeleton cards (same grid layout) -->
-    <GalleryTemplateSkeleton v-if="loading" />
+    <SkeletonsCardGridSkeleton v-if="loading" :count="6" variant="template" />
 
     <!-- Error: retry state -->
     <GalleryErrorState

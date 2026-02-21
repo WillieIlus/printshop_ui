@@ -11,7 +11,7 @@
 
     <!-- Table skeleton -->
     <div v-else-if="variant === 'table'" class="rounded-xl border border-gray-200/80 bg-white overflow-hidden dark:border-gray-700/60 dark:bg-gray-800/50">
-      <div class="border-b border-gray-100 px-5 py-4 dark:border-gray-700/60">
+      <div v-if="showHeader" class="border-b border-gray-100 px-5 py-4 dark:border-gray-700/60">
         <div class="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700" />
       </div>
       <div class="p-5 space-y-3">
@@ -52,9 +52,10 @@ const props = withDefaults(
     variant?: 'kpi' | 'table' | 'cards' | 'block'
     rows?: number
     cardCount?: number
+    showHeader?: boolean
     class?: string
   }>(),
-  { variant: 'block', rows: 5, cardCount: 6 }
+  { variant: 'block', rows: 5, cardCount: 6, showHeader: true }
 )
 
 const wrapperClass = computed(() => props.class ?? '')

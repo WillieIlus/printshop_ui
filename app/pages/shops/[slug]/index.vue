@@ -1,6 +1,13 @@
 <template>
   <div class="space-y-8">
-    <CommonLoadingSpinner v-if="shopStore.loading" />
+    <div v-if="shopStore.loading" class="space-y-6">
+      <SkeletonsShopHeaderSkeleton />
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8 animate-pulse">
+        <div class="h-6 w-48 rounded bg-gray-200 dark:bg-gray-700" />
+        <div class="mt-4 h-4 w-full rounded bg-gray-100 dark:bg-gray-700/80" />
+        <div class="mt-2 h-4 w-3/4 rounded bg-gray-100 dark:bg-gray-700/80" />
+      </div>
+    </div>
     <template v-else-if="shop">
       <!-- Shop Header -->
       <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
@@ -56,7 +63,7 @@
 
       <!-- Rate Card -->
       <div id="rate-card">
-        <CommonLoadingSpinner v-if="pricingStore.loading" />
+        <SkeletonsListRowSkeleton v-if="pricingStore.loading" :rows="5" :show-header="true" />
         <PricingRateCardDisplay 
           v-else-if="rateCard" 
           :rate-card="rateCard"

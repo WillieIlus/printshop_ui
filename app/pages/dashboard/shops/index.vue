@@ -13,6 +13,16 @@
     </DashboardPageHeader>
 
     <DashboardSkeletonState v-if="shopStore.loading" variant="cards" :card-count="6" />
+    <CommonErrorState
+      v-else-if="shopStore.error"
+      title="Could not load shops"
+      :message="shopStore.error"
+    >
+      <UButton color="primary" @click="shopStore.fetchMyShops()">
+        <UIcon name="i-lucide-refresh-cw" class="h-4 w-4 mr-2" />
+        Retry
+      </UButton>
+    </CommonErrorState>
     <div v-else-if="shopStore.myShops.length" class="col-span-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       <ShopsShopCard
         v-for="shop in shopStore.myShops"

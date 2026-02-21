@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-[60vh] flex items-center justify-center p-4">
-    <div v-if="!shopStore.currentShop && shopStore.loading" class="flex justify-center py-12">
-      <CommonLoadingSpinner />
+    <div v-if="!shopStore.currentShop && shopStore.loading" class="w-full max-w-md mx-auto">
+      <SkeletonsShopHeaderSkeleton />
     </div>
     <template v-else-if="shopStore.currentShop">
       <!-- Modal on desktop, Drawer on mobile - always open when on this page -->

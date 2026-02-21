@@ -8,7 +8,12 @@
       {{ locationError }}
       <UButton variant="ghost" size="sm" class="mt-2" @click="requestLocation">Try again</UButton>
     </div>
-    <ShopsNearbyShops :shops="shopStore.nearbyShops" :loading="shopStore.loading" />
+    <ShopsNearbyShops
+      :shops="shopStore.nearbyShops"
+      :loading="shopStore.loading"
+      :error="shopStore.error"
+      @retry="requestLocation"
+    />
   </div>
 </template>
 
