@@ -28,16 +28,7 @@
 
         <!-- Right side -->
         <div class="flex items-center gap-3">
-          <ClientOnly>
-            <button
-              v-if="authStore.isAuthenticated"
-              class="rounded-lg p-2 text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
-              aria-label="Toggle theme"
-              @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'"
-            >
-              <UIcon :name="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" class="h-5 w-5" />
-            </button>
-          </ClientOnly>
+          <ThemeCycleButton />
 
           <!-- User Avatar / Login -->
           <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
@@ -75,15 +66,6 @@
             </UPopover>
           </div>
           <div v-else class="flex items-center gap-2">
-            <ClientOnly>
-              <button
-                class="rounded-lg p-2 text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
-                aria-label="Toggle theme"
-                @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'"
-              >
-                <UIcon :name="colorMode.value === 'dark' ? 'i-lucide-sun' : 'i-lucide-moon'" class="h-5 w-5" />
-              </button>
-            </ClientOnly>
             <NuxtLink to="/auth/login" class="hidden text-sm font-semibold text-gray-600 dark:text-gray-400 transition-colors hover:text-flamingo-600 dark:hover:text-flamingo-400 sm:inline-flex">
               Log In
             </NuxtLink>
@@ -158,7 +140,6 @@ import { useUserStore } from '~/stores/user'
 
 const authStore = useAuthStore()
 const userStore = useUserStore()
-const colorMode = useColorMode()
 const mobileOpen = ref(false)
 const becomingPrinter = ref(false)
 const notification = useNotification()
