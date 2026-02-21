@@ -90,6 +90,11 @@ function constraintBadge(t: PrintTemplateListDTO): string | null {
   return formatGsmConstraint(t)
 }
 
+/** Shop name for display (shop-scoped: always current shop; from template.created_by_shop as fallback) */
+function shopNameForTemplate(t: PrintTemplateListDTO): string {
+  return t.created_by_shop?.name ?? shop.value?.name ?? 'Shop'
+}
+
 watch([shopSlug, selectedCategory, searchQuery], () => {
   fetchData()
 }, { immediate: true })
@@ -149,7 +154,7 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
         @click="selectedCategory = cat.slug"
       >
         {{ cat.name }}
-        <span v-if="cat.template_count != null" class="ml-1 opacity-75">({{ cat.template_count }})</span>
+        <span v-if="(cat.template_count ?? cat.templates_count) != null" class="ml-1 opacity-75">({{ cat.template_count ?? cat.templates_count }})</span>
       </UButton>
     </div>
 
@@ -226,24 +231,34 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
               {{ constraintBadge(t) }}
             </UBadge>
           </div>
-          <p v-if="t.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            By {{ shopNameForTemplate(t) }}
+          </p>
+          <p v-if="t.description" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
             {{ t.description }}
           </p>
-          <div class="mt-4 flex items-center justify-between">
+          <div class="mt-4 flex items-center justify-between gap-2">
             <div>
               <span class="text-xs text-gray-500 dark:text-gray-400">From</span>
               <div class="text-lg font-bold text-flamingo-600 dark:text-flamingo-400">
                 {{ formatKES(t.starting_price) }}
               </div>
             </div>
-            <UButton
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="openTweaker(t)"
-            >
-              Tweak
-            </UButton>
+            <div class="flex gap-2 shrink-0">
+              <NuxtLink :to="`/gallery/${shopSlug}/${t.slug}`">
+                <UButton color="neutral" variant="outline" size="sm">
+                  View
+                </UButton>
+              </NuxtLink>
+              <UButton
+                color="primary"
+                variant="soft"
+                size="sm"
+                @click="openTweaker(t)"
+              >
+                Tweak
+              </UButton>
+            </div>
           </div>
         </div>
       </article>

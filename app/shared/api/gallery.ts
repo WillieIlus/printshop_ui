@@ -5,6 +5,7 @@ import type {
   TemplatePriceResponseDTO,
   TemplateCalculatePricePayload,
 } from '~/shared/types/templates'
+import type { PublicShopDTO } from '~/shared/types/gallery'
 import type { PaginatedResponse } from '~/shared/types'
 import { API } from '~/shared/api-paths'
 
@@ -12,6 +13,16 @@ export interface ListShopTemplatesParams {
   category?: string
   search?: string
   ordering?: string
+}
+
+export async function listPublicShops(): Promise<PublicShopDTO[]> {
+  const { get } = useApi()
+  const data = await get<PublicShopDTO[] | { results: PublicShopDTO[] }>(API.shopsPublic())
+  if (Array.isArray(data)) return data
+  if (data && typeof data === 'object' && Array.isArray((data as { results?: PublicShopDTO[] }).results)) {
+    return (data as { results: PublicShopDTO[] }).results
+  }
+  return []
 }
 
 export async function listShopCategories(shopSlug: string): Promise<TemplateCategoryDTO[]> {
@@ -31,7 +42,7 @@ export async function listShopTemplates(
   params?: ListShopTemplatesParams
 ): Promise<PaginatedResponse<PrintTemplateListDTO>> {
   const { get } = useApi()
-  const query: Record<string, string | number | boolean> = {}
+  const query: Record<string, string | number> = {}
   if (params?.category) query.category = params.category
   if (params?.search) query.search = params.search
   if (params?.ordering) query.ordering = params.ordering
@@ -61,14 +72,10 @@ export async function calculateShopTemplatePrice(
   shopSlug: string,
   templateSlug: string,
   payload: TemplateCalculatePricePayload
-): Promise<TemplatePriceResponseDTO | null> {
+): Promise<TemplatePriceResponseDTO> {
   const { post } = useApi()
-  try {
-    return await post<TemplatePriceResponseDTO>(
-      API.shopTemplateCalculatePrice(shopSlug, templateSlug),
-      payload
-    )
-  } catch {
-    return null
-  }
+  return await post<TemplatePriceResponseDTO>(
+    API.shopTemplateCalculatePrice(shopSlug, templateSlug),
+    payload as Record<string, unknown>
+  )
 }

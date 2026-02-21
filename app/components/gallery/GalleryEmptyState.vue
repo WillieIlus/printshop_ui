@@ -5,7 +5,7 @@ interface Props {
   shopSlug?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   shopName: 'This printer',
   isPrinterOwner: false,
   shopSlug: '',

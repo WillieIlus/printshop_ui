@@ -1,10 +1,12 @@
 /** Template gallery types — backend serializers */
 
 export interface TemplateCategoryDTO {
-  id: number
+  id?: number
   name: string
   slug: string
   template_count?: number
+  templates_count?: number
+  display_order?: number
 }
 
 export interface TemplateGsmConstraints {

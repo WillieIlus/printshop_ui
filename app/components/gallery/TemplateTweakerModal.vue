@@ -9,18 +9,24 @@ import {
   DialogDescription,
   DialogClose,
 } from 'reka-ui'
+import type { CatalogTemplate } from '~/shared/types/template'
 import type {
   PrintTemplateListDTO,
   PrintTemplateDetailDTO,
   TemplateCalculatePricePayload,
+  TemplatePriceResponseDTO,
 } from '~/shared/types/templates'
 import { getShopTemplate, calculateShopTemplatePrice } from '~/shared/api/gallery'
 import { formatKES } from '~/utils/formatters'
+import { parseApiError } from '~/utils/api-error'
+
+const DEBOUNCE_MS = 400
 
 const props = withDefaults(
   defineProps<{
     open: boolean
-    template: PrintTemplateListDTO | null
+    /** Template with at least title; slug required when shopSlug is set */
+    template: (PrintTemplateListDTO | PrintTemplateDetailDTO | CatalogTemplate) | null
     shopSlug?: string
   }>(),
   { shopSlug: '' }
@@ -37,17 +43,20 @@ const selectedFinishingIds = ref<number[]>([])
 const templateDetail = ref<PrintTemplateDetailDTO | null>(null)
 const loadingDetail = ref(false)
 const calculating = ref(false)
-const priceResult = ref<{ total: string | number; breakdown?: { label: string; amount: string | number }[] } | null>(null)
+const priceResult = ref<TemplatePriceResponseDTO | null>(null)
 const inputError = ref<string | null>(null)
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 const gsmMin = computed(() => {
   const t = templateDetail.value ?? props.template
-  return t?.gsm_min ?? 0
+  if (!t) return 0
+  return (t as PrintTemplateListDTO).gsm_min ?? (t as CatalogTemplate).min_gsm ?? 0
 })
 
 const gsmMax = computed(() => {
   const t = templateDetail.value ?? props.template
-  return t?.gsm_max ?? 9999
+  if (!t) return 9999
+  return (t as PrintTemplateListDTO).gsm_max ?? (t as CatalogTemplate).max_gsm ?? 9999
 })
 
 const gsmPlaceholder = computed(() => {
@@ -77,7 +86,8 @@ const mandatoryFinishing = computed(() => {
 
 const minQuantity = computed(() => {
   const t = templateDetail.value ?? props.template
-  return (t && 'min_quantity' in t && t.min_quantity) ?? 1
+  const val = t && 'min_quantity' in t ? (t as PrintTemplateDetailDTO).min_quantity : undefined
+  return val ?? 1
 })
 
 function validateInput(): boolean {
@@ -92,17 +102,19 @@ function validateInput(): boolean {
     inputError.value = `GSM must be at least ${gsmMin.value}`
     return false
   }
-  if (gsmMax.value != null && gsmMax.value < 9999 && g > gsmMax.value) {
-    inputError.value = `GSM must be at most ${gsmMax.value}`
+  const gsmMaxVal = Number(gsmMax.value)
+  if (gsmMaxVal < 9999 && g > gsmMaxVal) {
+    inputError.value = `GSM must be at most ${gsmMaxVal}`
     return false
   }
   return true
 }
 
 async function fetchPrice() {
-  if (!props.shopSlug || !props.template || !validateInput()) return
+  if (!props.shopSlug || !props.template?.slug || !validateInput()) return
   calculating.value = true
   priceResult.value = null
+  inputError.value = null
   try {
     const payload: TemplateCalculatePricePayload = {
       quantity: quantity.value,
@@ -113,11 +125,19 @@ async function fetchPrice() {
     }
     const result = await calculateShopTemplatePrice(props.shopSlug, props.template.slug, payload)
     priceResult.value = result
-  } catch {
-    inputError.value = 'Failed to calculate price'
+  } catch (err) {
+    inputError.value = parseApiError(err, 'Invalid quantity or GSM. Please check the constraints.')
   } finally {
     calculating.value = false
   }
+}
+
+function debouncedFetchPrice() {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    debounceTimer = null
+    void fetchPrice()
+  }, DEBOUNCE_MS)
 }
 
 function toggleOption(id: number) {
@@ -127,7 +147,7 @@ function toggleOption(id: number) {
   } else {
     selectedOptionIds.value = [...selectedOptionIds.value, id]
   }
-  if (props.shopSlug && props.template) void fetchPrice()
+  if (props.shopSlug && props.template?.slug) debouncedFetchPrice()
 }
 
 function toggleFinishing(id: number) {
@@ -137,13 +157,13 @@ function toggleFinishing(id: number) {
   } else {
     selectedFinishingIds.value = [...selectedFinishingIds.value, id]
   }
-  if (props.shopSlug && props.template) void fetchPrice()
+  if (props.shopSlug && props.template?.slug) debouncedFetchPrice()
 }
 
 watch(
   () => [quantity.value, gsm.value, printSides.value],
   () => {
-    if (props.shopSlug && props.template) void fetchPrice()
+    if (props.shopSlug && props.template?.slug) debouncedFetchPrice()
   }
 )
 
@@ -156,15 +176,18 @@ watch(
       inputError.value = null
       return
     }
-    if (template && slug) {
-      quantity.value = template.min_quantity ?? 100
-      gsm.value = template.gsm_min ?? template.gsm_max ?? 300
-      if (template.gsm_min != null && template.gsm_max != null) {
-        gsm.value = Math.round((template.gsm_min + template.gsm_max) / 2)
-      } else if (template.gsm_min != null) {
-        gsm.value = template.gsm_min
-      } else if (template.gsm_max != null) {
-        gsm.value = template.gsm_max
+    if (template?.slug && slug) {
+      const t = template as PrintTemplateListDTO & { min_quantity?: number; min_gsm?: number; max_gsm?: number }
+      quantity.value = t.min_quantity ?? 100
+      const gMin = t.gsm_min ?? t.min_gsm
+      const gMax = t.gsm_max ?? t.max_gsm
+      gsm.value = gMin ?? gMax ?? 300
+      if (gMin != null && gMax != null) {
+        gsm.value = Math.round((gMin + gMax) / 2)
+      } else if (gMin != null) {
+        gsm.value = gMin
+      } else if (gMax != null) {
+        gsm.value = gMax
       }
       printSides.value = 'DUPLEX'
       selectedOptionIds.value = []
@@ -178,7 +201,7 @@ watch(
       } finally {
         loadingDetail.value = false
       }
-      await fetchPrice()
+      await fetchPrice() // immediate on open, no debounce
     }
   },
   { immediate: true }
@@ -186,7 +209,7 @@ watch(
 
 const templateTitle = computed(() => props.template?.title ?? templateDetail.value?.title ?? 'Configure Template')
 const descriptionId = 'template-tweaker-desc'
-const isShopScoped = computed(() => Boolean(props.shopSlug && props.template))
+const isShopScoped = computed(() => Boolean(props.shopSlug && props.template?.slug))
 </script>
 
 <template>
@@ -252,7 +275,7 @@ const isShopScoped = computed(() => Boolean(props.shopSlug && props.template))
                   <UInput
                     v-model.number="quantity"
                     type="number"
-                    :min="minQuantity"
+                    :min="minQuantity > 0 ? minQuantity : undefined"
                     size="lg"
                     class="w-full"
                   />
@@ -357,9 +380,30 @@ const isShopScoped = computed(() => Boolean(props.shopSlug && props.template))
                   </div>
                 </div>
 
-                <!-- Imposition (digital only) -->
+                <!-- Imposition: use backend calculation_steps when available, else ImpositionPanel -->
+                <div
+                  v-if="priceResult?.calculation_steps?.length"
+                  class="rounded-xl border border-violet-200 dark:border-violet-800/50 bg-violet-50/50 dark:bg-violet-950/20 p-4 space-y-2"
+                >
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <UIcon name="i-lucide-layout-grid" class="h-4 w-4 text-violet-500 dark:text-violet-400" />
+                    Imposition
+                  </h4>
+                  <ul class="space-y-1.5 text-sm">
+                    <li
+                      v-for="(step, i) in priceResult.calculation_steps"
+                      :key="i"
+                      class="font-mono text-gray-700 dark:text-gray-300"
+                    >
+                      {{ step }}
+                    </li>
+                  </ul>
+                </div>
                 <ImpositionPanel
+                  v-else
                   :quantity="quantity"
+                  :ups-per-sheet-from-backend="priceResult?.ups_per_sheet ?? null"
+                  :sheets-needed-from-backend="priceResult?.sheets_needed ?? null"
                   :ups-per-sheet-from-template="templateDetail?.ups_per_sheet ?? templateDetail?.imposition_count ?? null"
                   :default-ups-per-sheet="25"
                 />
@@ -368,7 +412,7 @@ const isShopScoped = computed(() => Boolean(props.shopSlug && props.template))
                 <div
                   class="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4 border border-gray-200 dark:border-gray-700"
                 >
-                  <div v-if="calculating" class="flex items-center gap-2 text-sm text-gray-500">
+                  <div v-if="calculating" class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <UIcon name="i-lucide-loader-2" class="h-4 w-4 animate-spin" />
                     Calculating...
                   </div>
@@ -388,6 +432,15 @@ const isShopScoped = computed(() => Boolean(props.shopSlug && props.template))
                       <span class="text-lg font-bold text-flamingo-600 dark:text-flamingo-400">
                         {{ formatKES(priceResult.total) }}
                       </span>
+                    </div>
+                    <div v-if="priceResult.notes?.length" class="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700 space-y-1">
+                      <p
+                        v-for="(note, i) in priceResult.notes"
+                        :key="i"
+                        class="text-xs text-amber-700 dark:text-amber-400 italic"
+                      >
+                        {{ note }}
+                      </p>
                     </div>
                   </div>
                   <div v-else-if="inputError" class="text-sm text-red-600 dark:text-red-400">
