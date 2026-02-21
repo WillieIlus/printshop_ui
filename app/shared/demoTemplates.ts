@@ -32,6 +32,12 @@ export interface DemoTemplate {
   defaultWidthM?: number
   /** For SQM: default height in meters */
   defaultHeightM?: number
+  /** For digital: default GSM (e.g. 300) */
+  defaultGsm?: number
+  /** Demo starting price (KES) for display on cards */
+  demoBasePrice: number
+  /** For digital: material key in demoRateCard (e.g. 'gloss150_sra3') */
+  materialKey?: string
   demoImage?: string
   badge?: string
   /** Shop that provides this template (for demo display) */
@@ -60,6 +66,9 @@ export const templates: DemoTemplate[] = [
     defaultQty: 500,
     defaultMaterial: 'Paper 300gsm',
     defaultFinishings: ['LAMINATION', 'ROUND_EDGES'],
+    defaultGsm: 300,
+    demoBasePrice: 4250,
+    materialKey: 'gloss150_sra3',
     badge: 'Popular',
     created_by_shop: { name: 'PrintPro Nairobi', slug: 'printpro-nairobi' },
   },
@@ -75,6 +84,9 @@ export const templates: DemoTemplate[] = [
     defaultQty: 250,
     defaultMaterial: 'Art 350gsm',
     defaultFinishings: ['LAMINATION'],
+    defaultGsm: 350,
+    demoBasePrice: 2850,
+    materialKey: 'art350_sra3',
   },
   {
     id: 'flyer-1',
@@ -88,6 +100,9 @@ export const templates: DemoTemplate[] = [
     defaultQty: 1000,
     defaultMaterial: 'Paper 300gsm',
     defaultFinishings: ['CUTTING'],
+    defaultGsm: 300,
+    demoBasePrice: 8250,
+    materialKey: 'gloss150_sra3',
     badge: 'Popular',
   },
   {
@@ -102,6 +117,9 @@ export const templates: DemoTemplate[] = [
     defaultQty: 500,
     defaultMaterial: 'Paper 300gsm',
     defaultFinishings: [],
+    defaultGsm: 300,
+    demoBasePrice: 8750,
+    materialKey: 'gloss150_sra3',
   },
   {
     id: 'billboard-1',
@@ -117,6 +135,8 @@ export const templates: DemoTemplate[] = [
     defaultFinishings: ['EYELETS'],
     defaultWidthM: 6,
     defaultHeightM: 3,
+    demoBasePrice: 28500,
+    materialKey: 'Vinyl',
   },
   {
     id: 'billboard-2',
@@ -132,6 +152,8 @@ export const templates: DemoTemplate[] = [
     defaultFinishings: [],
     defaultWidthM: 4,
     defaultHeightM: 2,
+    demoBasePrice: 15200,
+    materialKey: 'Vinyl',
   },
   {
     id: 'rollup-1',
@@ -147,6 +169,8 @@ export const templates: DemoTemplate[] = [
     defaultFinishings: [],
     defaultWidthM: 0.85,
     defaultHeightM: 2,
+    demoBasePrice: 1280,
+    materialKey: 'Banner',
     badge: 'Popular',
   },
   {
@@ -163,6 +187,8 @@ export const templates: DemoTemplate[] = [
     defaultFinishings: [],
     defaultWidthM: 1,
     defaultHeightM: 2,
+    demoBasePrice: 1520,
+    materialKey: 'Banner',
   },
   {
     id: 'notebook-1',
@@ -176,6 +202,9 @@ export const templates: DemoTemplate[] = [
     defaultQty: 100,
     defaultMaterial: 'Bond 80gsm',
     defaultFinishings: [],
+    defaultGsm: 80,
+    demoBasePrice: 850,
+    materialKey: 'bond80',
   },
   {
     id: 'magazine-1',
@@ -189,6 +218,9 @@ export const templates: DemoTemplate[] = [
     defaultQty: 200,
     defaultMaterial: 'Paper 300gsm',
     defaultFinishings: ['LAMINATION'],
+    defaultGsm: 300,
+    demoBasePrice: 11200,
+    materialKey: 'gloss150_sra3',
   },
 ]
 
