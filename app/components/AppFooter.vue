@@ -53,8 +53,8 @@
       <div class="flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-8 sm:flex-row">
         <p class="text-sm">© <ClientOnly>{{ new Date().getFullYear() }}<template #fallback>2025</template></ClientOnly> <span class="font-semibold text-white">Printy</span>. All rights reserved.</p>
         <div class="flex items-center gap-6 text-sm">
-          <a href="#" class="transition-colors hover:text-white">Privacy Policy</a>
-          <a href="#" class="transition-colors hover:text-white">Terms of Service</a>
+          <NuxtLink to="/privacy" class="transition-colors hover:text-white">Privacy Policy</NuxtLink>
+          <NuxtLink to="/terms" class="transition-colors hover:text-white">Terms of Service</NuxtLink>
         </div>
       </div>
     </div>

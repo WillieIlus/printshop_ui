@@ -17,13 +17,16 @@
       <FormsFormInput name="email" label="Email" type="email" placeholder="john@example.com" icon="i-lucide-mail" />
       <FormsFormInput name="password" label="Password" type="password" placeholder="Create a password" icon="i-lucide-lock" />
       <FormsFormInput name="password_confirm" label="Confirm Password" type="password" placeholder="Confirm your password" icon="i-lucide-lock" />
-      <label class="flex items-start gap-2">
+      <label class="flex items-start gap-2 cursor-pointer">
         <UCheckbox v-model="agreeTerms" class="mt-1" />
         <span class="text-sm text-gray-600 dark:text-gray-400">
-          I agree to the <a href="#" class="text-primary-600 hover:underline dark:text-primary-400">Terms of Service</a>
-          and <a href="#" class="text-primary-600 hover:underline dark:text-primary-400">Privacy Policy</a>
+          I agree to the <NuxtLink to="/terms" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:underline dark:text-primary-400" @click.stop>Terms of Service</NuxtLink>
+          and <NuxtLink to="/privacy" target="_blank" rel="noopener noreferrer" class="text-primary-600 hover:underline dark:text-primary-400" @click.stop>Privacy Policy</NuxtLink>
         </span>
       </label>
+      <p v-if="!agreeTerms" class="text-xs text-amber-600 dark:text-amber-400 -mt-2">
+        You must accept the Terms and Privacy Policy to continue.
+      </p>
       <UButton type="submit" color="primary" block :loading="loading" :disabled="!meta.valid || !agreeTerms">
         Create Account
       </UButton>
