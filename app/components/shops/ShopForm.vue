@@ -40,9 +40,9 @@
         </div>
       </UCard>
 
-      <div class="flex justify-end gap-4">
+      <div class="sticky bottom-0 -mx-4 -mb-4 mt-6 flex justify-end gap-4 bg-white dark:bg-gray-900 px-4 py-4 sm:-mx-6 sm:-mb-6 sm:px-6 sm:pt-6 border-t border-gray-200 dark:border-gray-700 sm:border-t-0">
         <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
-        <UButton type="submit" color="primary" :loading="loading" :disabled="!meta.valid">
+        <UButton type="submit" color="primary" :loading="loading" :disabled="!meta.valid" class="disabled:!bg-gray-300 disabled:!text-gray-500 dark:disabled:!bg-gray-600 dark:disabled:!text-gray-400">
           {{ isEdit ? 'Update Shop' : 'Create Shop' }}
         </UButton>
       </div>

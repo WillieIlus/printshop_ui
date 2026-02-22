@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col bg-[#f3f6fc] dark:bg-[#101828] text-[#101828] dark:text-gray-100 overflow-x-hidden">
     <!-- Top bar -->
-    <header class="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-4 border-b border-gray-200/70 dark:border-gray-800 bg-[#f3f6fc]/90 dark:bg-[#101828]/90 backdrop-blur-md px-4 sm:px-6">
+    <header class="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#101828] px-4 sm:px-6">
       <NuxtLink to="/dashboard" class="flex items-center gap-3 shrink-0 group">
         <span class="grid h-8 w-8 place-items-center rounded-xl overflow-hidden shrink-0" style="background: #e13515;">
           <CommonPrintyLogoMark img-class="h-5 w-5" />
@@ -25,7 +25,7 @@
     <div class="flex flex-1 overflow-hidden min-w-0">
       <!-- Sidebar: hidden on < md, full sidebar on md+ -->
       <aside
-        class="hidden md:flex md:flex-col md:shrink-0 md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900"
+        class="hidden md:flex md:flex-col md:shrink-0 md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
       >
         <nav class="flex flex-col gap-1 p-4 overflow-y-auto">
           <template v-for="item in navItems" :key="item.to">

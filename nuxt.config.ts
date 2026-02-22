@@ -82,6 +82,7 @@ export default defineNuxtConfig({
     fallback: 'light',
     classSuffix: '',
     storageKey: 'printshop-color-mode',
+    storage: 'localStorage',
   },
 
   // CSR only for private app; public pages (shops, index) use SSR for SEO + share previews

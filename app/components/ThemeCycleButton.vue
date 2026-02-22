@@ -10,7 +10,7 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
 
-const order = ['dark', 'system', 'light'] as const
+const order = ['light', 'dark', 'system'] as const
 type Mode = (typeof order)[number]
 
 const pref = computed<Mode>(() => (colorMode.preference || 'system') as Mode)

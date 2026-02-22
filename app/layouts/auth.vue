@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col bg-[#f3f6fc] dark:bg-[#101828] text-[#101828] dark:text-gray-100">
     <!-- Top bar: back link + theme toggle (sample design) -->
-    <div class="shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200/70 dark:border-gray-800 bg-[#f3f6fc]/90 dark:bg-[#101828]/90 backdrop-blur-md">
+    <div class="shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#101828]">
       <NuxtLink
         v-if="backTo"
         :to="backTo"
@@ -50,7 +50,7 @@
           </slot>
         </div>
 
-        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900 shadow-sm hover:shadow-md transition-shadow p-6 sm:p-8">
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-shadow p-6 sm:p-8">
           <slot />
         </div>
 

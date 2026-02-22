@@ -1,6 +1,6 @@
 <template>
   <div
-    class="overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-700/60 dark:bg-gray-800/50"
+    class="overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-700/60 dark:bg-gray-900"
     :class="colSpanClass"
   >
     <div

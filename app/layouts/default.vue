@@ -5,7 +5,7 @@
     </header>
     <AppHeader v-else />
 
-    <div v-if="$slots.breadcrumb" class="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#101828] shrink-0">
+    <div v-if="$slots.breadcrumb" class="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#101828] shrink-0">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2">
         <slot name="breadcrumb" />
       </div>

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group relative overflow-hidden rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-gray-700/60 dark:bg-gray-800/50"
+    class="group relative overflow-hidden rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-gray-700/60 dark:bg-gray-900"
   >
     <div class="flex items-start justify-between">
       <div
