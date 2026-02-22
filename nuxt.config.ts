@@ -99,6 +99,13 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
       ],
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Montserrat+Alternates:wght@400;600;700&display=swap',
+        },
+        { rel: 'icon', type: 'image/x-icon', href: '/printy-brand-assets-ready/favicons/favicon-light.ico' },
+      ],
       htmlAttrs: {
         lang: 'en',
         class: 'scroll-smooth',

@@ -39,13 +39,11 @@
 
 /* Printy brand: primary #e13515, Mirage secondary */
 @theme {
-  /* Custom font stack */
-  --font-sans:
-    "Qurova",
-    "Montserrat Alternates",
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
+  /* Typography: body=Montserrat, headings=Qurova, links/buttons=Montserrat Alternates */
+  --font-body: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Qurova", ui-sans-serif, system-ui, sans-serif;
+  --font-accent: "Montserrat Alternates", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body);
 
   /* Primary CTA: #e13515 (exact) */
   --color-primary: #e13515;
@@ -116,8 +114,19 @@ html {
 }
 
 body {
-  @apply font-sans text-[#101828];
+  font-family: var(--font-body);
+  @apply text-[#101828];
   background-color: #f3f6fc;
+}
+
+/* Headings use Qurova */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Links and buttons use Montserrat Alternates */
+a, button, .btn-primary, [role="button"] {
+  font-family: var(--font-accent);
 }
 
 /* Dark mode: mirage-950 for deep ink, light text */

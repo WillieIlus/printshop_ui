@@ -1,7 +1,5 @@
 <template>
-  <div class="flex items-center justify-center" :class="iconClass">
-    <UIcon name="i-lucide-printer" :class="iconClass" />
-  </div>
+  <CommonPrintyLogoMark :img-class="iconClass || 'h-8 w-8'" />
 </template>
 
 <script setup lang="ts">

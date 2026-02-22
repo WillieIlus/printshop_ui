@@ -1,9 +1,9 @@
 <template>
   <header class="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-b dark:border-gray-700 z-50">
     <div class="flex items-center justify-between h-full px-4">
-      <NuxtLink to="/dashboard" class="flex items-center gap-2 shrink-0">
+      <NuxtLink to="/dashboard" class="flex items-center gap-3 shrink-0">
         <CommonAppLogo icon-class="h-8 w-8" />
-        <span class="font-bold text-xl hidden sm:block text-gray-900 dark:text-white">Printy</span>
+        <CommonPrintyWordmark img-class="h-5 w-auto max-w-[90px] hidden sm:block" />
       </NuxtLink>
       <div class="flex items-center gap-4">
         <UButton variant="ghost" size="sm" color="neutral" aria-label="Notifications">

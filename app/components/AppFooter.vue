@@ -1,15 +1,15 @@
 <!-- AppFooter.vue — Site footer with Printy branding (Mirage-950) -->
 <template>
-  <footer class="bg-[#101828] py-12 text-gray-300 sm:py-16">
+  <footer class="bg-[#101828] py-12 text-gray-300 sm:py-16" style="font-family: var(--font-body);">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="mb-12 grid grid-cols-2 gap-8 md:grid-cols-4">
         <!-- Brand -->
         <div class="col-span-2 md:col-span-1">
-          <div class="mb-4 flex items-center gap-2">
-            <div class="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden" style="background: #e13515;">
-              <img src="/Printy-Logo-on-black.svg" alt="Printy" class="h-6 w-6 object-contain" />
+          <div class="mb-4 flex items-center gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden" style="background: #e13515;">
+              <CommonPrintyLogoMark img-class="h-6 w-6" />
             </div>
-            <span class="text-xl font-bold text-white">Printy</span>
+            <CommonPrintyWordmark img-class="h-6 w-auto max-w-[120px]" dark-only />
           </div>
           <p class="text-sm leading-relaxed">
             Your Price, Instantly. The intelligent quoting and pricing engine for modern print shops. Not a marketplace — a pricing brain.
@@ -49,7 +49,7 @@
       </div>
 
       <div class="flex flex-col items-center justify-between gap-4 border-t border-gray-700 pt-8 sm:flex-row">
-        <p class="text-sm">© <ClientOnly>{{ new Date().getFullYear() }}<template #fallback>2025</template></ClientOnly> <span class="font-semibold text-white">Printy</span>. All rights reserved.</p>
+        <p class="text-sm">© <ClientOnly>{{ new Date().getFullYear() }}<template #fallback>2025</template></ClientOnly> Printy. All rights reserved.</p>
         <div class="flex items-center gap-6 text-sm">
           <NuxtLink to="/privacy" class="transition-colors hover:text-white">Privacy Policy</NuxtLink>
           <NuxtLink to="/terms" class="transition-colors hover:text-white">Terms of Service</NuxtLink>

@@ -28,11 +28,11 @@
       <div class="w-full max-w-md">
         <div v-if="$slots.branding || showBranding" class="text-center mb-8">
           <slot name="branding">
-            <NuxtLink to="/" class="inline-flex items-center gap-2 group">
-              <span class="grid h-12 w-12 place-items-center rounded-xl shadow-lg transition-transform group-hover:scale-105 overflow-hidden" style="background: #e13515; box-shadow: 0 10px 15px -3px rgb(225 53 21 / 0.25);">
-                <img src="/Printy-Logo-on-black.svg" alt="Printy" class="h-7 w-7 object-contain" />
+            <NuxtLink to="/" class="inline-flex items-center gap-3 group">
+              <span class="grid h-12 w-12 place-items-center rounded-xl shadow-lg transition-transform group-hover:scale-105 overflow-hidden shrink-0" style="background: #e13515;">
+                <CommonPrintyLogoMark img-class="h-7 w-7" />
               </span>
-              <span class="text-lg font-bold text-gray-900 dark:text-white">Printy</span>
+              <CommonPrintyWordmark img-class="h-6 w-auto max-w-[100px]" />
             </NuxtLink>
           </slot>
         </div>
