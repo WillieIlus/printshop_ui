@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100" :class="{ 'flex flex-col items-center justify-center': center }">
+  <div class="min-h-screen bg-[#f3f6fc] dark:bg-[#101828] text-[#101828] dark:text-gray-100" :class="{ 'flex flex-col items-center justify-center': center }">
     <slot />
     <UNotifications />
   </div>

@@ -1,15 +1,15 @@
 <template>
-  <nav class="sticky top-0 z-50 border-b border-gray-200/70 dark:border-gray-800/70 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md">
+  <nav class="sticky top-0 z-50 border-b border-gray-200/70 dark:border-gray-800/70 bg-[#f3f6fc]/90 dark:bg-[#101828]/90 backdrop-blur-md">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="flex items-center gap-2.5">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 shadow-lg shadow-flamingo-500/25">
-            <UIcon name="i-lucide-printer" class="h-6 w-6 text-white" />
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden shadow-lg" style="background: #e13515; box-shadow: 0 10px 15px -3px rgb(225 53 21 / 0.25);">
+            <img src="/Printy-Logo-on-black.svg" alt="Printy" class="h-6 w-6 object-contain" />
           </div>
           <div class="leading-tight">
-            <div class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Printy</div>
-            <div class="hidden text-[11px] text-gray-500 dark:text-gray-400 sm:block">Quoting & Pricing Engine</div>
+            <div class="text-lg font-bold tracking-tight text-[#101828] dark:text-white">Printy</div>
+            <div class="hidden text-[11px] text-gray-500 dark:text-gray-400 sm:block">Your Price, Instantly</div>
           </div>
         </NuxtLink>
 
@@ -34,8 +34,8 @@
           <div v-if="authStore.isAuthenticated" class="flex items-center gap-2">
             <UPopover mode="click" :popper="{ placement: 'bottom-end' }">
               <template #default>
-                <button class="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 transition-all hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm">
-                  <div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-flamingo-400 to-flamingo-600 text-xs font-bold text-white">
+                <button class="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800 px-3 py-1.5 transition-all hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm">
+                  <div class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white" style="background: #e13515;">
                     {{ userInitials }}
                   </div>
                   <span class="hidden text-sm font-medium text-gray-700 dark:text-gray-200 sm:inline">{{ userName }}</span>
@@ -71,7 +71,7 @@
             </NuxtLink>
             <NuxtLink
               to="/auth/signup"
-              class="rounded-xl bg-flamingo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-flamingo-500/25 transition-all hover:bg-flamingo-600 hover:shadow-flamingo-500/40"
+              class="btn-primary rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg transition-all hover:shadow-[#e13515]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#e13515] focus-visible:outline-offset-2"
             >
               Get Started
             </NuxtLink>
@@ -112,7 +112,7 @@
           </div>
           <div v-if="authStore.isAuthenticated && isCustomer" class="mt-3 grid gap-2 px-3">
             <button
-              class="rounded-xl bg-flamingo-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-flamingo-600 flex items-center justify-center gap-2"
+              class="btn-primary rounded-xl px-4 py-2.5 text-center text-sm font-semibold flex items-center justify-center gap-2"
               :disabled="becomingPrinter"
               @click="onBecomePrinter(); mobileOpen = false"
             >
@@ -124,7 +124,7 @@
             <NuxtLink to="/auth/login" class="rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-2.5 text-center text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700" @click="mobileOpen = false">
               Log In
             </NuxtLink>
-            <NuxtLink to="/auth/signup" class="rounded-xl bg-flamingo-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-flamingo-600" @click="mobileOpen = false">
+            <NuxtLink to="/auth/signup" class="btn-primary rounded-xl px-4 py-2.5 text-center text-sm font-semibold" @click="mobileOpen = false">
               Get Started
             </NuxtLink>
           </div>
@@ -167,6 +167,8 @@ async function onBecomePrinter() {
 
 const navLinks = [
   { label: 'Templates', to: '/gallery', icon: 'i-lucide-layout-grid' },
+  { label: 'About', to: '/about' },
+  { label: 'Help Center', to: '/help' },
   { label: 'Problem', to: '/#problem' },
   { label: 'Pricing Models', to: '/#models' },
   { label: 'Shops', to: '/shops' },

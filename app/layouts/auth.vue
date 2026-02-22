@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+  <div class="min-h-screen flex flex-col bg-[#f3f6fc] dark:bg-[#101828] text-[#101828] dark:text-gray-100">
     <!-- Top bar: back link + theme toggle (sample design) -->
-    <div class="shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200/70 dark:border-gray-800 bg-white/85 dark:bg-gray-900/85 backdrop-blur-md">
+    <div class="shrink-0 flex items-center justify-between px-4 py-3 border-b border-gray-200/70 dark:border-gray-800 bg-[#f3f6fc]/90 dark:bg-[#101828]/90 backdrop-blur-md">
       <NuxtLink
         v-if="backTo"
         :to="backTo"
@@ -29,8 +29,8 @@
         <div v-if="$slots.branding || showBranding" class="text-center mb-8">
           <slot name="branding">
             <NuxtLink to="/" class="inline-flex items-center gap-2 group">
-              <span class="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 text-white shadow-lg shadow-flamingo-500/25 transition-transform group-hover:scale-105">
-                <UIcon name="i-lucide-printer" class="w-7 h-7" />
+              <span class="grid h-12 w-12 place-items-center rounded-xl shadow-lg transition-transform group-hover:scale-105 overflow-hidden" style="background: #e13515; box-shadow: 0 10px 15px -3px rgb(225 53 21 / 0.25);">
+                <img src="/Printy-Logo-on-black.svg" alt="Printy" class="h-7 w-7 object-contain" />
               </span>
               <span class="text-lg font-bold text-gray-900 dark:text-white">Printy</span>
             </NuxtLink>
@@ -50,7 +50,7 @@
           </slot>
         </div>
 
-        <div class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:shadow-md transition-shadow p-6 sm:p-8">
+        <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900 shadow-sm hover:shadow-md transition-shadow p-6 sm:p-8">
           <slot />
         </div>
 

@@ -1,7 +1,54 @@
 @import "tailwindcss";
 
-/* Flamingo color palette (#F05224) - primary brand */
+/* Self-hosted Qurova (OTF/TTF in /public/) */
+@font-face {
+  font-family: "Qurova";
+  src: url("/qurova-light.otf") format("opentype"), url("/qurova-light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qurova";
+  src: url("/qurova-regular.otf") format("opentype"), url("/qurova-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qurova";
+  src: url("/qurova-medium.otf") format("opentype"), url("/qurova-medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qurova";
+  src: url("/qurova-semibold.otf") format("opentype"), url("/qurova-semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Qurova";
+  src: url("/qurova-bold.otf") format("opentype"), url("/qurova-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Printy brand: primary #e13515, Mirage secondary */
 @theme {
+  /* Custom font stack */
+  --font-sans:
+    "Qurova",
+    "Montserrat Alternates",
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  /* Primary CTA: #e13515 (exact) */
+  --color-primary: #e13515;
   --color-flamingo-50: #fef4ee;
   --color-flamingo-100: #fde6d7;
   --color-flamingo-200: #fbc9ad;
@@ -9,12 +56,12 @@
   --color-flamingo-400: #f37344;
   --color-flamingo-500: #f05224;
   --color-flamingo-600: #e13515;
-  --color-flamingo-700: #bb2513;
+  --color-flamingo-700: #c92f13;
   --color-flamingo-800: #942018;
   --color-flamingo-900: #781d16;
   --color-flamingo-950: #410b09;
 
-  /* Map primary to flamingo for compatibility */
+  /* Map primary for Nuxt UI compatibility */
   --color-primary-50: #fef4ee;
   --color-primary-100: #fde6d7;
   --color-primary-200: #fbc9ad;
@@ -22,10 +69,23 @@
   --color-primary-400: #f37344;
   --color-primary-500: #f05224;
   --color-primary-600: #e13515;
-  --color-primary-700: #bb2513;
+  --color-primary-700: #c92f13;
   --color-primary-800: #942018;
   --color-primary-900: #781d16;
   --color-primary-950: #410b09;
+
+  /* Mirage (secondary/neutral) */
+  --color-mirage-50: #f3f6fc;
+  --color-mirage-100: #e7edf7;
+  --color-mirage-200: #cad8ed;
+  --color-mirage-300: #9bb7de;
+  --color-mirage-400: #6591cb;
+  --color-mirage-500: #4173b6;
+  --color-mirage-600: #305999;
+  --color-mirage-700: #28487c;
+  --color-mirage-800: #243e68;
+  --color-mirage-900: #233657;
+  --color-mirage-950: #101828;
 
   /* Design system: one spacing scale (4px base) */
   --spacing-1: 0.25rem;   /* 4px */
@@ -56,12 +116,14 @@ html {
 }
 
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply font-sans text-[#101828];
+  background-color: #f3f6fc;
 }
 
-/* Dark mode: dark backgrounds with white/light text (Nuxt UI uses .dark class) */
+/* Dark mode: mirage-950 for deep ink, light text */
 .dark body {
-  @apply bg-gray-950 text-gray-100;
+  background-color: #101828;
+  @apply text-gray-100;
 }
 
 /* Dark mode: reverse common light surfaces to dark */
@@ -107,6 +169,23 @@ body {
 .dark .hover\:text-gray-900:hover {
   @apply text-white;
 }
+
+/* Primary CTA button: #e13515, hover #c92f13 */
+.btn-primary {
+  background-color: #e13515;
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #c92f13;
+}
+.btn-primary:focus-visible {
+  outline: 2px solid #e13515;
+  outline-offset: 2px;
+}
+.btn-primary:disabled {
+  @apply bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400;
+}
+
 /* Alert/warning boxes */
 .dark .bg-amber-50 {
   @apply bg-amber-900/30;
@@ -132,8 +211,10 @@ body [data-reka-combobox-content] {
 }
 
 .dashboard-surface {
-  /* Calmer than marketing: subtle app surface, layered in dark mode */
-  @apply bg-gray-100/90 dark:bg-[#0f1419];
+  background-color: #f3f6fc;
+}
+.dark .dashboard-surface {
+  background-color: #101828;
 }
 
 /* Page & layout transitions (avoids parentNode bug during navigation) */

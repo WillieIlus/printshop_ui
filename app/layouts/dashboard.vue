@@ -1,10 +1,10 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden">
+  <div class="min-h-screen flex flex-col bg-[#f3f6fc] dark:bg-[#101828] text-[#101828] dark:text-gray-100 overflow-x-hidden">
     <!-- Top bar -->
-    <header class="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-4 border-b border-gray-200/70 dark:border-gray-800 bg-white/85 dark:bg-gray-900/85 backdrop-blur-md px-4 sm:px-6">
+    <header class="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-4 border-b border-gray-200/70 dark:border-gray-800 bg-[#f3f6fc]/90 dark:bg-[#101828]/90 backdrop-blur-md px-4 sm:px-6">
       <NuxtLink to="/dashboard" class="flex items-center gap-2 shrink-0 group">
-        <span class="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 text-white shadow-lg shadow-flamingo-500/25 transition-transform group-hover:scale-105">
-          <UIcon name="i-lucide-printer" class="w-4 h-4" />
+        <span class="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-flamingo-500 to-flamingo-700 shadow-lg shadow-flamingo-500/25 transition-transform group-hover:scale-105 overflow-hidden">
+          <img src="/Printy-Logo-on-black.svg" alt="Printy" class="h-5 w-5 object-contain" />
         </span>
         <span class="font-semibold text-gray-900 dark:text-white hidden sm:inline">Printy</span>
       </NuxtLink>
@@ -25,7 +25,7 @@
     <div class="flex flex-1 overflow-hidden min-w-0">
       <!-- Sidebar: hidden on < md, full sidebar on md+ -->
       <aside
-        class="hidden md:flex md:flex-col md:shrink-0 md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+        class="hidden md:flex md:flex-col md:shrink-0 md:w-64 border-r border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900"
       >
         <nav class="flex flex-col gap-1 p-4 overflow-y-auto">
           <template v-for="item in navItems" :key="item.to">

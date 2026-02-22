@@ -20,8 +20,8 @@
       <label class="flex items-start gap-2">
         <UCheckbox v-model="agreeTerms" class="mt-1" />
         <span class="text-sm text-gray-600 dark:text-gray-400">
-          I agree to the <a href="#" class="text-primary-600 hover:underline dark:text-primary-400">Terms of Service</a>
-          and <a href="#" class="text-primary-600 hover:underline dark:text-primary-400">Privacy Policy</a>
+          I agree to the <NuxtLink to="/terms" class="text-[#e13515] hover:underline dark:text-primary-400">Terms of Service</NuxtLink>
+          and <NuxtLink to="/privacy" class="text-[#e13515] hover:underline dark:text-primary-400">Privacy Policy</NuxtLink>
         </span>
       </label>
       <UButton type="submit" color="primary" block :loading="loading" :disabled="!meta.valid || !agreeTerms">
