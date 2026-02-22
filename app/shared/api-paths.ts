@@ -1,6 +1,6 @@
 /**
- * API path segments relative to NUXT_PUBLIC_API_BASE (e.g. http://localhost:8000/api).
- * Matches Django REST framework URL names from the backend.
+ * API path segments relative to runtimeConfig.public.apiBase (derived from NUXT_PUBLIC_API_BASE_URL + '/api').
+ * Local: http://localhost:8000/api. Production: https://amazingace00.pythonanywhere.com/api
  */
 export const API = {
   // Auth (api-auth/)

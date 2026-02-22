@@ -2,7 +2,7 @@ import { useAuthStore } from '~/stores/auth'
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
-
+  // baseURL built from runtimeConfig.public.apiBase (derived from NUXT_PUBLIC_API_BASE_URL + '/api')
   const api = $fetch.create({
     baseURL: config.public.apiBase as string,
     // JWT auth via Authorization header - no credentials/cookies needed for CORS.

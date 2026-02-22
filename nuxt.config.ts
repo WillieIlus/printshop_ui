@@ -40,8 +40,11 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8000/api',
-      mediaBase: process.env.NUXT_PUBLIC_MEDIA_BASE || 'http://localhost:8000/media',
+      // Single source of truth: server root (no trailing slash). Local: http://localhost:8000, Prod: https://amazingace00.pythonanywhere.com
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
+      // Derived from apiBaseUrl — do not set directly
+      apiBase: (process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000') + '/api',
+      mediaBase: (process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8000') + '/media',
     },
   },
 

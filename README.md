@@ -26,12 +26,17 @@ Copy environment variables:
 cp .env.example .env
 ```
 
-Edit `.env` if your API base URL differs:
+Edit `.env` – set `NUXT_PUBLIC_API_BASE_URL` (server root, no trailing slash):
 
 ```
-NUXT_PUBLIC_API_BASE=http://localhost:8000/api
-NUXT_PUBLIC_MEDIA_BASE=http://localhost:8000/media
+# Local dev
+NUXT_PUBLIC_API_BASE_URL=http://localhost:8000
+
+# Production (Netlify): set in Site settings > Environment variables
+# NUXT_PUBLIC_API_BASE_URL=https://amazingace00.pythonanywhere.com
 ```
+
+**Netlify:** You **must** set the environment variable `NUXT_PUBLIC_API_BASE_URL` to `https://amazingace00.pythonanywhere.com` in your Netlify Site settings so production login and API calls use the correct backend.
 
 ## Development
 
