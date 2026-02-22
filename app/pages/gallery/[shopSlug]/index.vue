@@ -3,6 +3,7 @@ import type { PrintTemplateListDTO, TemplateCategoryDTO } from '~/shared/types/t
 import { formatGsmConstraint } from '~/shared/types/templates'
 import { listShopCategories, listShopTemplates } from '~/shared/api/gallery'
 import { useShopStore } from '~/stores/shop'
+import { useAuthStore } from '~/stores/auth'
 import { formatKES } from '~/utils/formatters'
 
 definePageMeta({ layout: 'default' })
@@ -11,11 +12,13 @@ const route = useRoute()
 const shopSlug = computed(() => String(route.params.shopSlug))
 
 const shopStore = useShopStore()
+const authStore = useAuthStore()
 const { getMediaUrl } = useApi()
 
 const categories = ref<TemplateCategoryDTO[]>([])
 const templates = ref<PrintTemplateListDTO[]>([])
 const loading = ref(true)
+const fetchError = ref<string | null>(null)
 const searchQuery = ref('')
 const selectedCategory = ref('all')
 
@@ -24,22 +27,35 @@ const shop = computed(() => shopStore.currentShop)
 const tweakerOpen = ref(false)
 const selectedTemplate = ref<PrintTemplateListDTO | null>(null)
 
+/** Whether the current user is a PRINTER who owns this shop */
+const isPrinterOwner = computed(() => {
+  if (!authStore.isAuthenticated || authStore.user?.role !== 'PRINTER') return false
+  return shopStore.myShops.some((s) => s.slug === shopSlug.value)
+})
+
 async function fetchData() {
   if (!shopSlug.value) return
   loading.value = true
+  fetchError.value = null
   try {
-    const [cats, tmplRes] = await Promise.all([
+    const [catsRes, tmplRes] = await Promise.allSettled([
       listShopCategories(shopSlug.value),
       listShopTemplates(shopSlug.value, {
         category: selectedCategory.value === 'all' ? undefined : selectedCategory.value,
         search: searchQuery.value.trim() || undefined,
       }),
     ])
-    categories.value = cats
-    templates.value = tmplRes.results
+    categories.value = catsRes.status === 'fulfilled' ? catsRes.value : []
+    if (tmplRes.status === 'fulfilled') {
+      templates.value = tmplRes.value.results
+    } else {
+      templates.value = []
+      fetchError.value = 'Failed to load templates'
+    }
   } catch {
     categories.value = []
     templates.value = []
+    fetchError.value = 'Failed to load templates'
   } finally {
     loading.value = false
   }
@@ -47,6 +63,13 @@ async function fetchData() {
 
 async function fetchShop() {
   await shopStore.fetchShopBySlug(shopSlug.value)
+}
+
+/** Fetch myShops when authenticated so we can show "Add template" for owners */
+async function ensureMyShops() {
+  if (authStore.isAuthenticated && shopStore.myShops.length === 0) {
+    await shopStore.fetchMyShops()
+  }
 }
 
 function openTweaker(template: PrintTemplateListDTO) {
@@ -59,8 +82,17 @@ function onTweakerOpenUpdate(v: boolean) {
   if (!v) selectedTemplate.value = null
 }
 
+function clearCategoryFilter() {
+  selectedCategory.value = 'all'
+}
+
 function constraintBadge(t: PrintTemplateListDTO): string | null {
   return formatGsmConstraint(t)
+}
+
+/** Shop name for display (shop-scoped: always current shop; from template.created_by_shop as fallback) */
+function shopNameForTemplate(t: PrintTemplateListDTO): string {
+  return t.created_by_shop?.name ?? shop.value?.name ?? 'Shop'
 }
 
 watch([shopSlug, selectedCategory, searchQuery], () => {
@@ -68,6 +100,10 @@ watch([shopSlug, selectedCategory, searchQuery], () => {
 }, { immediate: true })
 
 watch(shopSlug, fetchShop, { immediate: true })
+
+onMounted(() => {
+  ensureMyShops()
+})
 
 function previewUrl(t: PrintTemplateListDTO): string | null {
   if (!t.preview_image) return null
@@ -97,7 +133,7 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
       </div>
     </div>
 
-    <!-- Category tabs -->
+    <!-- Category tabs - ALWAYS render (even when templates empty or loading) -->
     <div class="flex flex-wrap gap-2 mb-6">
       <UButton
         :variant="selectedCategory === 'all' ? 'solid' : 'outline'"
@@ -118,7 +154,7 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
         @click="selectedCategory = cat.slug"
       >
         {{ cat.name }}
-        <span v-if="cat.template_count != null" class="ml-1 opacity-75">({{ cat.template_count }})</span>
+        <span v-if="(cat.template_count ?? cat.templates_count) != null" class="ml-1 opacity-75">({{ cat.template_count ?? cat.templates_count }})</span>
       </UButton>
     </div>
 
@@ -131,18 +167,25 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
       class="w-full max-w-md mb-6"
     />
 
-    <!-- Loading -->
-    <CommonLoadingSpinner v-if="loading" />
+    <!-- Loading: skeleton cards (same grid layout) -->
+    <GalleryTemplateSkeleton v-if="loading" />
 
-    <!-- Empty -->
-    <CommonEmptyState
-      v-else-if="!templates.length"
-      title="No templates found"
-      description="Try a different category or search."
-      icon="i-lucide-file-search"
+    <!-- Error: retry state -->
+    <GalleryErrorState
+      v-else-if="fetchError"
+      @retry="fetchData"
     />
 
-    <!-- Grid -->
+    <!-- Empty: premium empty state -->
+    <GalleryEmptyState
+      v-else-if="!templates.length"
+      :shop-name="shop ? shop.name : 'This printer'"
+      :is-printer-owner="isPrinterOwner"
+      :shop-slug="shopSlug"
+      @browse-another-category="clearCategoryFilter"
+    />
+
+    <!-- Grid: templates -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <article
         v-for="t in templates"
@@ -188,24 +231,34 @@ function previewUrl(t: PrintTemplateListDTO): string | null {
               {{ constraintBadge(t) }}
             </UBadge>
           </div>
-          <p v-if="t.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            By {{ shopNameForTemplate(t) }}
+          </p>
+          <p v-if="t.description" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
             {{ t.description }}
           </p>
-          <div class="mt-4 flex items-center justify-between">
+          <div class="mt-4 flex items-center justify-between gap-2">
             <div>
               <span class="text-xs text-gray-500 dark:text-gray-400">From</span>
               <div class="text-lg font-bold text-flamingo-600 dark:text-flamingo-400">
                 {{ formatKES(t.starting_price) }}
               </div>
             </div>
-            <UButton
-              color="primary"
-              variant="soft"
-              size="sm"
-              @click="openTweaker(t)"
-            >
-              Tweak
-            </UButton>
+            <div class="flex gap-2 shrink-0">
+              <NuxtLink :to="`/gallery/${shopSlug}/${t.slug}`">
+                <UButton color="neutral" variant="outline" size="sm">
+                  View
+                </UButton>
+              </NuxtLink>
+              <UButton
+                color="primary"
+                variant="soft"
+                size="sm"
+                @click="openTweaker(t)"
+              >
+                Tweak
+              </UButton>
+            </div>
           </div>
         </div>
       </article>

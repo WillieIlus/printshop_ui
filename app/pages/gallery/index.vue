@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import type { Shop } from '~/shared/types'
-import { useShopStore } from '~/stores/shop'
+import type { PublicShopDTO } from '~/shared/types/gallery'
+import { listPublicShops } from '~/shared/api/gallery'
 
 definePageMeta({
   layout: 'default',
 })
 
-const shopStore = useShopStore()
+const { getMediaUrl } = useApi()
 
-onMounted(() => shopStore.fetchShops())
+const shops = ref<PublicShopDTO[]>([])
+const loading = ref(true)
+const fetchError = ref<string | null>(null)
 
-const shops = computed(() => shopStore.shops)
+async function fetchShops() {
+  loading.value = true
+  fetchError.value = null
+  try {
+    shops.value = await listPublicShops()
+  } catch {
+    shops.value = []
+    fetchError.value = 'Failed to load shops'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchShops)
 </script>
 
 <template>
@@ -24,26 +39,26 @@ const shops = computed(() => shopStore.shops)
       </p>
     </div>
 
-    <CommonLoadingSpinner v-if="shopStore.loading" />
+    <CommonLoadingSpinner v-if="loading" />
 
     <CommonEmptyState
-      v-else-if="!shops.length"
-      title="No shops yet"
-      description="There are no print shops available. Check back later."
+      v-else-if="fetchError || !shops.length"
+      :title="fetchError ? 'Could not load shops' : 'No print shops available yet'"
+      :description="fetchError ? 'Something went wrong. Please try again later.' : 'There are no print shops available. Check back later.'"
       icon="i-lucide-store"
     />
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <article
         v-for="shop in shops"
-        :key="shop.id"
+        :key="shop.slug"
         class="group overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm transition-all hover:border-flamingo-200 dark:hover:border-flamingo-800/50 hover:shadow-lg"
       >
         <div class="relative bg-gradient-to-r from-flamingo-500/10 to-flamingo-700/10 dark:from-flamingo-500/20 dark:to-flamingo-700/20 px-6 py-5">
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-sm">
-                <UAvatar v-if="shop.logo" :src="shop.logo" :alt="shop.name" size="xl" class="h-full w-full rounded-xl" />
+                <UAvatar v-if="shop.logo" :src="shop.logo.startsWith('http') ? shop.logo : (getMediaUrl(shop.logo) ?? shop.logo)" :alt="shop.name" size="xl" class="h-full w-full rounded-xl" />
                 <UIcon v-else name="i-lucide-printer" class="h-6 w-6 text-flamingo-600 dark:text-flamingo-400" />
               </div>
               <div class="min-w-0">

@@ -28,6 +28,7 @@ export const API = {
   socialLinkDetail: (pk: number) => `social-links/${pk}/`,
   // Shops
   shops: () => 'shops/',
+  shopsPublic: () => 'shops/public/',
   shopsMyShops: () => 'shops/my_shops/',
   shopDetail: (slug: string) => `shops/${slug}/`,
   shopTransferOwnership: (slug: string) => `shops/${slug}/transfer_ownership/`,
