@@ -1,19 +1,19 @@
 <template>
   <div class="space-y-4">
     <!-- Loading -->
-    <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div v-for="i in 6" :key="i" class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden animate-pulse">
-        <div class="aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
-        <div class="p-5 space-y-3">
-          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-          <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-          <div class="flex gap-2">
-            <div class="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
-            <div class="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <SkeletonsCardGridSkeleton v-if="loading" :count="6" variant="template" />
+
+    <!-- Error -->
+    <CommonErrorState
+      v-else-if="fetchError"
+      title="Could not load templates"
+      :message="fetchError"
+    >
+      <UButton color="primary" @click="fetchFeatured">
+        <UIcon name="i-lucide-refresh-cw" class="h-4 w-4 mr-2" />
+        Try again
+      </UButton>
+    </CommonErrorState>
 
     <!-- Cards grid -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -137,6 +137,7 @@ const { get, getMediaUrl } = useApi()
 
 const templates = ref<CatalogTemplate[]>([])
 const loading = ref(true)
+const fetchError = ref<string | null>(null)
 const tweakModalOpen = ref(false)
 const selectedTemplate = ref<CatalogTemplate | null>(null)
 
@@ -144,6 +145,8 @@ const take = computed(() => (props.limit && props.limit > 0 ? props.limit : 999)
 
 async function fetchFeatured() {
   loading.value = true
+  fetchError.value = null
+  let gotData = false
   try {
     const slice = (arr: CatalogTemplate[]) => arr.slice(0, take.value)
 
@@ -153,6 +156,7 @@ async function fetchFeatured() {
     ).catch(() => null)
 
     if (data) {
+      gotData = true
       if (Array.isArray(data)) {
         templates.value = slice(data)
       } else if (data.results) {
@@ -169,6 +173,7 @@ async function fetchFeatured() {
     ).catch(() => null)
 
     if (popular) {
+      gotData = true
       const list = Array.isArray(popular) ? popular : popular.results ?? []
       templates.value = slice(list)
       if (templates.value.length > 0) return
@@ -181,6 +186,7 @@ async function fetchFeatured() {
     ).catch(() => null)
 
     if (fallback?.results?.length) {
+      gotData = true
       templates.value = slice(fallback.results)
     } else {
       // Last resort: plain templates list
@@ -189,10 +195,18 @@ async function fetchFeatured() {
         { limit: String(take.value) }
       ).catch(() => null)
       if (list) {
+        gotData = true
         const arr = Array.isArray(list) ? list : list.results ?? []
         templates.value = slice(arr)
       }
     }
+    if (!gotData) {
+      fetchError.value = 'Failed to load templates'
+      templates.value = []
+    }
+  } catch {
+    fetchError.value = 'Failed to load templates'
+    templates.value = []
   } finally {
     loading.value = false
   }

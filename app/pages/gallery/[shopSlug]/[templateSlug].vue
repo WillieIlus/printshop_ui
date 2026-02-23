@@ -59,7 +59,7 @@ watch([shopSlug, templateSlug], fetchTemplate, { immediate: true })
       </div>
     </div>
 
-    <CommonLoadingSpinner v-if="loading" />
+    <SkeletonsTemplateDetailSkeleton v-if="loading" />
 
     <CommonErrorState
       v-else-if="fetchError"

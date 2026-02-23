@@ -6,6 +6,16 @@
     />
 
     <DashboardSkeletonState v-if="claimStore.loading" variant="cards" :card-count="6" />
+    <CommonErrorState
+      v-else-if="claimStore.error"
+      title="Could not load claims"
+      :message="claimStore.error"
+    >
+      <UButton color="primary" @click="claimStore.fetchClaims()">
+        <UIcon name="i-lucide-refresh-cw" class="h-4 w-4 mr-2" />
+        Retry
+      </UButton>
+    </CommonErrorState>
     <div v-else-if="claimStore.claims.length" class="col-span-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
       <ClaimsClaimCard v-for="c in claimStore.claims" :key="c.id" :claim="c">
         <template #actions>
