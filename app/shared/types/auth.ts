@@ -22,9 +22,11 @@ import type { UserRole } from './user'
 export interface AuthUser {
   id: number
   email: string
-  first_name: string
-  last_name: string
+  first_name?: string
+  last_name?: string
+  name?: string
   is_active: boolean
-  date_joined: string
+  date_joined?: string
+  is_staff?: boolean
   role?: UserRole
 }

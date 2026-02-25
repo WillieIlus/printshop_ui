@@ -118,7 +118,7 @@ async function onSubmit(data: UserUpdatePayload) {
     await userStore.fetchMe()
     await profileStore.fetchProfile()
     if (authStore.user) {
-      await authStore.fetchUser()
+      await authStore.fetchMe()
     }
     notification.success('Profile and social links saved successfully')
     await navigateTo('/dashboard/profile')

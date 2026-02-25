@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async () => {
   if (authStore.isAuthenticated) {
     let u = authStore.user
     if (!u) {
-      await authStore.fetchUser()
+      await authStore.fetchMe()
       u = authStore.user
     }
     const shopStore = useShopStore()

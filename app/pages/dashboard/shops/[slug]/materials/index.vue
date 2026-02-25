@@ -29,7 +29,7 @@
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Paper</th>
               <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">In stock</th>
               <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Reorder at</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Buy price</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Buy / Sell</th>
               <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
               <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
             </tr>
@@ -49,25 +49,30 @@
                 </div>
               </td>
               <td class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-white">
-                {{ item.quantity_in_stock }} sheets
+                {{ item.quantity_in_stock != null ? `${item.quantity_in_stock} sheets` : '-' }}
               </td>
               <td class="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">
-                {{ item.reorder_level }}
+                {{ item.reorder_level ?? '-' }}
               </td>
               <td class="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">
-                {{ item.buying_price_per_sheet ? `KES ${item.buying_price_per_sheet}` : '-' }}
+                KES {{ item.buying_price }} / KES {{ item.selling_price }}
               </td>
               <td class="px-4 py-3 text-center">
                 <UBadge
-                  :color="(item.needs_reorder ?? item.quantity_in_stock <= item.reorder_level) ? 'error' : 'success'"
+                  :color="(item.needs_reorder ?? (item.quantity_in_stock != null && item.reorder_level != null && item.quantity_in_stock <= item.reorder_level)) ? 'error' : 'success'"
                   variant="soft"
                   size="xs"
                 >
-                  {{ (item.needs_reorder ?? item.quantity_in_stock <= item.reorder_level) ? 'Low stock' : 'OK' }}
+                  {{ (item.needs_reorder ?? (item.quantity_in_stock != null && item.reorder_level != null && item.quantity_in_stock <= item.reorder_level)) ? 'Low stock' : 'OK' }}
                 </UBadge>
               </td>
               <td class="px-4 py-3 text-right">
-                <UButton variant="ghost" size="xs" @click="openAdjustModal(item)">
+                <UButton
+                  v-if="item.quantity_in_stock != null"
+                  variant="ghost"
+                  size="xs"
+                  @click="openAdjustModal(item)"
+                >
                   <UIcon name="i-lucide-plus-minus" class="w-4 h-4" />
                 </UButton>
                 <UButton variant="ghost" size="xs" @click="editItem(item)">Edit</UButton>
@@ -113,7 +118,7 @@
         <div v-if="adjustingItem" class="space-y-4">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             {{ adjustingItem.sheet_size }} {{ adjustingItem.gsm }}gsm {{ adjustingItem.paper_type }}
-            — current: {{ adjustingItem.quantity_in_stock }} sheets
+            — current: {{ adjustingItem.quantity_in_stock ?? 0 }} sheets
           </p>
           <div>
             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -143,7 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PaperStock } from '~/stores/paperStock'
+import type { Paper } from '~/stores/paperStock'
 import { usePaperStockStore } from '~/stores/paperStock'
 
 definePageMeta({
@@ -158,19 +163,19 @@ const toast = useToast()
 const slug = computed(() => route.params.slug as string)
 const modalOpen = ref(false)
 const formReady = ref(false)
-const editing = ref<PaperStock | null>(null)
+const editing = ref<Paper | null>(null)
 const formLoading = ref(false)
 const adjustModalOpen = ref(false)
-const adjustingItem = ref<PaperStock | null>(null)
+const adjustingItem = ref<Paper | null>(null)
 const adjustmentValue = ref<string>('')
 const adjustLoading = ref(false)
 
-function openModal(item?: PaperStock) {
+function openModal(item?: Paper) {
   editing.value = item ?? null
   modalOpen.value = true
 }
 
-function editItem(item: PaperStock) {
+function editItem(item: Paper) {
   openModal(item)
 }
 
@@ -189,7 +194,7 @@ watch(modalOpen, (open) => {
   }
 })
 
-function openAdjustModal(item: PaperStock) {
+function openAdjustModal(item: Paper) {
   adjustingItem.value = item
   adjustmentValue.value = ''
   adjustModalOpen.value = true
@@ -205,9 +210,10 @@ async function onSubmit(data: {
   sheet_size: string
   gsm: number
   paper_type: string
-  quantity_in_stock?: number
-  reorder_level?: number
-  buying_price_per_sheet?: string
+  buying_price: string
+  selling_price: string
+  quantity_in_stock?: number | null
+  reorder_level?: number | null
 }) {
   formLoading.value = true
   try {
@@ -215,9 +221,10 @@ async function onSubmit(data: {
       sheet_size: data.sheet_size,
       gsm: data.gsm,
       paper_type: data.paper_type,
-      quantity_in_stock: data.quantity_in_stock ?? 0,
-      reorder_level: data.reorder_level ?? 100,
-      buying_price_per_sheet: data.buying_price_per_sheet || null,
+      buying_price: data.buying_price,
+      selling_price: data.selling_price,
+      quantity_in_stock: data.quantity_in_stock ?? null,
+      reorder_level: data.reorder_level ?? null,
     }
     if (editing.value) {
       await paperStockStore.updatePaperStock(slug.value, editing.value.id, payload)
@@ -258,7 +265,7 @@ async function applyAdjustment() {
   }
 }
 
-async function confirmDelete(item: PaperStock) {
+async function confirmDelete(item: Paper) {
   const name = `${item.sheet_size} ${item.gsm}gsm ${item.paper_type}`
   if (!confirm(`Delete "${name}"? This may affect quotes using this stock.`)) return
   try {

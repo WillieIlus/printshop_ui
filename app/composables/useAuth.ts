@@ -23,7 +23,7 @@ export function useAuth() {
   const loading = computed(() => authStore.loading)
 
   async function login(email: string, password: string, rememberMe = false) {
-    const result = await authStore.login({ email, password, remember_me: rememberMe })
+    const result = await authStore.login(email, password, rememberMe)
     if (result.success) {
       try {
         await profileStore.fetchProfile()

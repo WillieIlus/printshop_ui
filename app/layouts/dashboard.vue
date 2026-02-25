@@ -43,64 +43,17 @@
           <div class="my-2 border-t border-gray-200 dark:border-gray-700 pt-2">
             <p class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">My Shops</p>
             <ClientOnly>
-              <template v-if="shopStore.myShops.length">
-                <template v-for="shop in shopStore.myShops" :key="shop.slug">
+              <template v-if="sellerStore.shops.length">
                 <NuxtLink
-                  :to="`/dashboard/shops/${shop.slug}`"
+                  v-for="shop in sellerStore.shops"
+                  :key="shop.id"
+                  :to="`/dashboard/shops/${shop.id}/setup`"
                   class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                  :class="{ 'bg-flamingo-50 dark:bg-flamingo-900/20 text-flamingo-600 dark:text-flamingo-400': isShopActive(shop.slug) }"
+                  :class="{ 'bg-flamingo-50 dark:bg-flamingo-900/20 text-flamingo-600 dark:text-flamingo-400': isShopActive(shop.id) }"
                 >
                   <UIcon name="i-lucide-store" class="w-4 h-4 shrink-0" />
                   <span class="truncate">{{ shop.name }}</span>
                 </NuxtLink>
-                <div
-                  v-if="isShopActive(shop.slug)"
-                  class="ml-4 mt-1 space-y-0.5 border-l border-gray-200 dark:border-gray-700 pl-3"
-                >
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/machines`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Machines
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/materials`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Paper stock
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/pricing`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Stock & prices
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/products`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Products
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/quotes`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Quotes
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/members`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Team
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/dashboard/shops/${shop.slug}/hours`"
-                    class="block text-xs text-gray-600 dark:text-gray-400 hover:text-flamingo-600 dark:hover:text-flamingo-400"
-                  >
-                    Hours
-                  </NuxtLink>
-                </div>
-              </template>
               </template>
             </ClientOnly>
             <NuxtLink
@@ -115,10 +68,34 @@
         <div v-if="$slots['sidebar-footer']" class="mt-auto border-t border-gray-200 dark:border-gray-800 p-4">
           <slot name="sidebar-footer" />
         </div>
+        <div class="mt-auto border-t border-gray-200 dark:border-gray-800 p-4">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            icon="i-lucide-message-square-plus"
+            class="w-full justify-start"
+            @click="feedbackOpen = true"
+          >
+            Send Feedback
+          </UButton>
+        </div>
       </aside>
 
       <!-- Bottom nav: mobile only (< md) -->
       <DashboardBottomNav />
+
+      <!-- Floating feedback button: mobile only -->
+      <div class="fixed bottom-20 right-4 z-30 md:hidden">
+        <UButton
+          color="primary"
+          size="lg"
+          icon="i-lucide-message-square-plus"
+          aria-label="Send feedback"
+          class="rounded-full shadow-lg"
+          @click="feedbackOpen = true"
+        />
+      </div>
 
       <main class="flex-1 min-w-0 overflow-auto p-4 sm:p-6 lg:p-8 pb-20 md:pb-6 lg:pb-8">
         <div v-if="$slots.title || $slots.actions" class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -128,15 +105,27 @@
         <slot />
       </main>
     </div>
+
+    <DashboardBetaFeedbackModal
+      :open="feedbackOpen"
+      :page="route.path"
+      :user-agent="userAgent"
+      @update:open="feedbackOpen = $event"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useShopStore } from '~/stores/shop'
+import { useSellerStore } from '~/stores/seller'
 
 const colorMode = useColorMode()
 const route = useRoute()
-const shopStore = useShopStore()
+const sellerStore = useSellerStore()
+const feedbackOpen = ref(false)
+const userAgent = ref('')
+if (import.meta.client) {
+  userAgent.value = navigator.userAgent.slice(0, 255)
+}
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: 'i-lucide-layout-dashboard' },
@@ -151,11 +140,12 @@ function isActive(to: string) {
   return route.path.startsWith(to)
 }
 
-function isShopActive(slug: string) {
-  return route.params.slug === slug
+function isShopActive(shopId: number) {
+  const id = route.params.id ?? route.params.slug
+  return String(shopId) === id
 }
 
 onMounted(() => {
-  shopStore.fetchMyShops()
+  sellerStore.fetchShops()
 })
 </script>

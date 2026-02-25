@@ -1,5 +1,6 @@
-import type { AuthTokens, AuthUser, LoginCredentials, SignupCredentials } from '~/shared/types'
+import type { AuthTokens, AuthUser, SignupCredentials } from '~/shared/types'
 import { API } from '~/shared/api-paths'
+import { useApi } from '~/shared/api'
 import { authCookieStorage } from '~/utils/auth-cookie-storage'
 
 const AUTH_STORAGE_KEY = 'auth'
@@ -16,83 +17,90 @@ function extractErrorMessage(err: unknown, rateLimitStatus: number, rateLimitMes
   return err instanceof Error ? err.message : 'Login failed'
 }
 
-function extractErrorCode(err: unknown): string | undefined {
-  if (err && typeof err === 'object') {
-    const e = err as { data?: { code?: string; detail?: string }; response?: { _data?: { code?: string; detail?: string } } }
-    const data = e.data ?? e.response?._data
-    if (data && typeof data === 'object') {
-      const d = data as Record<string, unknown>
-      if (typeof d.code === 'string') return d.code
-      if (typeof d.detail === 'string' && d.detail.includes('email_not_verified')) return 'email_not_verified'
-    }
-  }
-  return undefined
-}
-
 export const useAuthStore = defineStore('auth', () => {
-  const tokens = ref<AuthTokens | null>(null)
+  const accessToken = ref<string | null>(null)
+  const refreshToken = ref<string | null>(null)
   const user = ref<AuthUser | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
-  const rememberMe = ref(true)
   const rateLimitUntil = ref<number>(0)
+  const rememberMe = ref(true)
 
-  const isAuthenticated = computed(() => !!tokens.value?.access)
-  const accessToken = computed(() => tokens.value?.access)
-  const refreshToken = computed(() => tokens.value?.refresh)
+  const isAuthenticated = computed(() => !!accessToken.value)
 
-  async function login(credentials: LoginCredentials) {
+  async function login(email: string, password: string, remember = true) {
     loading.value = true
     error.value = null
-    rememberMe.value = !!credentials.remember_me
+    rememberMe.value = remember
     try {
-      const { $api } = useNuxtApp()
-      const response = await $api<AuthTokens>(API.auth.login, {
+      const api = useApi()
+      const response = await api<AuthTokens>(API.auth.token, {
         method: 'POST',
-        body: { email: credentials.email, password: credentials.password },
+        body: { email, password },
       })
-      tokens.value = response
-      await fetchUser()
+      accessToken.value = response.access
+      refreshToken.value = response.refresh
+      await fetchMe()
       return { success: true }
     } catch (err: unknown) {
       const e = err as { statusCode?: number; status?: number }
-      const is429 = e?.statusCode === 429 || e?.status === 429
-      if (is429) rateLimitUntil.value = Date.now() + 60_000
+      if (e?.statusCode === 429 || e?.status === 429) rateLimitUntil.value = Date.now() + 60_000
       const message = extractErrorMessage(err, 429, 'Too many requests. Please wait a minute before trying again.')
       error.value = message
-      const code = extractErrorCode(err)
-      const is403 = e?.statusCode === 403 || e?.status === 403
-      return {
-        success: false,
-        error: message,
-        code: is403 && code === 'email_not_verified' ? 'email_not_verified' : undefined,
-        email: credentials.email,
-      }
+      return { success: false, error: message }
     } finally {
       loading.value = false
     }
+  }
+
+  async function refresh() {
+    if (!refreshToken.value) return false
+    try {
+      const api = useApi()
+      const response = await api<{ access: string; refresh?: string }>(API.auth.tokenRefresh, {
+        method: 'POST',
+        body: { refresh: refreshToken.value },
+      })
+      accessToken.value = response.access
+      if (response.refresh) refreshToken.value = response.refresh
+      return true
+    } catch {
+      logout()
+      return false
+    }
+  }
+
+  async function fetchMe() {
+    if (!accessToken.value) return
+    try {
+      const api = useApi()
+      user.value = await api<AuthUser>(API.auth.me)
+    } catch (err) {
+      console.error('Failed to fetch user:', err)
+    }
+  }
+
+  function logout() {
+    accessToken.value = null
+    refreshToken.value = null
+    user.value = null
+    navigateTo('/auth/login')
   }
 
   async function signup(credentials: SignupCredentials) {
     loading.value = true
     error.value = null
     try {
-      const { $api } = useNuxtApp()
-      await $api(API.auth.signup, {
+      const api = useApi()
+      await api(API.auth.register, {
         method: 'POST',
         body: {
           email: credentials.email,
           password: credentials.password,
-          password_confirmation: credentials.password_confirm,
-          first_name: credentials.first_name,
-          last_name: credentials.last_name,
+          name: `${credentials.first_name} ${credentials.last_name}`.trim(),
         },
       })
-      // Backend creates inactive user; email confirmation required before login
-      return {
-        success: true,
-        message: 'Registration successful. Please check your email to confirm your account.',
-      }
+      return { success: true, message: 'Registration successful. Please sign in.' }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Signup failed'
       error.value = message
@@ -102,112 +110,54 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function fetchUser() {
-    if (!tokens.value?.access) return
-    try {
-      const { $api } = useNuxtApp()
-      user.value = await $api<AuthUser>(API.userMe())
-    } catch (err) {
-      console.error('Failed to fetch user:', err)
-    }
-  }
-
-  async function refreshTokens() {
-    if (!tokens.value?.refresh) return false
-    try {
-      const { $api } = useNuxtApp()
-      const response = await $api<{ access: string; refresh?: string }>(API.auth.refresh, {
-        method: 'POST',
-        body: { refresh: tokens.value.refresh },
-      })
-      tokens.value = {
-        access: response.access,
-        refresh: response.refresh ?? tokens.value.refresh,
-      }
-      return true
-    } catch {
-      logout()
-      return false
-    }
-  }
-
-  function logout() {
-    tokens.value = null
-    user.value = null
-    navigateTo('/auth/login')
-  }
-
-  function setTokens(newTokens: AuthTokens) {
-    tokens.value = newTokens
-  }
-
-  /** Request password reset email (when backend endpoint exists) */
   async function requestPasswordReset(email: string) {
     error.value = null
     try {
-      const { $api } = useNuxtApp()
-      await $api(API.auth.forgotPassword, {
-        method: 'POST',
-        body: { email },
-      })
+      const api = useApi()
+      await api(API.auth.forgotPassword, { method: 'POST', body: { email } })
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Request failed'
-      error.value = message
-      return { success: false, error: message }
+      error.value = err instanceof Error ? err.message : 'Request failed'
+      return { success: false, error: error.value }
     }
   }
 
-  /** Confirm password reset with token from email (when backend endpoint exists) */
-  async function resetPassword(
-    uid: string,
-    token: string,
-    newPassword: string,
-    newPasswordConfirmation?: string
-  ) {
+  async function resetPassword(uid: string, token: string, newPassword: string, newPasswordConfirm?: string) {
     error.value = null
     try {
-      const { $api } = useNuxtApp()
-      await $api(API.auth.resetConfirm, {
+      const api = useApi()
+      await api(API.auth.resetConfirm, {
         method: 'POST',
-        body: {
-          uid,
-          token,
-          new_password: newPassword,
-          new_password_confirmation: newPasswordConfirmation ?? newPassword,
-        },
+        body: { uid, token, new_password: newPassword, new_password_confirmation: newPasswordConfirm ?? newPassword },
       })
       return { success: true }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Reset failed'
-      error.value = message
-      return { success: false, error: message }
+      error.value = err instanceof Error ? err.message : 'Reset failed'
+      return { success: false, error: error.value }
     }
   }
 
   return {
-    tokens,
+    accessToken,
+    refreshToken,
     user,
     loading,
     error,
     rateLimitUntil,
     rememberMe,
     isAuthenticated,
-    accessToken,
-    refreshToken,
     login,
-    signup,
-    fetchUser,
-    refreshTokens,
+    refresh,
+    fetchMe,
     logout,
-    setTokens,
+    signup,
     requestPasswordReset,
     resetPassword,
   }
 }, {
   persist: {
     key: AUTH_STORAGE_KEY,
-    storage: authCookieStorage, // Cookies only — see utils/auth-cookie-storage.ts
-    pick: ['tokens', 'rememberMe'],
+    storage: authCookieStorage,
+    pick: ['accessToken', 'refreshToken', 'rememberMe'],
   },
 })

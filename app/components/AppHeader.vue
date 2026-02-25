@@ -155,7 +155,7 @@ async function onBecomePrinter() {
   try {
     const result = await userStore.updateMe({ role: 'PRINTER' })
     if (result.success) {
-      await authStore.fetchUser()
+      await authStore.fetchMe()
       await navigateTo('/onboarding/printer')
     } else {
       notification.error(userStore.error ?? 'Failed to update role')
@@ -172,7 +172,9 @@ const navLinks = [
   { label: 'Problem', to: '/#problem' },
   { label: 'Pricing Models', to: '/#models' },
   { label: 'Shops', to: '/shops' },
+  { label: 'Your Quote', to: '/quote-draft', icon: 'i-lucide-shopping-cart' },
   { label: 'My Quotes', to: '/quotes' },
+  { label: 'Saved Shops', to: '/me/favorites', icon: 'i-lucide-heart' },
 ]
 
 const userName = computed(() => {

@@ -30,22 +30,30 @@
         portal="#modal-portal"
       />
       <FormsFormInput
-        name="quantity_in_stock"
-        label="Quantity in stock (sheets)"
+        name="buying_price"
+        label="Buying price per sheet"
         type="number"
-        placeholder="0"
+        placeholder="0.00"
+        required
+      />
+      <FormsFormInput
+        name="selling_price"
+        label="Selling price per sheet"
+        type="number"
+        placeholder="0.00"
+        required
+      />
+      <FormsFormInput
+        name="quantity_in_stock"
+        label="Quantity in stock (optional)"
+        type="number"
+        placeholder="Leave empty"
       />
       <FormsFormInput
         name="reorder_level"
-        label="Reorder level"
+        label="Reorder level (optional)"
         type="number"
         placeholder="100"
-      />
-      <FormsFormInput
-        name="buying_price_per_sheet"
-        label="Buying price per sheet (optional)"
-        type="number"
-        placeholder="0.00"
       />
       <div class="flex justify-end gap-2 pt-4">
         <UButton variant="outline" @click="$emit('cancel')">Cancel</UButton>
@@ -55,7 +63,7 @@
           :loading="loading"
           :disabled="loading"
         >
-          {{ stock ? 'Update' : 'Add' }} paper stock
+          {{ stock ? 'Update' : 'Add' }} paper
         </UButton>
       </div>
     </div>
@@ -63,11 +71,11 @@
 </template>
 
 <script setup lang="ts">
-import type { PaperStock } from '~/stores/paperStock'
+import type { Paper } from '~/stores/paperStock'
 import { object, number, string } from 'yup'
 
 const props = defineProps<{
-  stock: PaperStock | null
+  stock: Paper | null
   loading?: boolean
 }>()
 
@@ -76,9 +84,10 @@ defineEmits<{
     sheet_size: string
     gsm: number
     paper_type: string
-    quantity_in_stock?: number
-    reorder_level?: number
-    buying_price_per_sheet?: string
+    buying_price: string
+    selling_price: string
+    quantity_in_stock?: number | null
+    reorder_level?: number | null
   }]
   cancel: []
 }>()
@@ -101,17 +110,19 @@ const schema = object({
   sheet_size: string().oneOf(['A5', 'A4', 'A3', 'SRA3', 'SRA4']).required('Size is required'),
   gsm: number().min(60, 'Min 60 GSM').max(500, 'Max 500 GSM').required('GSM is required'),
   paper_type: string().oneOf(['GLOSS', 'MATTE', 'BOND', 'ART']).required('Paper type is required'),
-  quantity_in_stock: number().min(0).optional(),
-  reorder_level: number().min(0).optional(),
-  buying_price_per_sheet: string().optional(),
+  buying_price: string().required('Buying price is required'),
+  selling_price: string().required('Selling price is required'),
+  quantity_in_stock: number().min(0).optional().nullable(),
+  reorder_level: number().min(0).optional().nullable(),
 })
 
 const initialValues = computed(() => ({
   sheet_size: props.stock?.sheet_size ?? 'SRA3',
   gsm: props.stock?.gsm ?? '',
   paper_type: props.stock?.paper_type ?? 'GLOSS',
-  quantity_in_stock: props.stock?.quantity_in_stock ?? 0,
-  reorder_level: props.stock?.reorder_level ?? 100,
-  buying_price_per_sheet: props.stock?.buying_price_per_sheet ?? '',
+  buying_price: props.stock?.buying_price ?? '',
+  selling_price: props.stock?.selling_price ?? '',
+  quantity_in_stock: props.stock?.quantity_in_stock ?? '',
+  reorder_level: props.stock?.reorder_level ?? '',
 }))
 </script>

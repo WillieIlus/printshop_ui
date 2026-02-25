@@ -206,7 +206,7 @@ export const usePricingStore = defineStore('pricing', {
       this.loading = true
       try {
         const { $api } = useNuxtApp()
-        this.paperPrices = await $api<PaperPrice[]>(API.shopPaperPrices(slug))
+        this.paperPrices = await $api<PaperPrice[]>(API.shopPaper(slug))
       } catch (err: unknown) {
         this.error = parseApiError(err, 'Failed')
         throw err
@@ -220,7 +220,7 @@ export const usePricingStore = defineStore('pricing', {
      */
     async createPaperPrice(slug: string, data: PaperPriceForm) {
       const { $api } = useNuxtApp()
-      const created = await $api<PaperPrice>(API.shopPaperPrices(slug), {
+      const created = await $api<PaperPrice>(API.shopPaper(slug), {
         method: 'POST',
         body: data,
       })
@@ -233,7 +233,7 @@ export const usePricingStore = defineStore('pricing', {
      */
     async updatePaperPrice(slug: string, pk: number, data: Partial<PaperPriceForm>) {
       const { $api } = useNuxtApp()
-      const updated = await $api<PaperPrice>(API.shopPaperPriceDetail(slug, pk), {
+      const updated = await $api<PaperPrice>(API.shopPaperDetail(slug, pk), {
         method: 'PATCH',
         body: data,
       })
@@ -249,7 +249,7 @@ export const usePricingStore = defineStore('pricing', {
      */
     async deletePaperPrice(slug: string, pk: number) {
       const { $api } = useNuxtApp()
-      await $api(API.shopPaperPriceDetail(slug, pk), { method: 'DELETE' })
+      await $api(API.shopPaperDetail(slug, pk), { method: 'DELETE' })
       this.paperPrices = this.paperPrices.filter((p) => p.id !== pk)
     },
 

@@ -3,16 +3,18 @@
  * Local: http://localhost:8000/api. Production: https://amazingace00.pythonanywhere.com/api
  */
 export const API = {
-  // Auth (api-auth/)
+  // Auth (SimpleJWT / Printy_API)
   auth: {
-    login: 'auth/api-auth/login/',
-    refresh: 'auth/api-auth/token/refresh/',
+    token: 'auth/token/',
+    tokenRefresh: 'auth/token/refresh/',
+    me: 'auth/me/',
+    // Legacy / optional
     register: 'auth/register/',
-    signup: 'auth/signup/', // Use 'auth/register/' if backend only has register
+    signup: 'auth/signup/',
     verifyEmail: 'auth/email/verify/',
     resendVerification: 'auth/email/resend/',
-    forgotPassword: 'auth/api-auth/password/reset/',
-    resetConfirm: 'auth/api-auth/password/reset/confirm/',
+    forgotPassword: 'auth/password/reset/',
+    resetConfirm: 'auth/password/reset/confirm/',
   },
   // Users
   users: () => 'users/',
@@ -26,11 +28,36 @@ export const API = {
   // Social links (global)
   socialLinks: () => 'social-links/',
   socialLinkDetail: (pk: number) => `social-links/${pk}/`,
+  // Public (Printy_API buyer browsing)
+  publicShops: () => 'public/shops/',
+  publicShopCatalog: (slug: string) => `public/shops/${slug}/catalog/`,
+  // Quote drafts (Printy_API buyer)
+  quoteDraftsActive: (shopSlug: string) => `quote-drafts/active/?shop=${encodeURIComponent(shopSlug)}`,
+  quoteDraftPreviewPrice: (draftId: number) => `quote-drafts/${draftId}/preview-price/`,
+  quoteRequestItems: (draftId: number) => `quote-requests/${draftId}/items/`,
+  quoteRequestItemDetail: (draftId: number, itemId: number) => `quote-requests/${draftId}/items/${itemId}/`,
+  quoteRequests: () => 'quote-requests/',
+  quoteRequestDetail: (draftId: number) => `quote-requests/${draftId}/`,
+  quoteRequestSubmit: (draftId: number) => `quote-requests/${draftId}/submit/`,
   // Shops
   shops: () => 'shops/',
   shopsPublic: () => 'shops/public/',
   shopsMyShops: () => 'shops/my_shops/',
   shopDetail: (slug: string) => `shops/${slug}/`,
+  // Seller (Printy_API) — shop-scoped by id
+  sellerShopDetail: (id: number) => `shops/${id}/`,
+  sellerShopMachines: (shopId: number) => `shops/${shopId}/machines/`,
+  sellerShopMachineDetail: (shopId: number, pk: number) => `shops/${shopId}/machines/${pk}/`,
+  sellerShopPapers: (shopId: number) => `shops/${shopId}/papers/`,
+  sellerShopPaperDetail: (shopId: number, pk: number) => `shops/${shopId}/papers/${pk}/`,
+  sellerShopFinishingRates: (shopId: number) => `shops/${shopId}/finishing-rates/`,
+  sellerShopFinishingRateDetail: (shopId: number, pk: number) => `shops/${shopId}/finishing-rates/${pk}/`,
+  sellerShopMaterials: (shopId: number) => `shops/${shopId}/materials/`,
+  sellerShopMaterialDetail: (shopId: number, pk: number) => `shops/${shopId}/materials/${pk}/`,
+  sellerShopProducts: (shopId: number) => `shops/${shopId}/products/`,
+  sellerShopProductDetail: (shopId: number, pk: number) => `shops/${shopId}/products/${pk}/`,
+  sellerMachinePrintingRates: (machineId: number) => `machines/${machineId}/printing-rates/`,
+  sellerMachinePrintingRateDetail: (machineId: number, pk: number) => `machines/${machineId}/printing-rates/${pk}/`,
   shopTransferOwnership: (slug: string) => `shops/${slug}/transfer_ownership/`,
   shopMembers: (slug: string) => `shops/${slug}/members/`,
   shopMemberDetail: (slug: string, pk: number) => `shops/${slug}/members/${pk}/`,
@@ -54,6 +81,12 @@ export const API = {
     `shops/${slug}/quotes/${quoteId}/items/${pk}/`,
   requestQuote: (slug: string) => `shops/${slug}/request-quote/`,
   myQuotes: () => 'my-quotes/',
+  // Favorites (buyer)
+  shopFavorite: (shopId: number) => `shops/${shopId}/favorite/`,
+  meFavorites: () => 'me/favorites/',
+  // Ratings
+  shopRate: (shopId: number) => `shops/${shopId}/rate/`,
+  publicShopRatingSummary: (slug: string) => `public/shops/${slug}/rating-summary/`,
   // Templates (catalog) — public
   templates: () => 'templates/',
   templateCategories: () => 'templates/categories/',
@@ -85,32 +118,22 @@ export const API = {
   shopPricingStatus: (slug: string) => `shops/${slug}/pricing/status/`,
   
   // Pricing - Management (shop owner)
-  shopPrintingPrices: (slug: string) => `shops/${slug}/pricing/printing/`,
-  shopPrintingPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/printing/${pk}/`,
-  shopPaperPrices: (slug: string) => `shops/${slug}/pricing/paper/`,
-  shopPaperPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/paper/${pk}/`,
+  shopPrintingPrices: (slug: string) => `shops/${slug}/pricing/printing-prices/`,
+  shopPrintingPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/printing-prices/${pk}/`,
+  // Paper (unified: inventory - was paper-stock + paper-prices)
+  shopPaper: (slug: string) => `shops/${slug}/paper/`,
+  shopPaperDetail: (slug: string, pk: number) => `shops/${slug}/paper/${pk}/`,
+  shopPaperAdjust: (slug: string, pk: number) => `shops/${slug}/paper/${pk}/adjust/`,
   shopFinishingServices: (slug: string) => `shops/${slug}/pricing/finishing/`,
   shopFinishingServiceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/finishing/${pk}/`,
-  shopMaterialPrices: (slug: string) => `shops/${slug}/pricing/material/`,
-  shopMaterialPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/material/${pk}/`,
+  shopMaterialPrices: (slug: string) => `shops/${slug}/pricing/material-prices/`,
+  shopMaterialPriceDetail: (slug: string, pk: number) => `shops/${slug}/pricing/material-prices/${pk}/`,
   shopVolumeDiscounts: (slug: string) => `shops/${slug}/pricing/discounts/`,
   shopVolumeDiscountDetail: (slug: string, pk: number) => `shops/${slug}/pricing/discounts/${pk}/`,
   // Inventory (machines, materials, paper stock)
   shopMachines: (slug: string) => `shops/${slug}/machines/`,
   shopMachineDetail: (slug: string, id: number) => `shops/${slug}/machines/${id}/`,
-  shopMachineCapabilities: (slug: string, machinePk: number) => `shops/${slug}/machines/${machinePk}/capabilities/`,
-  shopMachineCapabilityDetail: (slug: string, machinePk: number, pk: number) =>
-    `shops/${slug}/machines/${machinePk}/capabilities/${pk}/`,
-  shopMaterials: (slug: string) => `shops/${slug}/materials/`,
-  shopMaterialDetail: (slug: string, id: number) => `shops/${slug}/materials/${id}/`,
-  shopMaterialStock: (slug: string, materialPk: number) => `shops/${slug}/materials/${materialPk}/stock/`,
-  shopMaterialStockDetail: (slug: string, materialPk: number, pk: number) =>
-    `shops/${slug}/materials/${materialPk}/stock/${pk}/`,
-  shopMaterialStockAdjust: (slug: string, materialPk: number, pk: number) =>
-    `shops/${slug}/materials/${materialPk}/stock/${pk}/adjust/`,
-  shopPaperStock: (slug: string) => `shops/${slug}/paper-stock/`,
-  shopPaperStockDetail: (slug: string, id: number) => `shops/${slug}/paper-stock/${id}/`,
-  shopPaperStockAdjust: (slug: string, id: number) => `shops/${slug}/paper-stock/${id}/adjust/`,
+  // Legacy material/stock routes removed (use pricing/material-prices for large-format)
   shopPricing: (slug: string) => `shops/${slug}/pricing/`,
 
   // Subscription & payments
