@@ -20,11 +20,11 @@
         <div>
           <h4 class="mb-4 font-semibold text-white">Product</h4>
           <ul class="space-y-3 text-sm">
-            <li><NuxtLink to="/dashboard" class="transition-colors hover:text-white">Dashboard</NuxtLink></li>
             <li><NuxtLink to="/shops" class="transition-colors hover:text-white">Shops</NuxtLink></li>
+            <li><NuxtLink to="/quote-draft" class="transition-colors hover:text-white">Your Quote</NuxtLink></li>
+            <li><NuxtLink to="/quotes" class="transition-colors hover:text-white">My Quotes</NuxtLink></li>
+            <li><NuxtLink to="/me/favorites" class="transition-colors hover:text-white">Saved Shops</NuxtLink></li>
             <li><NuxtLink to="/gallery" class="transition-colors hover:text-white">Templates</NuxtLink></li>
-            <li><NuxtLink to="/about#mock-templates" class="transition-colors hover:text-white">Mock Templates</NuxtLink></li>
-            <li><NuxtLink to="/dashboard/quotes" class="transition-colors hover:text-white">Quotes</NuxtLink></li>
           </ul>
         </div>
 
@@ -33,6 +33,8 @@
           <h4 class="mb-4 font-semibold text-white">Company</h4>
           <ul class="space-y-3 text-sm">
             <li><NuxtLink to="/about" class="transition-colors hover:text-white">About</NuxtLink></li>
+            <li><NuxtLink to="/#problem" class="transition-colors hover:text-white">Problem</NuxtLink></li>
+            <li><NuxtLink to="/#models" class="transition-colors hover:text-white">Pricing Models</NuxtLink></li>
             <li><NuxtLink to="/terms" class="transition-colors hover:text-white">Terms of Service</NuxtLink></li>
             <li><NuxtLink to="/privacy" class="transition-colors hover:text-white">Privacy Policy</NuxtLink></li>
           </ul>
@@ -43,7 +45,7 @@
           <h4 class="mb-4 font-semibold text-white">Support</h4>
           <ul class="space-y-3 text-sm">
             <li><NuxtLink to="/help" class="transition-colors hover:text-white">Help Center</NuxtLink></li>
-            <li><NuxtLink to="/about#mock-templates" class="transition-colors hover:text-white">Mock Templates</NuxtLink></li>
+            <li><NuxtLink to="/dashboard" class="transition-colors hover:text-white">Dashboard</NuxtLink></li>
           </ul>
         </div>
       </div>

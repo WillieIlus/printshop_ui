@@ -44,7 +44,7 @@
           <span class="tabular-nums">{{ result.total }} {{ result.currency }}</span>
         </div>
         <p v-if="result.hasNegotiable" class="mt-2 text-xs text-stone-500 dark:text-stone-400">
-          Some items may be negotiable
+          Some charges are negotiable.
         </p>
       </template>
       <UButton

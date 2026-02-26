@@ -31,13 +31,15 @@ export const API = {
   // Public (Printy_API buyer browsing)
   publicShops: () => 'public/shops/',
   publicShopCatalog: (slug: string) => `public/shops/${slug}/catalog/`,
-  // Quote drafts (Printy_API buyer)
+  // Quote drafts (Printy_API buyer — cart-like draft per shop)
   quoteDraftsActive: (shopSlug: string) => `quote-drafts/active/?shop=${encodeURIComponent(shopSlug)}`,
+  quoteDraftItems: (draftId: number) => `quote-drafts/${draftId}/items/`,
+  quoteDraftItemDetail: (draftId: number, itemId: number) => `quote-drafts/${draftId}/items/${itemId}/`,
   quoteDraftPreviewPrice: (draftId: number) => `quote-drafts/${draftId}/preview-price/`,
-  quoteRequestItems: (draftId: number) => `quote-requests/${draftId}/items/`,
-  quoteRequestItemDetail: (draftId: number, itemId: number) => `quote-requests/${draftId}/items/${itemId}/`,
+  quoteDraftRequestQuote: (draftId: number) => `quote-drafts/${draftId}/request-quote/`,
+  // Quote requests (read-only after submission)
   quoteRequests: () => 'quote-requests/',
-  quoteRequestDetail: (draftId: number) => `quote-requests/${draftId}/`,
+  quoteRequestDetail: (id: number) => `quote-requests/${id}/`,
   quoteRequestSubmit: (draftId: number) => `quote-requests/${draftId}/submit/`,
   // Shops
   shops: () => 'shops/',

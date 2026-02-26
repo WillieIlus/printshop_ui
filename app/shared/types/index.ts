@@ -1,4 +1,5 @@
 export * from './base'
+export * from './buyer'
 export * from './api'
 export * from './auth'
 export * from './user'

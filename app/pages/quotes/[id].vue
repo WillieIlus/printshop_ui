@@ -64,9 +64,11 @@
               class="flex items-center justify-between gap-4 px-6 py-4"
             >
               <div class="min-w-0 flex-1">
-                <p class="font-medium text-stone-800 dark:text-stone-100">{{ item.product_name }}</p>
+                <p class="font-medium text-stone-800 dark:text-stone-100">
+                  {{ item.title ?? item.product_name ?? 'Product' }}
+                </p>
                 <p class="text-sm text-stone-500 dark:text-stone-400">
-                  Qty: {{ item.quantity }} · {{ item.pricing_mode }}
+                  Qty: {{ item.quantity }} · {{ item.spec_text || item.pricing_mode || (item.chosen_width_mm && item.chosen_height_mm ? `${item.chosen_width_mm}×${item.chosen_height_mm}mm` : '') }}
                 </p>
               </div>
               <div v-if="item.line_total" class="shrink-0 text-sm font-medium text-stone-700 dark:text-stone-300 tabular-nums">
@@ -93,8 +95,8 @@
 </template>
 
 <script setup lang="ts">
-import type { QuoteDraft } from '~/services/quoteDraft'
-import { getDraft } from '~/services/quoteDraft'
+import type { QuoteDraft, QuoteItem } from '~/shared/types'
+import { getQuoteRequest } from '~/services/quoteDraft'
 
 definePageMeta({ layout: 'default' })
 
@@ -121,7 +123,7 @@ onMounted(async () => {
     return
   }
   try {
-    quote.value = await getDraft(numId)
+    quote.value = await getQuoteRequest(numId)
   } catch {
     quote.value = null
   } finally {

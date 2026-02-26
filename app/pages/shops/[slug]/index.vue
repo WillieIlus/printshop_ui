@@ -21,10 +21,14 @@
               <p class="text-stone-600 dark:text-stone-400">Browse products and add to your quote</p>
             </div>
           </div>
-          <div class="flex gap-2 shrink-0">
+          <div class="flex gap-2 shrink-0 flex-wrap">
             <UButton v-if="quoteDraftStore.currentShopSlug === slug && quoteDraftStore.activeDraft?.items?.length" to="/quote-draft" color="primary" variant="outline">
               <UIcon name="i-lucide-shopping-cart" class="mr-2 h-4 w-4" />
               View your quote ({{ quoteDraftStore.activeDraft.items.length }})
+            </UButton>
+            <UButton variant="outline" color="neutral" @click="customModalOpen = true">
+              <UIcon name="i-lucide-pen-tool" class="mr-2 h-4 w-4" />
+              Request Custom Print
             </UButton>
             <UButton to="/shops" variant="outline" color="neutral">
               <UIcon name="i-lucide-arrow-left" class="mr-2 h-4 w-4" />
@@ -81,6 +85,12 @@
         <div v-if="canRateShop && catalog.shop" class="mt-8">
           <ShopsShopRateForm :shop-id="catalog.shop.id" />
         </div>
+
+        <QuotesCustomPrintModal
+          v-model="customModalOpen"
+          :shop-slug="slug"
+          :paper-options="[]"
+        />
       </template>
       <div v-else class="rounded-2xl border border-amber-200/60 dark:border-amber-800/40 bg-white dark:bg-stone-900 p-12 text-center">
         <UIcon name="i-lucide-store" class="mx-auto h-16 w-16 text-amber-200 dark:text-amber-800" />
@@ -112,11 +122,13 @@ const toast = useToast()
 const catalog = ref<CatalogResponse | null>(null)
 const loading = ref(true)
 const addingProductId = ref<number | null>(null)
+const customModalOpen = ref(false)
 const ratingSummary = ref<RatingSummary | null>(null)
 const canRateShop = computed(() => catalog.value?.shop && canRate(catalog.value.shop.id))
 
 onMounted(async () => {
   try {
+    quoteDraftStore.setShop(slug.value)
     const [cat, summary] = await Promise.all([
       getCatalog(slug.value),
       getRatingSummary(slug.value),
@@ -133,6 +145,10 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function openCustomModal() {
+  customModalOpen.value = true
+}
 
 async function onAddToQuote(product: Product) {
   addingProductId.value = product.id

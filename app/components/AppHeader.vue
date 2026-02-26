@@ -166,15 +166,8 @@ async function onBecomePrinter() {
 }
 
 const navLinks = [
-  { label: 'Templates', to: '/gallery', icon: 'i-lucide-layout-grid' },
-  { label: 'About', to: '/about' },
-  { label: 'Help Center', to: '/help' },
-  { label: 'Problem', to: '/#problem' },
-  { label: 'Pricing Models', to: '/#models' },
-  { label: 'Shops', to: '/shops' },
+  { label: 'Shops', to: '/shops', icon: 'i-lucide-store' },
   { label: 'Your Quote', to: '/quote-draft', icon: 'i-lucide-shopping-cart' },
-  { label: 'My Quotes', to: '/quotes' },
-  { label: 'Saved Shops', to: '/me/favorites', icon: 'i-lucide-heart' },
 ]
 
 const userName = computed(() => {

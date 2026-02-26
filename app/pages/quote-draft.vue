@@ -27,8 +27,12 @@
               class="flex items-center justify-between gap-4 px-6 py-4"
             >
               <div class="min-w-0 flex-1">
-                <p class="font-medium text-stone-800 dark:text-stone-100">{{ item.product_name }}</p>
-                <p class="text-sm text-stone-500 dark:text-stone-400">{{ item.pricing_mode }}</p>
+                <p class="font-medium text-stone-800 dark:text-stone-100">
+                  {{ item.item_type === 'CUSTOM' ? item.title : (item.product_name ?? 'Product') }}
+                </p>
+                <p class="text-sm text-stone-500 dark:text-stone-400">
+                  {{ item.item_type === 'CUSTOM' ? (item.spec_text || `${item.chosen_width_mm}×${item.chosen_height_mm}mm`) : (item.pricing_mode ?? '') }}
+                </p>
               </div>
               <div class="flex items-center gap-3 shrink-0">
                 <div class="flex items-center gap-1 rounded-lg border border-amber-200/80 dark:border-amber-700/50">
@@ -103,7 +107,7 @@
       <div v-else class="rounded-2xl border border-amber-200/60 dark:border-amber-800/40 bg-white dark:bg-stone-900 p-12 text-center">
         <UIcon name="i-lucide-shopping-cart" class="mx-auto h-16 w-16 text-amber-200 dark:text-amber-800" />
         <h3 class="mt-4 text-lg font-medium text-stone-700 dark:text-stone-300">No items in your quote</h3>
-        <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Browse shops and add products to get a quote.</p>
+        <p class="mt-2 text-sm text-stone-500 dark:text-stone-400">Browse shops, add products, or request a custom print to get a quote.</p>
         <UButton to="/shops" color="primary" class="mt-4">Browse shops</UButton>
       </div>
     </div>
@@ -111,12 +115,18 @@
 </template>
 
 <script setup lang="ts">
-import type { QuoteDraftItem } from '~/services/quoteDraft'
+import type { QuoteItem } from '~/shared/types'
 import { useQuoteDraftStore } from '~/stores/quoteDraft'
 
 definePageMeta({ layout: 'default' })
 
 const quoteDraftStore = useQuoteDraftStore()
+
+onMounted(async () => {
+  if (quoteDraftStore.currentShopSlug && !quoteDraftStore.activeDraft) {
+    await quoteDraftStore.loadActiveDraft()
+  }
+})
 const toast = useToast()
 const draft = computed(() => quoteDraftStore.activeDraft)
 const canEdit = computed(() => draft.value?.status === 'DRAFT')
@@ -141,7 +151,7 @@ async function onRequestQuote() {
   }
 }
 
-async function onQtyChange(item: QuoteDraftItem, delta: number) {
+async function onQtyChange(item: QuoteItem, delta: number) {
   if (!canEdit.value) return
   const newQty = item.quantity + delta
   mutatingItemId.value = item.id
@@ -159,7 +169,7 @@ async function onQtyChange(item: QuoteDraftItem, delta: number) {
   }
 }
 
-async function onRemove(item: QuoteDraftItem) {
+async function onRemove(item: QuoteItem) {
   if (!canEdit.value) return
   mutatingItemId.value = item.id
   mutatingAction.value = 'remove'

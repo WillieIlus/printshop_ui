@@ -1,43 +1,56 @@
-import type { QuoteDraft } from '~/services/quoteDraft'
-import { getActiveDraft, getDraft, addItem, updateItem, removeItem, requestQuote } from '~/services/quoteDraft'
+import type { QuoteDraft, QuoteItem } from '~/shared/types'
+import type { AddProductItemPayload, AddCustomItemPayload } from '~/services/quoteDraft'
+import { getActiveDraft, getQuoteRequest, addItem, updateItem, removeItem, previewPrice, requestQuote } from '~/services/quoteDraft'
 
 export const useQuoteDraftStore = defineStore('quoteDraft', () => {
   const activeDraft = ref<QuoteDraft | null>(null)
   const currentShopSlug = ref<string | null>(null)
   const isLoading = ref(false)
 
-  async function loadDraft(shopSlug: string) {
+  function setShop(slug: string | null) {
+    currentShopSlug.value = slug
+  }
+
+  async function loadActiveDraft() {
+    const slug = currentShopSlug.value
+    if (!slug) return null
     isLoading.value = true
     try {
-      activeDraft.value = await getActiveDraft(shopSlug)
-      currentShopSlug.value = shopSlug
+      activeDraft.value = await getActiveDraft(slug)
       return activeDraft.value
     } finally {
       isLoading.value = false
     }
   }
 
-  async function addToQuote(
-    productId: number,
-    shopSlug: string,
-    pricingMode: 'SHEET' | 'LARGE_FORMAT' = 'SHEET'
-  ) {
+  async function addProductToQuote(productId: number, shopSlug: string, pricingMode: 'SHEET' | 'LARGE_FORMAT' = 'SHEET') {
+    setShop(shopSlug)
     let draft = activeDraft.value
     if (!draft || currentShopSlug.value !== shopSlug) {
-      draft = await loadDraft(shopSlug)
+      draft = await loadActiveDraft()
     }
     if (!draft) return null
-    const item = await addItem(draft.id, {
+    const payload: AddProductItemPayload = {
+      item_type: 'PRODUCT',
       product: productId,
       quantity: 1,
       pricing_mode: pricingMode,
-    })
-    if (activeDraft.value?.id === draft.id) {
-      activeDraft.value = {
-        ...activeDraft.value,
-        items: [...(activeDraft.value.items ?? []), item],
-      }
     }
+    const item = await addItem(draft.id, payload)
+    await refreshDraft()
+    return item
+  }
+
+  async function addCustomToQuote(payload: AddCustomItemPayload) {
+    const slug = currentShopSlug.value
+    if (!slug) return null
+    let draft = activeDraft.value
+    if (!draft || currentShopSlug.value !== slug) {
+      draft = await loadActiveDraft()
+    }
+    if (!draft) return null
+    const item = await addItem(draft.id, payload)
+    await refreshDraft()
     return item
   }
 
@@ -45,7 +58,10 @@ export const useQuoteDraftStore = defineStore('quoteDraft', () => {
     const draft = activeDraft.value
     if (!draft) return
     try {
-      activeDraft.value = await getDraft(draft.id)
+      const slug = currentShopSlug.value
+      if (slug) {
+        activeDraft.value = await getActiveDraft(slug)
+      }
     } catch (err) {
       console.error('Failed to refresh draft:', err)
     }
@@ -55,7 +71,7 @@ export const useQuoteDraftStore = defineStore('quoteDraft', () => {
     const draft = activeDraft.value
     if (!draft || draft.status !== 'DRAFT') return
     if (qty < 1) return
-    await updateItem(draft.id, itemId, { quantity: qty })
+    await updateItem(draft.id, itemId, { quantity: qty } as Partial<AddProductItemPayload>)
     await refreshDraft()
   }
 
@@ -79,14 +95,22 @@ export const useQuoteDraftStore = defineStore('quoteDraft', () => {
     currentShopSlug.value = null
   }
 
+  async function addToQuote(productId: number, shopSlug: string, pricingMode: 'SHEET' | 'LARGE_FORMAT' = 'SHEET') {
+    return addProductToQuote(productId, shopSlug, pricingMode)
+  }
+
   return {
     activeDraft,
     currentShopSlug,
     isLoading,
-    loadDraft,
+    setShop,
+    loadActiveDraft,
     addToQuote,
+    addProductToQuote,
+    addCustomToQuote,
     updateItemQty,
     removeItemFromDraft,
+    previewPrice,
     submitDraft,
     refreshDraft,
     clearDraft,

@@ -1,33 +1,50 @@
+/**
+ * Quote draft service — Printy_API buyer flow.
+ * Uses quote-drafts for draft CRUD, quote-requests for read-only after submission.
+ */
 import { API } from '~/shared/api-paths'
 import { useApi } from '~/shared/api'
+import type { QuoteDraft, QuoteItem, PreviewPriceResponse } from '~/shared/types'
 
-export interface QuoteDraftItem {
-  id: number
+export type { PreviewPriceResponse }
+
+/** PRODUCT item payload */
+export interface AddProductItemPayload {
+  item_type: 'PRODUCT'
   product: number
-  product_name: string
   quantity: number
-  pricing_mode: string
-  unit_price?: string | null
-  line_total?: string | null
+  paper?: number
+  sides?: 'SIMPLEX' | 'DUPLEX'
+  color_mode?: 'BW' | 'COLOR'
+  finishing_rate_ids?: number[]
+  has_artwork?: boolean
 }
 
-export interface QuoteDraft {
-  id: number
-  shop: number
-  shop_name: string
-  status: string
-  items: QuoteDraftItem[]
-  totals?: Record<string, string>
+/** CUSTOM item payload */
+export interface AddCustomItemPayload {
+  item_type: 'CUSTOM'
+  title: string
+  spec_text: string
+  quantity: number
+  chosen_width_mm: number
+  chosen_height_mm: number
+  paper?: number
+  sides?: 'SIMPLEX' | 'DUPLEX'
+  color_mode?: 'BW' | 'COLOR'
+  has_artwork: boolean
 }
+
+export type AddItemPayload = AddProductItemPayload | AddCustomItemPayload
 
 export async function getActiveDraft(shopSlug: string): Promise<QuoteDraft> {
   const api = useApi()
   return await api<QuoteDraft>(API.quoteDraftsActive(shopSlug))
 }
 
-export async function getDraft(draftId: number): Promise<QuoteDraft> {
+/** Read-only view after submission */
+export async function getQuoteRequest(id: number): Promise<QuoteDraft> {
   const api = useApi()
-  return await api<QuoteDraft>(API.quoteRequestDetail(draftId))
+  return await api<QuoteDraft>(API.quoteRequestDetail(id))
 }
 
 export async function listQuoteRequests(): Promise<QuoteDraft[]> {
@@ -40,15 +57,9 @@ export async function listQuoteRequests(): Promise<QuoteDraft[]> {
   return []
 }
 
-export interface AddItemPayload {
-  product: number
-  quantity: number
-  pricing_mode: 'SHEET' | 'LARGE_FORMAT'
-}
-
-export async function addItem(draftId: number, payload: AddItemPayload): Promise<QuoteDraftItem> {
+export async function addItem(draftId: number, payload: AddItemPayload): Promise<QuoteItem> {
   const api = useApi()
-  return await api<QuoteDraftItem>(API.quoteRequestItems(draftId), {
+  return await api<QuoteItem>(API.quoteDraftItems(draftId), {
     method: 'POST',
     body: payload,
   })
@@ -58,9 +69,9 @@ export async function updateItem(
   draftId: number,
   itemId: number,
   payload: Partial<AddItemPayload>
-): Promise<QuoteDraftItem> {
+): Promise<QuoteItem> {
   const api = useApi()
-  return await api<QuoteDraftItem>(API.quoteRequestItemDetail(draftId, itemId), {
+  return await api<QuoteItem>(API.quoteDraftItemDetail(draftId, itemId), {
     method: 'PATCH',
     body: payload,
   })
@@ -68,19 +79,7 @@ export async function updateItem(
 
 export async function removeItem(draftId: number, itemId: number): Promise<void> {
   const api = useApi()
-  await api(API.quoteRequestItemDetail(draftId, itemId), { method: 'DELETE' })
-}
-
-export interface PreviewPriceLine {
-  label: string
-  amount: string
-}
-
-export interface PreviewPriceResponse {
-  currency: string
-  total: string
-  lines: PreviewPriceLine[]
-  hasNegotiable: boolean
+  await api(API.quoteDraftItemDetail(draftId, itemId), { method: 'DELETE' })
 }
 
 export async function previewPrice(draftId: number): Promise<PreviewPriceResponse> {
@@ -92,7 +91,7 @@ export async function previewPrice(draftId: number): Promise<PreviewPriceRespons
 
 export async function requestQuote(draftId: number): Promise<QuoteDraft> {
   const api = useApi()
-  return await api<QuoteDraft>(API.quoteRequestSubmit(draftId), {
+  return await api<QuoteDraft>(API.quoteDraftRequestQuote(draftId), {
     method: 'POST',
   })
 }
