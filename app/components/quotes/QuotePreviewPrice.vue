@@ -29,9 +29,10 @@
             v-for="(line, idx) in revealedLines"
             :key="idx"
             class="flex justify-between text-sm"
+            :class="{ 'pl-3': line.amount && idx > 0 }"
           >
             <span class="text-stone-600 dark:text-stone-400">{{ line.label }}</span>
-            <span class="font-medium text-stone-800 dark:text-stone-100 tabular-nums">
+            <span v-if="line.amount" class="font-medium text-stone-800 dark:text-stone-100 tabular-nums">
               {{ line.amount }} {{ result.currency }}
             </span>
           </div>

@@ -9,6 +9,14 @@ export interface ShopPublic {
   slug: string
 }
 
+/** Product image from catalog */
+export interface ProductImage {
+  id: number
+  image: string | null
+  is_primary: boolean
+  display_order: number
+}
+
 /** Product from catalog */
 export interface Product {
   id: number
@@ -22,6 +30,36 @@ export interface Product {
   default_sides?: 'SIMPLEX' | 'DUPLEX'
   is_active: boolean
   finishing_options?: { id: number; finishing_rate: number; is_default: boolean; price_adjustment?: string | null }[]
+  /** All images for this product */
+  images?: ProductImage[]
+  /** Path to primary/first image for card display (use getMediaUrl) */
+  primary_image?: string | null
+  /** Price hint object with display strings */
+  price_hint?: {
+    can_calculate?: boolean
+    price_display?: string
+    pricing_mode_label?: string
+    pricing_mode_explanation?: string
+    min_price?: number | null
+    max_price?: number | null
+    reason?: string
+    missing_fields?: string[]
+    suggestions?: { code?: string; message?: string }[]
+  } | null
+  /** Shop info when product comes from all-products gallery */
+  shop?: ShopPublic
+  /** Price range estimate */
+  price_range_est?: {
+    can_calculate?: boolean
+    price_display?: string
+    pricing_mode_label?: string
+    pricing_mode_explanation?: string
+    lowest?: { total?: string } | null
+    highest?: { total?: string } | null
+    reason?: string
+    missing_fields?: string[]
+    suggestions?: { code?: string; message?: string }[]
+  } | null
 }
 
 /** Quote draft / request (before pricing) */

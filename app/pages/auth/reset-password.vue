@@ -1,6 +1,7 @@
 <template>
-  <NuxtLayout name="auth" title="Reset password" subtitle="Enter your new password." back-to="/auth/login">
-    <VeeForm v-slot="{ meta }" :validation-schema="schema" @submit="handleSubmit">
+  <div>
+    <NuxtLayout name="auth" title="Reset password" subtitle="Enter your new password." back-to="/auth/login">
+      <VeeForm v-slot="{ meta }" :validation-schema="schema" @submit="handleSubmit">
       <div class="space-y-4">
         <FormsFormInput
           name="new_password"
@@ -21,7 +22,8 @@
         </UButton>
       </div>
     </VeeForm>
-  </NuxtLayout>
+    </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">

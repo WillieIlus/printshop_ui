@@ -11,6 +11,9 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth'
+import { useFavoritesStore } from '~/stores/favorites'
+
 const props = defineProps<{
   shopId: number
   shopName: string

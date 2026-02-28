@@ -4,6 +4,7 @@
  */
 import { API } from '~/shared/api-paths'
 import { useApi } from '~/shared/api'
+import { parseApiError } from '~/utils/api-error'
 import type { QuoteDraft, QuoteItem, PreviewPriceResponse } from '~/shared/types'
 
 export type { PreviewPriceResponse }
@@ -59,10 +60,15 @@ export async function listQuoteRequests(): Promise<QuoteDraft[]> {
 
 export async function addItem(draftId: number, payload: AddItemPayload): Promise<QuoteItem> {
   const api = useApi()
-  return await api<QuoteItem>(API.quoteDraftItems(draftId), {
-    method: 'POST',
-    body: payload,
-  })
+  try {
+    return await api<QuoteItem>(API.quoteDraftItems(draftId), {
+      method: 'POST',
+      body: payload,
+    })
+  } catch (err) {
+    const msg = parseApiError(err, 'Failed to add item to quote')
+    throw new Error(msg)
+  }
 }
 
 export async function updateItem(

@@ -7,11 +7,14 @@ const AUTH_STORAGE_KEY = 'auth'
 
 function extractErrorMessage(err: unknown, rateLimitStatus: number, rateLimitMessage: string): string {
   if (err && typeof err === 'object') {
-    const e = err as { statusCode?: number; status?: number; data?: { detail?: string }; response?: { _data?: { detail?: string } } }
+    const e = err as { statusCode?: number; status?: number; data?: Record<string, unknown>; response?: { _data?: Record<string, unknown> } }
     if (e.statusCode === rateLimitStatus || e.status === rateLimitStatus) return rateLimitMessage
-    const data = e.data ?? e.response?._data
-    if (data && typeof data === 'object' && 'detail' in data && typeof (data as { detail: unknown }).detail === 'string') {
-      return (data as { detail: string }).detail
+    const data = (e.data ?? e.response?._data) as Record<string, unknown> | undefined
+    if (data && typeof data === 'object') {
+      if (typeof data.detail === 'string') return data.detail
+      // DRF validation errors: { "email": ["..."], "password": ["..."] }
+      const first = Object.values(data).flat().find((v): v is string => typeof v === 'string')
+      if (first) return first
     }
   }
   return err instanceof Error ? err.message : 'Login failed'

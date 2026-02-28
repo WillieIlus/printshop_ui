@@ -81,12 +81,13 @@ export interface Product {
   finishing_options?: ProductFinishingOption[]
 }
 
+/** Printing rate per sheet — Single (simplex) and Double (duplex). Kenyan price list style. */
 export interface PrintingRate {
   id: number
   sheet_size: string
   color_mode: string
-  one_side_price: string
-  two_sides_price: string
+  single_price: string
+  double_price: string
   is_active: boolean
 }
 
@@ -133,6 +134,11 @@ export async function listMachines(shopId: number): Promise<Machine[]> {
     return (data as { results: Machine[] }).results
   }
   return []
+}
+
+export async function getMachine(shopId: number, pk: number): Promise<Machine> {
+  const api = useApi()
+  return await api<Machine>(API.sellerShopMachineDetail(shopId, pk))
 }
 
 export async function createMachine(shopId: number, body: Partial<Machine>): Promise<Machine> {

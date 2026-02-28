@@ -31,6 +31,7 @@ export const API = {
   // Public (Printy_API buyer browsing)
   publicShops: () => 'public/shops/',
   publicShopCatalog: (slug: string) => `public/shops/${slug}/catalog/`,
+  publicAllProducts: () => 'public/products/',
   // Quote drafts (Printy_API buyer — cart-like draft per shop)
   quoteDraftsActive: (shopSlug: string) => `quote-drafts/active/?shop=${encodeURIComponent(shopSlug)}`,
   quoteDraftItems: (draftId: number) => `quote-drafts/${draftId}/items/`,

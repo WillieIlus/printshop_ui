@@ -35,7 +35,7 @@ onMounted(fetchShops)
         Gallery
       </h1>
       <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
-        Browse templates by print shop. Select a shop to see its catalog.
+        Browse products by print shop. Select a shop to see its catalog.
       </p>
     </div>
 
@@ -87,7 +87,7 @@ onMounted(fetchShops)
             class="btn-primary inline-flex items-center justify-center gap-2 w-full rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
           >
             <UIcon name="i-lucide-layout-grid" class="h-4 w-4" />
-            Browse templates
+            Browse products
           </NuxtLink>
         </div>
       </article>

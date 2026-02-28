@@ -77,8 +77,6 @@
         <slot />
       </main>
     </div>
-
-    <UNotifications />
   </div>
 </template>
 

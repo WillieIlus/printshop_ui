@@ -1,11 +1,12 @@
 <template>
-  <UModal :open="modelValue" @update:open="$emit('update:modelValue', $event)">
-    <template #content>
-      <div class="rounded-xl bg-white dark:bg-gray-900 shadow-xl border border-gray-200 dark:border-gray-700 p-6 max-w-lg">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Request Custom Print</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Specify your custom print job. Niko na design yangu = I already have artwork.</p>
-
-        <form class="space-y-4" @submit.prevent="onSubmit">
+  <UModal
+    :open="modelValue"
+    @update:open="$emit('update:modelValue', $event)"
+    title="Request Custom Print"
+    description="Specify your custom print job. Niko na design yangu = I already have artwork."
+  >
+    <template #body>
+      <form class="space-y-4" @submit.prevent="onSubmit">
           <UFormField label="Title" required>
             <UInput v-model="form.title" placeholder="e.g. Custom Artwork Print" required />
           </UFormField>
@@ -60,18 +61,18 @@
             <UTextarea v-model="form.spec_text" placeholder="e.g. 14cm by 17cm, 200gsm duplex, 400pcs" :rows="3" />
           </UFormField>
 
-          <div class="flex justify-end gap-2 pt-4">
-            <UButton variant="ghost" @click="$emit('update:modelValue', false)">Cancel</UButton>
-            <UButton type="submit" color="primary" :loading="saving">Add to Quote</UButton>
-          </div>
-        </form>
-      </div>
+        <div class="flex justify-end gap-2 pt-4">
+          <UButton variant="ghost" @click="$emit('update:modelValue', false)">Cancel</UButton>
+          <UButton type="submit" color="primary" :loading="saving">Add to Quote</UButton>
+        </div>
+      </form>
     </template>
   </UModal>
 </template>
 
 <script setup lang="ts">
 import type { AddCustomItemPayload } from '~/services/quoteDraft'
+import { useQuoteDraftStore } from '~/stores/quoteDraft'
 
 const props = defineProps<{
   modelValue: boolean

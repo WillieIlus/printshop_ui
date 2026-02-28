@@ -59,8 +59,6 @@
         </div>
       </div>
     </div>
-
-    <UNotifications />
   </div>
 </template>
 

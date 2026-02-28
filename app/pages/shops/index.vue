@@ -74,6 +74,8 @@ import type { ShopPublic } from '~/shared/types'
 import { listShops } from '~/services/public'
 import { getRatingSummary } from '~/services/ratings'
 import type { RatingSummary } from '~/services/ratings'
+import { useAuthStore } from '~/stores/auth'
+import { useFavoritesStore } from '~/stores/favorites'
 
 definePageMeta({ layout: 'default' })
 

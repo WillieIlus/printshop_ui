@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-amber-50/80 dark:bg-stone-950">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
       <CommonLoadingSpinner v-if="loading" />
-      <template v-else-if="catalog">
+      <template v-else-if="catalog?.shop">
         <!-- Shop header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
           <div class="flex-1 min-w-0">
@@ -44,23 +44,43 @@
             :key="product.id"
             class="rounded-2xl border border-amber-200/80 dark:border-amber-800/50 bg-white dark:bg-stone-900 shadow-sm overflow-hidden hover:shadow-lg transition-all"
           >
-            <div class="p-6">
-              <div class="flex items-start gap-3">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/40">
-                  <UIcon name="i-lucide-package" class="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                </div>
-                <div class="min-w-0 flex-1">
-                  <h3 class="font-semibold text-stone-800 dark:text-stone-100 truncate">
-                    {{ product.name }}
-                  </h3>
-                  <p v-if="product.category" class="mt-0.5 text-sm text-amber-600 dark:text-amber-400">
-                    {{ product.category }}
-                  </p>
-                  <p v-if="product.description" class="mt-2 text-sm text-stone-500 dark:text-stone-400 line-clamp-2">
-                    {{ product.description }}
-                  </p>
-                </div>
+            <!-- Product image or placeholder -->
+            <div class="relative aspect-[4/3] bg-amber-50 dark:bg-stone-800 overflow-hidden">
+              <NuxtImg
+                v-if="productImageUrl(product)"
+                :src="productImageUrl(product)!"
+                :alt="product.name"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-else
+                class="absolute inset-0 flex items-center justify-center"
+              >
+                <UIcon name="i-lucide-package" class="h-16 w-16 text-amber-200 dark:text-amber-800" />
               </div>
+            </div>
+            <div class="p-6">
+              <h3 class="font-semibold text-stone-800 dark:text-stone-100 truncate">
+                {{ product.name }}
+              </h3>
+              <p v-if="product.category" class="mt-0.5 text-sm text-amber-600 dark:text-amber-400">
+                {{ product.category }}
+              </p>
+              <div class="mt-1">
+                <p class="text-sm font-medium text-amber-700 dark:text-amber-300">
+                  {{ priceDisplay(product) }}
+                </p>
+                <p
+                  v-if="pricingExplanation(product)"
+                  class="mt-0.5 text-xs text-stone-500 dark:text-stone-400 line-clamp-2"
+                  :title="pricingExplanation(product)!"
+                >
+                  {{ pricingExplanation(product) }}
+                </p>
+              </div>
+              <p v-if="product.description" class="mt-2 text-sm text-stone-500 dark:text-stone-400 line-clamp-2">
+                {{ product.description }}
+              </p>
               <UButton
                 color="primary"
                 variant="solid"
@@ -106,8 +126,11 @@
 import type { CatalogResponse } from '~/services/public'
 import type { Product } from '~/shared/types'
 import { getCatalog } from '~/services/public'
+import { formatKES } from '~/utils/formatters'
 import { getRatingSummary } from '~/services/ratings'
 import type { RatingSummary } from '~/services/ratings'
+import { useAuthStore } from '~/stores/auth'
+import { useFavoritesStore } from '~/stores/favorites'
 import { useQuoteDraftStore } from '~/stores/quoteDraft'
 
 definePageMeta({ layout: 'default' })
@@ -115,9 +138,11 @@ definePageMeta({ layout: 'default' })
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 const quoteDraftStore = useQuoteDraftStore()
+const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
 const { canRate, load: loadRatable } = useRatableShops()
 const toast = useToast()
+const { getMediaUrl } = useApi()
 
 const catalog = ref<CatalogResponse | null>(null)
 const loading = ref(true)
@@ -135,7 +160,7 @@ onMounted(async () => {
     ])
     catalog.value = cat
     ratingSummary.value = summary
-    if (useAuthStore().isAuthenticated) {
+    if (authStore.isAuthenticated) {
       favoritesStore.loadFavorites()
       await loadRatable()
     }
@@ -145,6 +170,29 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function productImageUrl(product: Product): string | null {
+  const path = product.primary_image
+  if (!path) return null
+  if (path.startsWith('http')) return path
+  return getMediaUrl(path)
+}
+
+function priceDisplay(product: Product): string {
+  const est = product.price_range_est
+  const hint = product.price_hint
+  if (est?.price_display) return est.price_display
+  if (hint?.price_display) return hint.price_display
+  if (est?.lowest?.total) return `From ${formatKES(est.lowest.total)}`
+  if (hint?.min_price != null) return `From ${formatKES(hint.min_price)}`
+  return 'Price on request'
+}
+
+function pricingExplanation(product: Product): string | null {
+  return product.price_range_est?.pricing_mode_explanation
+    ?? product.price_hint?.pricing_mode_explanation
+    ?? null
+}
 
 function openCustomModal() {
   customModalOpen.value = true

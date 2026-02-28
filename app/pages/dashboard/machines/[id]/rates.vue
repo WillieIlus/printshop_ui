@@ -2,8 +2,12 @@
   <div class="col-span-12 space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Printing rates</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Set prices per sheet by size and color mode for this machine.</p>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {{ machineName ? `${machineName} — Printing rates` : 'Printing rates' }}
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">
+          Set prices per sheet by size and color. Single = simplex (1-sided), Double = duplex (2-sided).
+        </p>
       </div>
       <UButton :to="backUrl" variant="ghost" size="sm">
         <UIcon name="i-lucide-arrow-left" class="mr-2 h-4 w-4" />
@@ -26,8 +30,8 @@
             <tr>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Sheet size</th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Color mode</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">One-sided</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Two-sided</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Single</th>
+              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Double</th>
               <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
               <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
             </tr>
@@ -36,8 +40,44 @@
             <tr v-for="r in items" :key="r.id" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
               <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ r.sheet_size }}</td>
               <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ r.color_mode === 'BW' ? 'Black & White' : 'Color' }}</td>
-              <td class="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">{{ r.one_side_price }}</td>
-              <td class="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-400">{{ r.two_sides_price }}</td>
+              <td class="px-4 py-2 text-right">
+                <span
+                  v-if="editingCell !== `${r.id}-single`"
+                  class="inline-block min-w-[4rem] px-2 py-1 rounded cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 text-sm tabular-nums"
+                  @click="startEdit(r, 'single')"
+                >
+                  {{ r.single_price }}
+                </span>
+                <UInput
+                  v-else
+                  v-model="editValue"
+                  type="text"
+                  size="xs"
+                  class="w-20 text-right tabular-nums"
+                  placeholder="0.00"
+                  @blur="saveCell(r, 'single')"
+                  @keydown.enter="saveCell(r, 'single')"
+                />
+              </td>
+              <td class="px-4 py-2 text-right">
+                <span
+                  v-if="editingCell !== `${r.id}-double`"
+                  class="inline-block min-w-[4rem] px-2 py-1 rounded cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 text-sm tabular-nums"
+                  @click="startEdit(r, 'double')"
+                >
+                  {{ r.double_price }}
+                </span>
+                <UInput
+                  v-else
+                  v-model="editValue"
+                  type="text"
+                  size="xs"
+                  class="w-20 text-right tabular-nums"
+                  placeholder="0.00"
+                  @blur="saveCell(r, 'double')"
+                  @keydown.enter="saveCell(r, 'double')"
+                />
+              </td>
               <td class="px-4 py-3 text-center">
                 <UBadge :color="r.is_active ? 'success' : 'neutral'" variant="soft" size="xs">{{ r.is_active ? 'Active' : 'Inactive' }}</UBadge>
               </td>
@@ -65,11 +105,11 @@
         <UFormField label="Color mode">
           <USelectMenu v-model="form.color_mode" :items="colorModeOptions" value-key="value" />
         </UFormField>
-        <UFormField label="One-sided price">
-          <UInput v-model="form.one_side_price" type="text" placeholder="0.00" required />
+        <UFormField label="Single (simplex) price">
+          <UInput v-model="form.single_price" type="text" placeholder="0.00" required />
         </UFormField>
-        <UFormField label="Two-sided price">
-          <UInput v-model="form.two_sides_price" type="text" placeholder="0.00" required />
+        <UFormField label="Double (duplex) price">
+          <UInput v-model="form.double_price" type="text" placeholder="0.00" required />
         </UFormField>
         <div class="flex items-center gap-2">
           <UCheckbox v-model="form.is_active" />
@@ -87,8 +127,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PrintingRate } from '~/services/seller'
-import { listPrintingRates, createPrintingRate, updatePrintingRate, deletePrintingRate } from '~/services/seller'
+import type { Machine, PrintingRate } from '~/services/seller'
+import { getMachine, listPrintingRates, createPrintingRate, updatePrintingRate, deletePrintingRate } from '~/services/seller'
 
 definePageMeta({
   layout: 'dashboard',
@@ -101,17 +141,20 @@ const shopId = computed(() => route.query.shop as string)
 const backUrl = computed(() => (shopId.value ? `/dashboard/shops/${shopId.value}/setup` : '/dashboard'))
 
 const toast = useToast()
+const machineName = ref<string>('')
 const items = ref<PrintingRate[]>([])
 const loading = ref(true)
 const saving = ref(false)
 const modalOpen = ref(false)
 const editing = ref<PrintingRate | null>(null)
+const editingCell = ref<string | null>(null)
+const editValue = ref('')
 
 const form = reactive({
   sheet_size: 'A4',
   color_mode: 'BW',
-  one_side_price: '0',
-  two_sides_price: '0',
+  single_price: '0',
+  double_price: '0',
   is_active: true,
 })
 
@@ -134,6 +177,11 @@ async function load() {
   if (Number.isNaN(machineId.value)) return
   loading.value = true
   try {
+    const shopIdNum = shopId.value ? parseInt(shopId.value, 10) : NaN
+    if (!Number.isNaN(shopIdNum)) {
+      const m = await getMachine(shopIdNum, machineId.value)
+      machineName.value = m?.name ?? ''
+    }
     items.value = await listPrintingRates(machineId.value)
   } catch {
     items.value = []
@@ -142,19 +190,50 @@ async function load() {
   }
 }
 
+function startEdit(r: PrintingRate, field: 'single' | 'double') {
+  editingCell.value = `${r.id}-${field}`
+  editValue.value = field === 'single' ? r.single_price : r.double_price
+  nextTick(() => {
+    const inputs = document.querySelectorAll<HTMLInputElement>('input[type="text"].tabular-nums')
+    const last = inputs[inputs.length - 1]
+    last?.focus()
+  })
+}
+
+async function saveCell(r: PrintingRate, field: 'single' | 'double') {
+  if (editingCell.value !== `${r.id}-${field}`) return
+  const val = editValue.value.trim()
+  if (!val) {
+    editingCell.value = null
+    return
+  }
+  const payload = field === 'single'
+    ? { single_price: val }
+    : { double_price: val }
+  try {
+    const updated = await updatePrintingRate(machineId.value, r.id, payload)
+    const idx = items.value.findIndex((i) => i.id === r.id)
+    if (idx >= 0) items.value[idx] = updated
+    toast.add({ title: 'Updated', color: 'success' })
+  } catch (e) {
+    toast.add({ title: 'Error', description: e instanceof Error ? e.message : 'Failed', color: 'error' })
+  }
+  editingCell.value = null
+}
+
 function openModal(r?: PrintingRate) {
   editing.value = r ?? null
   if (r) {
     form.sheet_size = r.sheet_size
     form.color_mode = r.color_mode
-    form.one_side_price = r.one_side_price
-    form.two_sides_price = r.two_sides_price
+    form.single_price = r.single_price
+    form.double_price = r.double_price
     form.is_active = r.is_active
   } else {
     form.sheet_size = 'A4'
     form.color_mode = 'BW'
-    form.one_side_price = '0'
-    form.two_sides_price = '0'
+    form.single_price = '0'
+    form.double_price = '0'
     form.is_active = true
   }
   modalOpen.value = true
@@ -170,8 +249,8 @@ async function onSubmit() {
     const payload = {
       sheet_size: form.sheet_size,
       color_mode: form.color_mode,
-      one_side_price: form.one_side_price,
-      two_sides_price: form.two_sides_price,
+      single_price: form.single_price,
+      double_price: form.double_price,
       is_active: form.is_active,
     }
     if (editing.value) {

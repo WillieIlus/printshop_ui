@@ -1,23 +1,24 @@
-import type {
-  TemplateCategoryDTO,
-  PrintTemplateListDTO,
-  PrintTemplateDetailDTO,
-  TemplatePriceResponseDTO,
-  TemplateCalculatePricePayload,
-} from '~/shared/types/templates'
+/**
+ * Gallery API — uses catalog endpoints (public/products, public/shops/{slug}/catalog).
+ * Products replace the previous "templates" concept.
+ */
 import type { PublicShopDTO } from '~/shared/types/gallery'
-import type { PaginatedResponse } from '~/shared/types'
+import type { CatalogResponse } from '~/services/public'
+import type { Product } from '~/shared/types'
+import type { PrintTemplateDetailDTO, TemplateCalculatePricePayload, TemplatePriceResponseDTO } from '~/shared/types/templates'
 import { API } from '~/shared/api-paths'
+import { useApi } from '~/shared/api'
 
-export interface ListShopTemplatesParams {
-  category?: string
-  search?: string
-  ordering?: string
+/** All products from all shops (for /gallery). Each product includes shop. */
+export async function getAllProducts(): Promise<Product[]> {
+  const api = useApi()
+  const data = await api<{ products: Product[] }>(API.publicAllProducts())
+  return data?.products ?? []
 }
 
 export async function listPublicShops(): Promise<PublicShopDTO[]> {
-  const { get } = useApi()
-  const data = await get<PublicShopDTO[] | { results: PublicShopDTO[] }>(API.shopsPublic())
+  const api = useApi()
+  const data = await api<PublicShopDTO[] | { results: PublicShopDTO[] }>(API.publicShops())
   if (Array.isArray(data)) return data
   if (data && typeof data === 'object' && Array.isArray((data as { results?: PublicShopDTO[] }).results)) {
     return (data as { results: PublicShopDTO[] }).results
@@ -25,57 +26,28 @@ export async function listPublicShops(): Promise<PublicShopDTO[]> {
   return []
 }
 
-export async function listShopCategories(shopSlug: string): Promise<TemplateCategoryDTO[]> {
-  const { get } = useApi()
-  const data = await get<TemplateCategoryDTO[] | { results: TemplateCategoryDTO[] }>(
-    API.shopTemplateCategories(shopSlug)
-  )
-  if (Array.isArray(data)) return data
-  if (data && typeof data === 'object' && Array.isArray((data as { results?: TemplateCategoryDTO[] }).results)) {
-    return (data as { results: TemplateCategoryDTO[] }).results
-  }
-  return []
-}
-
-export async function listShopTemplates(
-  shopSlug: string,
-  params?: ListShopTemplatesParams
-): Promise<PaginatedResponse<PrintTemplateListDTO>> {
-  const { get } = useApi()
-  const query: Record<string, string | number> = {}
-  if (params?.category) query.category = params.category
-  if (params?.search) query.search = params.search
-  if (params?.ordering) query.ordering = params.ordering
-
-  const response = await get<PaginatedResponse<PrintTemplateListDTO>>(API.shopTemplates(shopSlug), query)
-  return {
-    count: response?.count ?? 0,
-    next: response?.next ?? null,
-    previous: response?.previous ?? null,
-    results: response?.results ?? [],
-  }
-}
-
-export async function getShopTemplate(
-  shopSlug: string,
-  templateSlug: string
-): Promise<PrintTemplateDetailDTO | null> {
-  const { get } = useApi()
+export async function getShopCatalog(shopSlug: string): Promise<CatalogResponse | null> {
+  const api = useApi()
   try {
-    return await get<PrintTemplateDetailDTO>(API.shopTemplateDetail(shopSlug, templateSlug))
+    return await api<CatalogResponse>(API.publicShopCatalog(shopSlug))
   } catch {
     return null
   }
 }
 
+/** @deprecated Legacy template API — no backend. Returns null. Use catalog/products instead. */
+export async function getShopTemplate(
+  _shopSlug: string,
+  _templateSlug: string
+): Promise<PrintTemplateDetailDTO | null> {
+  return null
+}
+
+/** @deprecated Legacy template API — no backend. Throws. Use quote-draft flow instead. */
 export async function calculateShopTemplatePrice(
-  shopSlug: string,
-  templateSlug: string,
-  payload: TemplateCalculatePricePayload
+  _shopSlug: string,
+  _templateSlug: string,
+  _payload: TemplateCalculatePricePayload
 ): Promise<TemplatePriceResponseDTO> {
-  const { post } = useApi()
-  return await post<TemplatePriceResponseDTO>(
-    API.shopTemplateCalculatePrice(shopSlug, templateSlug),
-    payload as Record<string, unknown>
-  )
+  throw new Error('Template price API is deprecated. Use the quote-draft flow for product pricing.')
 }

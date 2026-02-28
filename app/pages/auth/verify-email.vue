@@ -1,10 +1,11 @@
 <template>
-  <NuxtLayout
-    name="auth"
-    title="Verify your email"
-    subtitle="We sent a 6-digit code to your email. Enter it below."
-    back-to="/auth/login"
-  >
+  <div>
+    <NuxtLayout
+      name="auth"
+      title="Verify your email"
+      subtitle="We sent a 6-digit code to your email. Enter it below."
+      back-to="/auth/login"
+    >
     <VeeForm v-slot="{ meta }" :validation-schema="verifySchema" @submit="onSubmit">
       <div class="space-y-4">
         <UAlert
@@ -79,7 +80,8 @@
         </p>
       </div>
     </VeeForm>
-  </NuxtLayout>
+    </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
